@@ -24,8 +24,7 @@ export default function MentorSearch ({
         placeholder="Search Mentors..."
         className="w-full pl-12 pr-12 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:outline-none"
       />
-
-
+      
     </div>
   )
 }
