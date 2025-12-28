@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { mockMentors, type MentorProfile } from "../mentor/[mentorId]/mock";
+import { mockMentors, type MentorProfile } from "./mock";
 import MentorCard from "@/components/ui/MentorCard";
 import MentorSearch from "@/components/ui/MentorSearch";
 import { MentorFilters } from "@/components/ui/MentorFilter";
