@@ -19,8 +19,7 @@
 - [Environment Variables](#environment-variables)
 - [Development Status](#development-status)
 - [Roadmap](#roadmap)
-- [Contributing](#contributing)
-- [License](#license)
+- [Scripts](#scripts)
 
 ---
 
@@ -99,10 +98,10 @@ MentorHub/
 │   │   └── firebase.ts       # Firebase config
 │   └── public/               # Static assets
 │
-├── backend/                  # Express.js API (Not yet implemented)
+├── backend/                  # Express.js API (In Development)
 │   └── src/
 │       ├── api/
-│       │   └── auth/         # Auth endpoints (placeholder)
+│       │   └── auth/         # Auth endpoints
 │       └── lib/
 │
 └── README.md
@@ -123,7 +122,7 @@ MentorHub/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/MentorHub.git
+   git clone <repository-url>
    cd MentorHub
    ```
 
@@ -232,30 +231,4 @@ npm run start    # Start production server
 
 ---
 
-## Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
----
-
-## License
-
-This project is licensed under the ISC License.
-
----
-
-## Contact
-
-**Shaunak Mishra** - Project Owner
-
----
-
-<p align="center">
-  Made with care for students chasing their dreams
-</p>
+**Proprietary and Confidential**
