@@ -3,6 +3,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "../components/shared/Navbar";
+import { MentorOnboardingProvider } from "../lib/context/MentorOnboardingContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,16 +27,16 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider>
-      <html lang="en" className="scroll-smooth">
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-          <Navbar />
-          <main>
-            {children}
-          </main>
-        </body>
-      </html>
+      <MentorOnboardingProvider>
+        <html lang="en" className="scroll-smooth">
+          <body
+            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          >
+            <Navbar />
+            <main>{children}</main>
+          </body>
+        </html>
+      </MentorOnboardingProvider>
     </ClerkProvider>
   );
 }

@@ -1,5 +1,6 @@
 import {BookOpen, Stethoscope, Brain, Calculator, Scale, Cog, FlaskConical, DollarSign, Globe, GraduationCap} from "lucide-react";
 import Link from "next/link";
+import BecomeMentorButton from '../components/landing/BecomeMentorButton';
 
 export default function Home() {
   return (
@@ -31,12 +32,7 @@ export default function Home() {
               Find Your Mentor
             </Link>
 
-            <Link
-              href="/sign-up/mentor"
-              className="px-8 py-3 bg-white text-blue-800 rounded-3xl border-2 border-blue-800 hover:bg-blue-50 transition-colors"
-            >
-              Become a Mentor
-            </Link>
+            <BecomeMentorButton/>
           </div>
         </div>
 
