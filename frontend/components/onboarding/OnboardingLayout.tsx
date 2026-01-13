@@ -9,8 +9,8 @@ import clsx from "clsx"; // Assuming clsx is installed, if not we can stick to s
 const STEPS = [
   "/onboarding/profile/basic-info",
   "/onboarding/profile/expertise",
-  "/onboarding/profile/pricing",
   "/onboarding/profile/availability",
+  "/onboarding/profile/pricing",
   "/onboarding/profile/review",
 ];
 

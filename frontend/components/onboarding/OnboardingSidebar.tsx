@@ -24,14 +24,14 @@ const STEPS = [
     icon: Briefcase,
   },
   {
-    label: "Pricing",
-    path: "/onboarding/profile/pricing",
-    icon: DollarSign,
-  },
-  {
     label: "Availability",
     path: "/onboarding/profile/availability",
     icon: Calendar,
+  },
+  {
+    label: "Pricing",
+    path: "/onboarding/profile/pricing",
+    icon: DollarSign,
   },
   {
     label: "Review",
