@@ -22,7 +22,7 @@ export default function ReviewPage() {
         throw new Error("Failed to submit profile");
       }
 
-      router.push("/mentor/dashboard");
+      router.push("/mentors/dashboard");
     } catch (err) {
       console.error("Submission error:", err);
       alert("Something went wrong. Please try again.");
