@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     const allSessions = Array.from(sessions.values());
 
     // Filter sessions based on role
-    const userSessions = allSessions.filter((session) => {
+    const userSessions = allSessions.filter((session: any) => {
       if (role === "mentor") {
         return session.mentorId === userId;
       } else if (role === "student") {
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Sort by scheduled time (upcoming first)
-    userSessions.sort((a, b) => {
+    userSessions.sort((a: any, b: any) => {
       return new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime();
     });
 
