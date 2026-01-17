@@ -13,7 +13,7 @@ export default function Home() {
       }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
-        {/* Hero Section */}
+        {/* Hero  Section */}
         <div className="mb-16 text-center">
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">
             <span className="text-blue-800">Ace Your </span>
