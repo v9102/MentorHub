@@ -17,7 +17,7 @@ export function Button({
       className={clsx(
         "px-4 py-2 rounded-md text-sm font-medium transition",
         variant === "primary" &&
-          "bg-blue-600 text-white hover:bg-blue-700",
+          "bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 shadow-sm",
         variant === "ghost" &&
           "text-gray-700 hover:bg-gray-100",
         variant === "outline" &&

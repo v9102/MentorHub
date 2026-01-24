@@ -49,92 +49,92 @@ export default function AvailabilityPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex justify-center px-4 py-12">
-      <div className="w-full max-w-2xl">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900">
-            When are you available?
-          </h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Select the days and time slots when students can book sessions
-          </p>
-        </div>
+    <div className="max-w-2xl mx-auto py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-blue-900">
+          When are you available?
+        </h1>
+        <p className="text-gray-600 mt-2">
+          Select the days and time slots when students can book sessions.
+        </p>
+      </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-          <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6">
-            {/* Available Days */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium">
-                Available Days <span className="text-red-500">*</span>
-              </label>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+        <form onSubmit={handleSubmit(onSubmit)} className="p-8 space-y-8">
+          {/* Available Days */}
+          <div className="space-y-3">
+            <label className="block text-sm font-medium text-gray-700">
+              Available Days <span className="text-red-500">*</span>
+            </label>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {DAYS_OF_WEEK.map((day) => (
-                  <label
-                    key={day}
-                    className="flex items-center gap-2 text-sm"
-                  >
-                    <input
-                      type="checkbox"
-                      value={day}
-                      {...register("days", {
-                        validate: (value) =>
-                          value.length > 0 || "Select at least one day",
-                      })}
-                    />
-                    {day}
-                  </label>
-                ))}
-              </div>
-
-              {errors.days && (
-                <p className="text-sm text-red-500">
-                  {errors.days.message as string}
-                </p>
-              )}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {DAYS_OF_WEEK.map((day) => (
+                <label
+                  key={day}
+                  className="flex items-center gap-3 p-3 border rounded-lg hover:bg-orange-50 cursor-pointer transition-colors has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50"
+                >
+                  <input
+                    type="checkbox"
+                    value={day}
+                    {...register("days", {
+                      validate: (value) =>
+                        value.length > 0 || "Select at least one day",
+                    })}
+                    className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+                  />
+                  <span className="text-sm text-gray-700">{day}</span>
+                </label>
+              ))}
             </div>
 
-            {/* Time Slots */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium">
-                Preferred Time Slots <span className="text-red-500">*</span>
-              </label>
+            {errors.days && (
+              <p className="text-sm text-red-500">
+                {errors.days.message as string}
+              </p>
+            )}
+          </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {TIME_SLOTS.map((slot) => (
-                  <label
-                    key={slot}
-                    className="flex items-center gap-2 text-sm"
-                  >
-                    <input
-                      type="checkbox"
-                      value={slot}
-                      {...register("timeSlots", {
-                        validate: (value) =>
-                          value.length > 0 ||
-                          "Select at least one time slot",
-                      })}
-                    />
-                    {slot}
-                  </label>
-                ))}
-              </div>
+          {/* Time Slots */}
+          <div className="space-y-3">
+            <label className="block text-sm font-medium text-gray-700">
+              Preferred Time Slots <span className="text-red-500">*</span>
+            </label>
 
-              {errors.timeSlots && (
-                <p className="text-sm text-red-500">
-                  {errors.timeSlots.message as string}
-                </p>
-              )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {TIME_SLOTS.map((slot) => (
+                <label
+                  key={slot}
+                  className="flex items-center gap-3 p-3 border rounded-lg hover:bg-orange-50 cursor-pointer transition-colors has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50"
+                >
+                  <input
+                    type="checkbox"
+                    value={slot}
+                    {...register("timeSlots", {
+                      validate: (value) =>
+                        value.length > 0 ||
+                        "Select at least one time slot",
+                    })}
+                    className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+                  />
+                  <span className="text-sm text-gray-700">{slot}</span>
+                </label>
+              ))}
             </div>
 
-            {/* Action */}
+            {errors.timeSlots && (
+              <p className="text-sm text-red-500">
+                {errors.timeSlots.message as string}
+              </p>
+            )}
+          </div>
+
+          <div className="pt-4 border-t border-gray-100">
             <OnboardingActionButton
               isValid={isValid}
               isSubmitting={isSubmitting}
             />
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
     </div>
   );

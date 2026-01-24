@@ -14,6 +14,9 @@ export type MentorProfile = {
   yearsOfExperience: number;
   studentsHelped: number;
   rating: number;
+  reviewsCount?: number;
+  sessions?: number;
+  attendance?: number;
   responseTime: string;
   pricing: number;
   availability: string[];
@@ -22,7 +25,15 @@ export type MentorProfile = {
     text: string;
     rating: number;
   }[];
+  offerings?: {
+    id: string;
+    title: string;
+    price: number;
+    discount?: number;
+    icon?: string;
+  }[];
 };
+
 
 export const mockMentors: Record<string, MentorProfile> = {
   "edensaha1": {
@@ -41,10 +52,19 @@ export const mockMentors: Record<string, MentorProfile> = {
     yearsOfExperience: 5,
     studentsHelped: 150,
     rating: 4.8,
+    reviewsCount: 45,
+    sessions: 150,
+    attendance: 92,
     responseTime: "Within 2 hours",
     pricing: 1000,
     availability: ["Mon 5-7 PM", "Wed 6-8 PM", "Sat 10-12 AM"],
-    testimonials: [{ studentName: "Priya", text: "Amazing mentor!", rating: 5 }]
+    testimonials: [{ studentName: "Priya", text: "Amazing mentor!", rating: 5 }],
+    offerings: [
+      { id: "1", title: "1:1 Video Call", price: 1000, icon: "video" },
+      { id: "2", title: "CV Review", price: 500, discount: 20, icon: "document" },
+      { id: "3", title: "Query Chat", price: 300, icon: "message" },
+      { id: "4", title: "Study Resources", price: 200, icon: "book" }
+    ]
   },
   "priya_sharma2": {
     id: "priya_sharma2",
@@ -62,10 +82,18 @@ export const mockMentors: Record<string, MentorProfile> = {
     yearsOfExperience: 3,
     studentsHelped: 450,
     rating: 4.9,
+    reviewsCount: 89,
+    sessions: 450,
+    attendance: 96,
     responseTime: "Within 1 hour",
     pricing: 1200,
     availability: ["Tue 7-9 PM", "Thu 7-9 PM", "Sun 10-12 AM"],
-    testimonials: [{ studentName: "Rahul", text: "Her Biology notes are the best!", rating: 5 }]
+    testimonials: [{ studentName: "Rahul", text: "Her Biology notes are the best!", rating: 5 }],
+    offerings: [
+      { id: "1", title: "1:1 Consultation", price: 1200, icon: "video" },
+      { id: "2", title: "NEET Strategy", price: 800, discount: 15, icon: "document" },
+      { id: "3", title: "Doubt Clearing", price: 400, icon: "message" }
+    ]
   },
   "arjun_malhotra3": {
     id: "arjun_malhotra3",

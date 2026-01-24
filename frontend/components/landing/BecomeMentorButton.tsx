@@ -11,7 +11,8 @@ export default function BecomeMentorButton() {
 
   const handleClick = () => {
     if (!isSignedIn) {
-      router.push(`/sign-in?redirect=${onboardingPath}`);
+      // Redirect to mentor sign-up page
+      router.push(`/sign-up/mentor?redirect_url=${encodeURIComponent(onboardingPath)}`);
     } else {
       router.push(onboardingPath);
     }

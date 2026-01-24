@@ -7,7 +7,7 @@ export default function MentorSignUpPage() {
         routing="path"
         path="/sign-up/mentor"
         signInUrl="/sign-in"
-        afterSignUpUrl="/mentor/dashboard"
+        afterSignUpUrl="/onboarding/profile/basic-info"
       />
     </div>
   );

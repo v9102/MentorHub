@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { MentorPricingInfo } from "@/lib/types/mentor-onboarding-data";
 import { OnboardingActionButton } from "@/components/onboarding/OnboardingActionButton";
 import { useMentorOnboarding } from "@/lib/context/MentorOnboardingContext";
+import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 
 export default function PricingPage() {
   const router = useRouter();
@@ -33,27 +35,26 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex justify-center px-4 py-12">
-      <div className="w-full max-w-2xl">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900">
-            Set your pricing
-          </h1>
-          <p className="text-sm text-gray-500 mt-1">
-            You can change this anytime later
-          </p>
-        </div>
+    <div className="max-w-2xl mx-auto py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-blue-900">
+          Set your pricing
+        </h1>
+        <p className="text-gray-600 mt-2">
+          You can change this anytime later.
+        </p>
+      </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-          <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+        <form onSubmit={handleSubmit(onSubmit)} className="p-8 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Price per Session */}
-            <div className="space-y-1">
-              <label className="block text-sm font-medium">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
                 Price per session (₹) <span className="text-red-500">*</span>
               </label>
 
-              <input
+              <Input
                 type="number"
                 placeholder="e.g. 499"
                 {...register("pricePerSession", {
@@ -63,7 +64,6 @@ export default function PricingPage() {
                     message: "Price cannot be negative",
                   },
                 })}
-                className="w-full border rounded-md px-3 py-2"
               />
 
               {errors.pricePerSession && (
@@ -74,45 +74,43 @@ export default function PricingPage() {
             </div>
 
             {/* Session Duration */}
-            <div className="space-y-1">
-              <label className="block text-sm font-medium">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
                 Session duration <span className="text-red-500">*</span>
               </label>
 
-              <select
-                {...register("sessionDuration", { required: true })}
-                className="w-full border rounded-md px-3 py-2"
-              >
+              <Select {...register("sessionDuration", { required: true })}>
                 <option value={30}>30 minutes</option>
                 <option value={45}>45 minutes</option>
                 <option value={60}>60 minutes</option>
-              </select>
+              </Select>
             </div>
+          </div>
 
-            {/* Free Trial */}
-            <div className="flex items-start gap-3">
-              <input
-                type="checkbox"
-                {...register("isFreeTrialEnabled")}
-                className="mt-1"
-              />
-              <div>
-                <label className="block text-sm font-medium">
-                  Offer a free intro call
-                </label>
-                <p className="text-xs text-gray-500">
-                  A short free call helps students decide faster
-                </p>
-              </div>
+          {/* Free Trial */}
+          <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+            <input
+              type="checkbox"
+              {...register("isFreeTrialEnabled")}
+              className="mt-1 w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+            />
+            <div>
+              <label className="block text-sm font-medium text-gray-900">
+                Offer a free intro call
+              </label>
+              <p className="text-xs text-gray-500 mt-0.5">
+                A short free call helps students decide faster.
+              </p>
             </div>
+          </div>
 
-            {/* Action */}
+          <div className="pt-2">
             <OnboardingActionButton
               isValid={isValid}
               isSubmitting={isSubmitting}
             />
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
     </div>
   );

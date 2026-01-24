@@ -22,7 +22,7 @@ export default function ReviewPage() {
         throw new Error("Failed to submit profile");
       }
 
-      router.push("/mentor/dashboard");
+      router.push("/mentors/dashboard");
     } catch (err) {
       console.error("Submission error:", err);
       alert("Something went wrong. Please try again.");
@@ -30,13 +30,17 @@ export default function ReviewPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex justify-center px-4 py-12">
-      <div className="w-full max-w-2xl">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-4">
+    <div className="max-w-2xl mx-auto py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-blue-900">
           Review your profile
         </h1>
+        <p className="text-gray-600 mt-2">
+          Check if everything looks correct before submitting.
+        </p>
+      </div>
 
-        <div className="bg-white rounded-xl border p-6 space-y-4">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 space-y-6">
           {/* Basic Info */}
           <Section title="Basic Information">
             <Item
@@ -127,6 +131,7 @@ export default function ReviewPage() {
               e.preventDefault();
               onSubmit();
             }}
+            className="pt-4 border-t border-gray-100"
           >
             <OnboardingActionButton
               isValid={true}
@@ -134,7 +139,6 @@ export default function ReviewPage() {
               label="Submit Profile"
             />
           </form>
-        </div>
       </div>
     </div>
   );

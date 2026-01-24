@@ -28,7 +28,7 @@ export default function Navbar() {
             <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-blue-800 group-hover:w-full transition-all duration-500"></span>
           </Link>
           <Link
-            href="/become-mentor"
+            href="/sign-up/mentor"
             className="text-gray-700 hover:text-gray-900 relative group"
           >
             Become a Mentor
