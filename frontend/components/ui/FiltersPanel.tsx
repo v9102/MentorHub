@@ -120,6 +120,7 @@ export default function FiltersPanel({
           <option value="UPSC">UPSC</option>
           <option value="CLAT">CLAT</option>
           <option value="CUET">CUET</option>
+          <option value="IIT JAM">IIT JAM</option>
         </select>
       </div>
 

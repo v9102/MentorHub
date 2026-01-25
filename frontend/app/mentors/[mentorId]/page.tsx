@@ -1,4 +1,4 @@
-import { mockMentors } from "../mock";
+import { fetchMentorById } from "@/lib/api/mentors";
 import Link from "next/link";
 
 export default async function MentorProfilePage({
@@ -8,7 +8,7 @@ export default async function MentorProfilePage({
 }) {
   const { mentorId } = await params;
 
-  const mentor = mockMentors[mentorId];
+  const mentor = await fetchMentorById(mentorId);
 
   if (!mentor) {
     return (

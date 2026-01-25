@@ -1,4 +1,4 @@
-import { mockMentors } from "../../mentors/mock";
+import { fetchMentorById } from "@/lib/api/mentors";
 import BookingClient from "./BookingClient";
 
 export default async function BookingPage({
@@ -8,7 +8,7 @@ export default async function BookingPage({
 }) {
   const { mentorId } = await params;
 
-  const mentor = mockMentors[mentorId];
+  const mentor = await fetchMentorById(mentorId);
 
   if (!mentor) {
     return (
