@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { MentorBasicInfo } from "@/lib/types/mentor-onboarding-data";
 import { OnboardingActionButton } from "@/components/onboarding/OnboardingActionButton";
 import { useMentorOnboarding } from "@/lib/context/MentorOnboardingContext";
-import { Input } from "@/components/ui/Input";
+import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/Select";
 
 export default function BasicInfoPage() {

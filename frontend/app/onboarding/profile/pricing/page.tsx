@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { MentorPricingInfo } from "@/lib/types/mentor-onboarding-data";
 import { OnboardingActionButton } from "@/components/onboarding/OnboardingActionButton";
 import { useMentorOnboarding } from "@/lib/context/MentorOnboardingContext";
-import { Input } from "@/components/ui/Input";
+import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/Select";
 
 export default function PricingPage() {
