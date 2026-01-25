@@ -7,7 +7,7 @@ import { MentorPricingInfo } from "@/lib/types/mentor-onboarding-data";
 import { OnboardingActionButton } from "@/components/onboarding/OnboardingActionButton";
 import { useMentorOnboarding } from "@/lib/context/MentorOnboardingContext";
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/Select";
+import { Select } from "@/components/ui/select";
 
 export default function PricingPage() {
   const router = useRouter();
