@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { SignedIn, SignedOut, UserButton, ClerkLoading, useUser, SignUpButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, UserButton, ClerkLoading, useUser, SignUpButton, SignInButton } from "@clerk/nextjs";
 import { BookOpen } from "lucide-react";
 
 export default function Navbar() {
@@ -63,19 +63,17 @@ export default function Navbar() {
             </div>
           </ClerkLoading>
           <SignedOut>
-            <Link
-              href="/sign-in"
-              className="px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100"
-            >
-              Sign In
-            </Link>
+            <SignInButton mode="modal" forceRedirectUrl="/student/dashboard">
+              <button className="px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100 cursor-pointer">
+                Sign In
+              </button>
+            </SignInButton>
 
-            <Link
-              href="/sign-up/student"
-              className="px-4 py-2 rounded-md bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 transition-all"
-            >
-              Get Started
-            </Link>
+            <SignUpButton mode="modal" forceRedirectUrl="/student/dashboard">
+              <button className="px-4 py-2 rounded-md bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 transition-all cursor-pointer">
+                Get Started
+              </button>
+            </SignUpButton>
           </SignedOut>
 
           <SignedIn>
