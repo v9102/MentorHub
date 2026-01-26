@@ -1,4 +1,4 @@
-import { mockMentors } from "../../../mentors/mock";
+import { fetchMentorById } from "@/lib/api/mentors";
 import ConfirmClient from "./ConfirmClient";
 
 export default async function ConfirmPage({
@@ -7,7 +7,7 @@ export default async function ConfirmPage({
   params: Promise<{ mentorId: string }>;
 }) {
   const { mentorId } = await params;
-  const mentor = mockMentors[mentorId];
+  const mentor = await fetchMentorById(mentorId);
 
   if (!mentor) {
     return (

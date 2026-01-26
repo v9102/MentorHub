@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { MentorExpertiseInfo } from "@/lib/types/mentor-onboarding-data";
 import { OnboardingActionButton } from "@/components/onboarding/OnboardingActionButton";
 import { useMentorOnboarding } from "@/lib/context/MentorOnboardingContext";
-import { Input } from "@/components/ui/Input";
+import { Input } from "@/components/ui/input";
 
 const SUBJECT_OPTIONS = [
   "Mathematics",

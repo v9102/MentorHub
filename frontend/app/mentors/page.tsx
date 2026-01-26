@@ -210,6 +210,7 @@ export default function MentorsPage() {
                         yearsOfExperience: mentor.yearsOfExperience,
                         sessions: mentor.sessions,
                         attendance: mentor.attendance,
+                        imageUrl: mentor.profilePhoto,
                         offerings: mentor.offerings,
                       }}
                     />

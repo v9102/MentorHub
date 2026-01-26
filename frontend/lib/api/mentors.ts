@@ -7,42 +7,60 @@ export const fetchMentors = async (): Promise<MentorProfile[]> => {
     const response = await fetch(`${BACKEND_URL}/api/mentors`);
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch mentors: ${response.statusText}`);
+      console.warn(`Failed to fetch mentors from backend (${response.statusText}).`);
+      return [];
     }
 
     const data = await response.json();
+
+
+    console.log("Raw backend data:", data);
+
 
     // Map backend data to MentorProfile type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return data.map((mentor: any) => ({
       id: mentor._id,
-      name: mentor.name || "Unknown Mentor",
-      profilePhoto: "/mentors/default_avatar.jpg", // Placeholder
-      tagLine: mentor.expertise || "Experienced Mentor",
+      name: `${mentor.firstName} ${mentor.lastName}`,
+      profilePhoto: mentor.avatar || "/mentors/default_avatar.jpg",
+      tagLine: `${mentor.education?.[0]?.institution || "Expert"} | ${mentor.exams?.[0] || "Mentor"}`,
       bio: mentor.bio || "No bio available.",
-      exam: "General", // Default
-      college: "Unknown", // Default
-      branch: "N/A", // Default
-      rank: 0,
-      yearOfPassing: 0,
-      subjects: mentor.expertise ? mentor.expertise.split(',').map((s: string) => s.trim()) : [],
-      specializations: [],
-      yearsOfExperience: 0,
-      studentsHelped: 0,
-      rating: 0,
-      reviewsCount: 0,
-      sessions: 0,
-      attendance: 0,
-      responseTime: "24 hours",
-      pricing: mentor.chargePerHour || 0,
-      availability: mentor.freeSlots ? mentor.freeSlots.map((slot: any) => `${slot.date} ${slot.startTime}-${slot.endTime}`) : [],
-      testimonials: [],
-      offerings: []
+      exam: mentor.exams?.[0] || "General",
+      college: mentor.education?.[0]?.institution || "Unknown",
+      branch: mentor.education?.[0]?.degree || "N/A",
+      rank: 0, // Not explicitly in top-level fields, could parse achievements
+      yearOfPassing: mentor.education?.[0]?.year || 0,
+      subjects: mentor.specializations || [],
+      specializations: mentor.specializations || [],
+      yearsOfExperience: mentor.experience || 0,
+      studentsHelped: mentor.completedSessions || 0,
+      rating: mentor.rating || 0,
+      reviewsCount: mentor.totalReviews || 0,
+      sessions: mentor.totalSessions || 0,
+      attendance: mentor.totalSessions > 0 ? Math.round((mentor.completedSessions / mentor.totalSessions) * 100) : 100,
+      responseTime: "Within 24 hours",
+      pricing: mentor.pricing?.oneOnOne || 0,
+      availability: mentor.availability?.map((a: any) =>
+        `${a.day} ${a.slots?.map((s: any) => `${s.startTime}-${s.endTime}`).join(", ")}`
+      ) || [],
+      testimonials: [], // Not in current response
+      offerings: [
+        { id: "1", title: "1:1 Session", price: mentor.pricing?.oneOnOne || 500, icon: "video" },
+        { id: "2", title: "Group Session", price: mentor.pricing?.group || 200, icon: "users" },
+        { id: "3", title: "Trial Session", price: mentor.pricing?.trial || 100, icon: "zap" }
+      ]
     }));
   } catch (error) {
     console.error("Error fetching mentors:", error);
+
     // Return empty array or rethrow depending on desired behavior
     // For now returning empty array so the page doesn't crash completely
+
     return [];
   }
+};
+
+export const fetchMentorById = async (id: string): Promise<MentorProfile | undefined> => {
+  const mentors = await fetchMentors();
+  return mentors.find((mentor) => mentor.id === id);
 };
