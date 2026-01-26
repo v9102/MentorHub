@@ -1,0 +1,12 @@
+# Ignore files for Cloud Build
+.env
+.env.local
+.env.*.local
+node_modules/
+npm-debug.log*
+.git/
+.gitignore
+README.md
+.vscode/
+.idea/
+*.swp

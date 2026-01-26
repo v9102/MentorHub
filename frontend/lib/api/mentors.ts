@@ -1,17 +1,17 @@
 import { MentorProfile } from "@/app/mentors/mock";
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
+const BACKEND_URL = "https://mentorhub-backend-5gk6jbun2q-el.a.run.app";
 
 export const fetchMentors = async (): Promise<MentorProfile[]> => {
   try {
     const response = await fetch(`${BACKEND_URL}/api/mentors`);
-    
+
     if (!response.ok) {
       throw new Error(`Failed to fetch mentors: ${response.statusText}`);
     }
 
     const data = await response.json();
-    
+
     // Map backend data to MentorProfile type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return data.map((mentor: any) => ({
@@ -43,6 +43,6 @@ export const fetchMentors = async (): Promise<MentorProfile[]> => {
     console.error("Error fetching mentors:", error);
     // Return empty array or rethrow depending on desired behavior
     // For now returning empty array so the page doesn't crash completely
-    return []; 
+    return [];
   }
 };
