@@ -1,0 +1,76 @@
+
+> mentor@0.1.0 build
+> next build
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /run/media/shaunakmishra25/DATA/Projects/MentorHub/package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /run/media/shaunakmishra25/DATA/Projects/MentorHub/frontend/package-lock.json
+
+   ▲ Next.js 16.0.10 (Turbopack)
+   - Environments: .env
+
+   Creating an optimized production build ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ ✓ Compiled successfully in 3.0s
+   Running TypeScript ...
+   Collecting page data using 11 workers ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   Generating static pages using 11 workers (0/21) ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   Generating static pages using 11 workers (5/21) 
+   Generating static pages using 11 workers (10/21) 
+   Generating static pages using 11 workers (15/21) 
+ ✓ Generating static pages using 11 workers (21/21) in 796.4ms
+   Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /api/mentor/onboarding
+├ ƒ /api/sessions/[sessionId]
+├ ƒ /api/sessions/create
+├ ƒ /api/sessions/join
+├ ƒ /api/sessions/list
+├ ƒ /book/[mentorId]
+├ ƒ /book/[mentorId]/confirm
+├ ƒ /call/[roomId]
+├ ƒ /exam/[examId]
+├ ○ /how-it-works
+├ ○ /mentor/register
+├ ○ /mentors
+├ ƒ /mentors/[mentorId]
+├ ○ /mentors/dashboard
+├ ○ /mentors/profile-setup
+├ ○ /onboarding/profile/availability
+├ ○ /onboarding/profile/basic-info
+├ ○ /onboarding/profile/expertise
+├ ○ /onboarding/profile/pricing
+├ ○ /onboarding/profile/public-profile
+├ ○ /onboarding/profile/review
+├ ƒ /session/[sessionId]
+├ ƒ /sign-in/[[...rest]]
+├ ƒ /sign-up/mentor/[[...rest]]
+├ ƒ /sign-up/student/[[...rest]]
+├ ○ /student
+└ ○ /test
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
