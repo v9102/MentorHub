@@ -41,14 +41,25 @@ export async function POST(req: Request) {
 
     const { type, data } = event;
 
+    if (!data.id) {
+        console.error("Missing clerkId (data.id) in webhook payload");
+        return new NextResponse("Missing clerkId", { status: 400 });
+    }
+
     //Connect DB
     await connectDB();
 
+    const email = data.email_addresses?.[0]?.email_address;
+
     try {
         if (type === "user.created") {
+            if (!email) {
+                console.error("Missing email in user.created webhook");
+                return new NextResponse("Missing email", { status: 400 });
+            }
             await User.create({
                 clerkId: data.id,
-                email: data.email_addresses[0].email_address,
+                email: email,
                 firstName: data.first_name,
                 lastName: data.last_name,
                 username: data.username,
@@ -62,7 +73,7 @@ export async function POST(req: Request) {
             await User.findOneAndUpdate(
                 { clerkId: data.id },
                 {
-                    email: data.email_addresses[0].email_address,
+                    email: email,
                     firstName: data.first_name,
                     lastName: data.last_name,
                     username: data.username,
@@ -74,9 +85,12 @@ export async function POST(req: Request) {
         if (type === "user.deleted") {
             await User.deleteOne({ clerkId: data.id });
         }
-    } catch (dbErr) {
+    } catch (dbErr: any) {
         console.error("Mongo error handling webhook:", dbErr);
-        return new NextResponse("DB error", { status: 500 });
+        if (dbErr.code === 11000) {
+            console.error("Duplicate key error:", dbErr.keyValue);
+        }
+        return new NextResponse(`DB error: ${dbErr.message}`, { status: 500 });
     }
 
     return NextResponse.json({ success: true })
