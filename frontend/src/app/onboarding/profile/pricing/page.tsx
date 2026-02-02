@@ -3,9 +3,9 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
-import { MentorPricingInfo } from "@/lib/types/mentor-onboarding-data";
-import { OnboardingActionButton } from "@/components/onboarding/OnboardingActionButton";
-import { useMentorOnboarding } from "@/lib/context/MentorOnboardingContext";
+import { MentorPricingInfo } from "@/shared/lib/types/mentor-onboarding-data";
+import { OnboardingActionButton } from "@/modules/onboarding/OnboardingActionButton";
+import { useMentorOnboarding } from "@/shared/lib/context/MentorOnboardingContext";
 
 export default function PricingPage() {
   const router = useRouter();

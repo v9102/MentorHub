@@ -5,9 +5,9 @@ import { useForm } from "react-hook-form";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 
-import { MentorBasicInfo } from "@/lib/types/mentor-onboarding-data";
-import { OnboardingActionButton } from "@/components/onboarding/OnboardingActionButton";
-import { useMentorOnboarding } from "@/lib/context/MentorOnboardingContext";
+import { MentorBasicInfo } from "@/shared/lib/types/mentor-onboarding-data";
+import { OnboardingActionButton } from "@/modules/onboarding/OnboardingActionButton";
+import { useMentorOnboarding } from "@/shared/lib/context/MentorOnboardingContext";
 
 export default function BasicInfoPage() {
   const { user } = useUser();

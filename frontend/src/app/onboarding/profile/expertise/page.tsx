@@ -3,10 +3,10 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
-import { MentorExpertiseInfo } from "@/lib/types/mentor-onboarding-data";
-import { OnboardingActionButton } from "@/components/onboarding/OnboardingActionButton";
-import { useMentorOnboarding } from "@/lib/context/MentorOnboardingContext";
-import { Input } from "@/components/ui/input";
+import { MentorExpertiseInfo } from "@/shared/lib/types/mentor-onboarding-data";
+import { OnboardingActionButton } from "@/modules/onboarding/OnboardingActionButton";
+import { useMentorOnboarding } from "@/shared/lib/context/MentorOnboardingContext";
+import { Input } from "@/shared/ui/input";
 
 const SUBJECT_OPTIONS = [
   "Mathematics",

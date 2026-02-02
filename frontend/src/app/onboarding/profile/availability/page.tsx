@@ -3,9 +3,9 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
-import { MentorAvailabilityInfo } from "@/lib/types/mentor-onboarding-data";
-import { OnboardingActionButton } from "@/components/onboarding/OnboardingActionButton";
-import { useMentorOnboarding } from "@/lib/context/MentorOnboardingContext";
+import { MentorAvailabilityInfo } from "@/shared/lib/types/mentor-onboarding-data";
+import { OnboardingActionButton } from "@/modules/onboarding/OnboardingActionButton";
+import { useMentorOnboarding } from "@/shared/lib/context/MentorOnboardingContext";
 
 const DAYS_OF_WEEK = [
   "Monday",

@@ -1,6 +1,6 @@
 "use client"
-import { MentorOnboardingProvider } from "@/lib/context/MentorOnboardingContext";
-import OnboardingLayoutWrapper from "@/components/onboarding/OnboardingLayout";
+import { MentorOnboardingProvider } from "@/shared/lib/context/MentorOnboardingContext";
+import OnboardingLayoutWrapper from "@/modules/onboarding/OnboardingLayout";
 
 export default function OnboardingLayout({
   children,

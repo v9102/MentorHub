@@ -1,8 +1,8 @@
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { Webhook } from "svix";
-import { connectDB } from "@/lib/db";
-import User from "@/lib/models/user";
+import { connectDB } from "@/shared/lib/db";
+import User from "@/shared/lib/models/user";
 
 export async function POST(req: Request) {
 

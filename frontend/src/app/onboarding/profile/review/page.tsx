@@ -1,8 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { OnboardingActionButton } from "@/components/onboarding/OnboardingActionButton";
-import { useMentorOnboarding } from "@/lib/context/MentorOnboardingContext";
+import { OnboardingActionButton } from "@/modules/onboarding/OnboardingActionButton";
+import { useMentorOnboarding } from "@/shared/lib/context/MentorOnboardingContext";
 
 export default function ReviewPage() {
   const { data } = useMentorOnboarding();
@@ -22,7 +22,7 @@ export default function ReviewPage() {
         throw new Error("Failed to submit profile");
       }
 
-      router.push("/mentors/dashboard");
+      router.push("/dashboard/mentor");
     } catch (err) {
       console.error("Submission error:", err);
       alert("Something went wrong. Please try again.");
