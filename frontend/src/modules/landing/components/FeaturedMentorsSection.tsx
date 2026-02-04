@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { featuredMentors } from '../data';
-import SimpleMentorCard from '@/shared/ui/SimpleMentorCard';
+import FeaturedMentorCard from './FeaturedMentorCard';
 import { Button } from '@/shared/ui/button';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
@@ -83,7 +83,7 @@ export default function FeaturedMentorsSection() {
                                     animate={{ opacity: 1 }}
                                     className="h-full min-w-[280px] sm:min-w-0 snap-center first:pl-2 last:pr-2 sm:first:pl-0 sm:last:pr-0"
                                 >
-                                    <SimpleMentorCard isLoading={true} />
+                                    <FeaturedMentorCard isLoading={true} />
                                 </motion.div>
                             ))
                         ) : (
@@ -96,19 +96,18 @@ export default function FeaturedMentorsSection() {
                                     viewport={{ once: true }}
                                     className="h-full min-w-[280px] sm:min-w-0 snap-center first:pl-2 last:pr-2 sm:first:pl-0 sm:last:pr-0"
                                 >
-                                    <SimpleMentorCard
+                                    <FeaturedMentorCard
                                         mentor={{
                                             id: mentor.id,
                                             name: mentor.name,
-                                            bio: `Mentoring aspirants for ${mentor.exam}.`,
                                             rating: mentor.rating,
                                             reviewsCount: mentor.reviews,
-                                            pricing: mentor.hourlyRate,
-                                            isVerified: true,
+                                            tagLine: mentor.tags.join(" | "),
                                             college: mentor.college,
                                             yearsOfExperience: 3,
                                             sessions: 50 + index * 10,
-                                            tagLine: mentor.tags.join(" | ")
+                                            pricing: mentor.hourlyRate,
+                                            bio: `Mentoring aspirants for ${mentor.exam}. Helping students achieve their dreams with personalized guidance.`
                                         }}
                                     />
                                 </motion.div>
