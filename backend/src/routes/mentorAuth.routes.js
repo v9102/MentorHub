@@ -1,8 +1,13 @@
 import express from "express";
-import { mentorSignup, mentorLogin } from "../controllers/mentorAuth.controller.js";
+import { ClerkExpressRequireAuth } from "@clerk/clerk-sdk-node";
+import { becomeMentor } from "../controllers/mentorAuth.controller.js";
 
 const router = express.Router();
-router.post("/signup", mentorSignup);
-router.post("/login", mentorLogin);
+
+router.post(
+  "/become-mentor",
+  ClerkExpressRequireAuth(),
+  becomeMentor
+);
 
 export default router;
