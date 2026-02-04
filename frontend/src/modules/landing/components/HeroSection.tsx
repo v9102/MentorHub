@@ -51,8 +51,8 @@ export default function HeroSection() {
                     transition={{ duration: 0.5, delay: 0.2 }}
                     className="mx-auto max-w-2xl text-base sm:text-lg text-gray-600 mb-10 px-4"
                 >
-                    Connect with mentors who have cracked IIT JEE, NEET, CAT, and UPSC.
-                    Get personalized strategy, roadmap, and doubt solving 1-on-1.
+                    Connect with mentors who serve in IAS, IPS, SBI, and Railways.
+                    Get personalized strategy, answer writing reviews, and interview guidance 1-on-1.
                 </motion.p>
 
                 <motion.div
@@ -73,7 +73,7 @@ export default function HeroSection() {
                                 defaultValue=""
                                 aria-label="Select your exam"
                             >
-                                <option value="" disabled>Select your exam (e.g., JEE, NEET)</option>
+                                <option value="" disabled>Select your exam (e.g., UPSC, SSC)</option>
                                 {popularExams.map((exam) => (
                                     <option key={exam.id} value={exam.id}>
                                         {exam.name}
@@ -92,7 +92,7 @@ export default function HeroSection() {
                         initial={{ opacity: 0, y: 40 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.7, delay: 0.4 }}
-                        className="relative mx-auto max-w-5xl rounded-[2.5rem] border border-gray-200 bg-white shadow-2xl overflow-hidden"
+                        className="relative mx-auto max-w-5xl rounded-2xl border border-gray-200 bg-white shadow-2xl overflow-hidden"
                     >
                         <div className="absolute top-0 left-0 w-full h-8 bg-gray-50 border-b border-gray-100 flex items-center px-4 gap-2 z-10">
                             <div className="w-3 h-3 rounded-full bg-red-400"></div>
@@ -112,64 +112,113 @@ export default function HeroSection() {
 }
 
 function HeroMockUI() {
-    return (
-        <div className="p-2 sm:p-4 pt-12 bg-gray-50/50 flex justify-center items-center min-h-[300px] sm:min-h-[400px]">
-            <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-                className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl items-center"
-            >
-                {/* Featured Success Card */}
-                <div className="relative bg-white p-6 rounded-2xl shadow-xl border border-orange-100 hover:shadow-2xl transition-all duration-300 group">
-                    {/* Warm Gradient Border Effect */}
-                    <div className="absolute inset-0 -z-10 bg-gradient-to-br from-orange-100 to-blue-50 rounded-2xl blur-xl opacity-40 group-hover:opacity-60 transition-opacity"></div>
+    // Simulate loading for 2 seconds
+    const [isLoading, setIsLoading] = React.useState(true);
 
-                    <div className="flex items-start justify-between mb-8">
-                        <div>
-                            <span className="inline-block px-3 py-1 bg-orange-50 text-orange-600 text-xs font-bold uppercase tracking-wider rounded-full mb-2">
-                                New Success Story
-                            </span>
-                            <h3 className="text-xl font-bold text-gray-900 leading-tight">
-                                "From 60th percentile to IIT Delhi CSE"
-                            </h3>
+    React.useEffect(() => {
+        const timer = setTimeout(() => setIsLoading(false), 2000);
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (isLoading) {
+        return (
+            <div className="p-2 sm:p-4 pt-12 bg-gray-50 flex justify-center items-center min-h-[300px] sm:min-h-[400px]">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl opacity-90">
+                    <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="h-12 w-12 rounded-full bg-gray-200 animate-pulse"></div>
+                            <div>
+                                <div className="h-4 w-32 bg-gray-200 rounded animate-pulse mb-2"></div>
+                                <div className="h-3 w-24 bg-gray-100 rounded animate-pulse"></div>
+                            </div>
                         </div>
-                        <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-xl">
-                            🎓
+                        <div className="space-y-2">
+                            <div className="h-3 w-full bg-gray-100 rounded animate-pulse"></div>
+                            <div className="h-3 w-5/6 bg-gray-100 rounded animate-pulse"></div>
                         </div>
                     </div>
-
-                    <div className="flex items-center gap-4 border-t border-gray-50 pt-6">
-                        <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/20">
-                            A
+                    <div className="hidden md:block bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                        <div className="flex justify-between items-center mb-4">
+                            <div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
+                            <div className="h-8 w-20 bg-blue-100 rounded-full animate-pulse"></div>
                         </div>
-                        <div>
-                            <p className="font-bold text-gray-900">Arjun Mehta</p>
-                            <p className="text-sm text-gray-500">Mentored by <span className="text-blue-600 font-medium">IIT B. Senior</span></p>
+                        <div className="space-y-3">
+                            {[1, 2, 3].map((i) => (
+                                <div key={i} className="flex items-center gap-3 p-2 rounded-lg bg-gray-50">
+                                    <div className="h-2 w-2 rounded-full bg-gray-300 animate-pulse"></div>
+                                    <div className="h-3 w-full bg-gray-200 rounded animate-pulse"></div>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>
+            </div>
+        );
+    }
 
-                {/* Stats / Activity Column */}
-                <div className="hidden md:flex flex-col gap-4">
-                    <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
-                        <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
-                            <span className="font-bold text-lg">98%</span>
+    return (
+        <div className="p-2 sm:p-4 pt-12 bg-gray-50 flex justify-center items-center min-h-[300px] sm:min-h-[400px]">
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl"
+            >
+                {/* Card 1: Upcoming Session */}
+                <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow">
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="font-semibold text-gray-900">Upcoming Session</h3>
+                        <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-bold uppercase rounded">Confirmed</span>
+                    </div>
+                    <div className="flex items-center gap-4 mb-6">
+                        <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xl">
+                            R
                         </div>
                         <div>
-                            <h4 className="font-semibold text-gray-900">Session Satisfaction</h4>
-                            <p className="text-xs text-gray-500">Based on 5k+ reviews</p>
+                            <p className="font-bold text-gray-900">Rahul Sharma</p>
+                            <p className="text-sm text-gray-500">IIT Bombay • JEE Advanced</p>
                         </div>
                     </div>
+                    <div className="flex gap-2">
+                        <div className="flex-1 bg-gray-50 p-2 rounded text-center">
+                            <p className="text-xs text-gray-500 font-medium">Date</p>
+                            <p className="font-semibold text-sm">Tomorrow</p>
+                        </div>
+                        <div className="flex-1 bg-gray-50 p-2 rounded text-center">
+                            <p className="text-xs text-gray-500 font-medium">Time</p>
+                            <p className="font-semibold text-sm">5:00 PM</p>
+                        </div>
+                    </div>
+                    <Button className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white">
+                        Join Meeting Room
+                    </Button>
+                </div>
 
-                    <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4 opacity-80 scale-95 translate-x-4">
-                        <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                            <span className="font-bold text-lg">24</span>
-                        </div>
-                        <div>
-                            <h4 className="font-semibold text-gray-900">Top Rankers Live Now</h4>
-                            <p className="text-xs text-gray-500">Available for 1:1</p>
-                        </div>
+                {/* Card 2: Mentor Stats / Mock Graph */}
+                <div className="hidden md:flex flex-col bg-white p-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow">
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="font-semibold text-gray-900">Performance</h3>
+                        <select className="text-xs border border-gray-200 rounded px-2 py-1 bg-gray-50 text-gray-600">
+                            <option>Last 7 Days</option>
+                        </select>
+                    </div>
+                    <div className="flex-1 flex items-end justify-between gap-2 px-2 pb-2">
+                        {[40, 70, 45, 90, 65, 85, 50].map((h, i) => (
+                            <motion.div
+                                key={i}
+                                initial={{ height: 0 }}
+                                animate={{ height: `${h}%` }}
+                                transition={{ delay: i * 0.1, duration: 0.5 }}
+                                className="w-full bg-blue-50 hover:bg-blue-100 rounded-t-sm relative group cursor-pointer"
+                            >
+                                <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                    {h}% Accuracy
+                                </div>
+                                <div className="absolute bottom-0 w-full bg-blue-500/20 h-full rounded-t-sm" style={{ height: `${h}%` }}></div>
+                            </motion.div>
+                        ))}
+                    </div>
+                    <div className="flex justify-between text-xs text-gray-400 mt-2 px-1">
+                        <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
                     </div>
                 </div>
             </motion.div>
