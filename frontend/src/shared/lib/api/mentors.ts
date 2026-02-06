@@ -36,42 +36,70 @@ export const fetchMentors = async (): Promise<MentorProfile[]> => {
 
       // The backend API already formats the data, so we don't need to re-map deeply
       // unless fields are missing.
-      return backendMentors.map((mentor: any) => ({
-        id: mentor.id || mentor.clerkId || mentor._id,
-        name: mentor.name || "Mentor",
-        profilePhoto: mentor.profilePhoto || mentor.imageUrl || "/mentors/default_avatar.jpg",
-        tagLine: mentor.tagLine || "",
-        bio: mentor.bio || "No bio available.",
-        exam: mentor.exam || "General",
-        service: mentor.service || "",
-        rank: mentor.rank || 0,
-        college: mentor.college || "N/A",
-        yearOfPassing: mentor.yearOfPassing || 0,
-        subjects: mentor.subjects || [],
-        specializations: mentor.specializations || [],
-        yearsOfExperience: mentor.yearsOfExperience || 0,
-        studentsHelped: mentor.studentsHelped || 0,
-        rating: mentor.rating || 0,
-        reviewsCount: mentor.reviewsCount || 0,
-        sessions: mentor.sessions || 0,
-        attendance: mentor.attendance || 100,
-        responseTime: mentor.responseTime || "Within 24 hours",
-        pricing: mentor.pricing || 0,
-        availability: mentor.availability || [],
-        testimonials: mentor.testimonials || [],
-        offerings: mentor.offerings || [
-          {
-            id: "1",
-            title: "1:1 Session",
-            price: mentor.pricing || 500,
-            icon: "video"
-          }
-        ],
-        // New Govt Fields (Pass through if present)
-        posting: mentor.posting,
-        attempts: mentor.attempts,
-        optionalSubject: mentor.optionalSubject,
-      } as MentorProfile));
+      return backendMentors.map((mentor: any) => {
+        const mp = mentor.mentorProfile || {};
+        const basic = mp.basicInfo || {};
+        const professional = mp.professionalInfo || {};
+        const expertise = mp.expertise || {};
+        const availability = mp.availability || {};
+        const pricing = mp.pricing || {};
+
+        return {
+          id: mentor.clerkId || mentor.id || mentor._id,
+          name: mentor.name || "Mentor",
+          profilePhoto: basic.profilePhoto || mentor.imageUrl || "/mentors/default_avatar.jpg",
+
+          // Constructed Tagline
+          tagLine: basic.currentRole && basic.currentOrganisation
+            ? `${basic.currentRole} at ${basic.currentOrganisation}`
+            : (mentor.tagLine || "Mentor"),
+
+          bio: basic.about || mentor.bio || "No bio available.",
+
+          // Education & Experience
+          college: professional.college || "N/A",
+          yearOfPassing: professional.passingYear || 0,
+          yearsOfExperience: basic.workExperience || 0,
+
+          // Expertise
+          subjects: expertise.subjects || [],
+          specializations: expertise.specializations ? [expertise.specializations] : [],
+
+          // Metrics (Defaults for now as backend doesn't track these yet)
+          studentsHelped: mentor.studentsHelped || 0,
+          rating: mentor.rating || 0,
+          reviewsCount: mentor.reviewsCount || 0,
+          sessions: mentor.sessions || 0,
+          attendance: mentor.attendance || 100,
+          responseTime: mentor.responseTime || "Within 24 hours",
+
+          // Pricing & Availability
+          pricing: pricing.pricePerSession || 0,
+          availability: [
+            ...(availability.days || []),
+            ...(availability.timeSlots || [])
+          ],
+
+          testimonials: mentor.testimonials || [],
+          offerings: mentor.offerings || [
+            {
+              id: "1",
+              title: "1:1 Session",
+              price: pricing.pricePerSession || 500,
+              icon: "video"
+            }
+          ],
+
+          // Govt Specific Fields (Pass through if present, otherwise undefined)
+          service: mentor.service,
+          posting: mentor.posting,
+          rank: mentor.rank,
+          attempts: mentor.attempts,
+          exam: mentor.exam || "General", // Default to General if not specified
+          optionalSubject: mentor.optionalSubject,
+
+        } as MentorProfile;
+      });
 
     } catch (e) {
       console.error("Failed to parse JSON:", e);
@@ -86,25 +114,22 @@ export const fetchMentors = async (): Promise<MentorProfile[]> => {
 
 export const fetchMentorById = async (id: string): Promise<MentorProfile | undefined> => {
   try {
-    const baseUrl = getBaseUrl();
-    const fetchUrl = `${baseUrl}/api/mentors/${id}`;
-    console.log(`[fetchMentorById] Fetching mentor from: ${fetchUrl}`);
-    console.log(`[fetchMentorById] Mentor ID: ${id}`);
+    console.log(`[fetchMentorById] Looking for mentor with clerkId: ${id}`);
 
-    const response = await fetch(fetchUrl, { cache: 'no-store' });
+    // Backend has no single-mentor endpoint, so fetch all and filter client-side
+    const allMentors = await fetchMentors();
 
-    console.log(`[fetchMentorById] Response status: ${response.status} ${response.statusText}`);
+    const mentor = allMentors.find(m => m.id === id);
 
-    if (!response.ok) {
-      console.warn(`[fetchMentorById] Failed to fetch mentor ${id} (${response.status} ${response.statusText})`);
-      return undefined;
+    if (mentor) {
+      console.log(`[fetchMentorById] Found mentor: ${mentor.name}`);
+    } else {
+      console.warn(`[fetchMentorById] No mentor found with id: ${id}`);
     }
 
-    const mentor = await response.json();
-    console.log(`[fetchMentorById] Successfully fetched mentor:`, mentor.name);
     return mentor;
   } catch (error) {
-    console.error(`[fetchMentorById] Error fetching mentor ${id}:`, error);
+    console.error(`[fetchMentorById] Error:`, error);
     return undefined;
   }
 };
