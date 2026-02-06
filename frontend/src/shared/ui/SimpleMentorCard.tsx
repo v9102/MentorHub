@@ -130,9 +130,7 @@ export default function SimpleMentorCard({
         {badges.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mb-4">
             {badges.map((badge, index) => (
-              <span key={index} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
-                {badge.text}
-              </span>
+              <TagBadge key={index} text={badge.text} variant={badge.variant} />
             ))}
           </div>
         )}
