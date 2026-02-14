@@ -8,8 +8,17 @@ const getBaseUrl = () => {
     // Client-side: use relative path
     return "";
   }
-  // Server-side: use absolute URL (fallback to localhost if env not set)
-  return process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  // Server-side: use absolute URL
+  if (process.env.NEXT_PUBLIC_APP_URL) {
+    return process.env.NEXT_PUBLIC_APP_URL;
+  }
+
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+
+  // Fallback to localhost
+  return "http://localhost:3000";
 };
 
 export const fetchMentors = async (): Promise<MentorProfile[]> => {
