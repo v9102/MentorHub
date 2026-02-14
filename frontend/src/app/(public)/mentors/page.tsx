@@ -8,6 +8,7 @@ import SearchBar from "@/shared/ui/SearchBar";
 import FiltersPanel from "@/shared/ui/FiltersPanel";
 import FiltersAccordion from "@/shared/ui/FiltersAccordion";
 import Pagination from "@/shared/ui/Pagination";
+import { FileText, GraduationCap, MessageSquare, Award, Briefcase, SlidersHorizontal, ChevronDown, Sparkles, Trophy, Calendar } from "lucide-react";
 
 interface FilterState {
   minHourlyRate: string;
@@ -37,7 +38,7 @@ export default function MentorsPage() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 9; // 3x3 grid on desktop
+  const itemsPerPage = 8;
 
   const [filters, setFilters] = useState<FilterState>({
     minHourlyRate: "",
@@ -47,12 +48,10 @@ export default function MentorsPage() {
     minRating: "",
   });
 
-  // Filter mentors based on search and filters
   const filteredMentors = useMemo(() => {
     return mentors.filter((mentor) => {
       const searchLower = searchTerm.trim().toLowerCase();
 
-      // Search
       if (
         searchLower &&
         !(
@@ -64,24 +63,20 @@ export default function MentorsPage() {
         return false;
       }
 
-      // Price
       const minPrice = Number(filters.minHourlyRate);
       const maxPrice = Number(filters.maxHourlyRate);
 
       if (filters.minHourlyRate && mentor.pricing < minPrice) return false;
       if (filters.maxHourlyRate && mentor.pricing > maxPrice) return false;
 
-      // Subject (array check)
       if (filters.subject && !mentor.subjects.includes(filters.subject)) {
         return false;
       }
 
-      // Exam
       if (filters.exam && mentor.exam !== filters.exam) {
         return false;
       }
 
-      // Rating (minimum)
       if (filters.minRating && mentor.rating < Number(filters.minRating)) {
         return false;
       }
@@ -90,13 +85,11 @@ export default function MentorsPage() {
     });
   }, [mentors, searchTerm, filters]);
 
-  // Calculate pagination
   const totalPages = Math.ceil(filteredMentors.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedMentors = filteredMentors.slice(startIndex, endIndex);
 
-  // Reset to page 1 when filters change
   const handleFiltersChange = (newFilters: FilterState) => {
     setFilters(newFilters);
     setCurrentPage(1);
@@ -107,25 +100,49 @@ export default function MentorsPage() {
     setCurrentPage(1);
   };
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-white">
-      <div className="max-w-7xl mx-auto px-4 pt-24 pb-8">
-        {/* Header */}
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-gray-900 mb-4">
-            Find Your Perfect <span className="text-blue-600">Mentor</span>
+    <div className="min-h-screen bg-neutral-50">
+      <div className="max-w-7xl mx-auto px-4 pt-24 pb-12">
+        <div className="mb-10 text-center">
+          <h1 className="text-4xl lg:text-5xl font-bold tracking-tight text-gray-900 mb-3">
+            Explore <span className="text-blue-600">Mentors</span>
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Connect with industry experts and accelerate your career
-          </p>
         </div>
 
-        {/* Search Bar */}
+        <div className="mb-8 overflow-x-auto scrollbar-hide">
+          <div className="flex gap-3 pb-2 min-w-max">
+            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-gray-200 hover:border-blue-300 transition-colors cursor-pointer">
+              <FileText className="w-4 h-4 text-gray-600" />
+              <span className="text-sm font-medium text-gray-700">CV Review</span>
+            </div>
+            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-gray-200 hover:border-blue-300 transition-colors cursor-pointer">
+              <GraduationCap className="w-4 h-4 text-gray-600" />
+              <span className="text-sm font-medium text-gray-700">MBA Preparation</span>
+            </div>
+            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-gray-200 hover:border-blue-300 transition-colors cursor-pointer">
+              <MessageSquare className="w-4 h-4 text-gray-600" />
+              <span className="text-sm font-medium text-gray-700">Interview Prep</span>
+            </div>
+            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-gray-200 hover:border-blue-300 transition-colors cursor-pointer">
+              <Award className="w-4 h-4 text-gray-600" />
+              <span className="text-sm font-medium text-gray-700">Career Guidance</span>
+            </div>
+            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-gray-200 hover:border-blue-300 transition-colors cursor-pointer">
+              <Briefcase className="w-4 h-4 text-gray-600" />
+              <span className="text-sm font-medium text-gray-700">Placement Support</span>
+            </div>
+          </div>
+        </div>
+
         <div className="mb-6">
           <SearchBar onSearchChange={handleSearchChange} />
         </div>
 
-        {/* Mobile Filters (Accordion) - Visible only on mobile */}
         <div className="mb-6 xl:hidden">
           <FiltersAccordion
             filters={filters}
@@ -134,9 +151,26 @@ export default function MentorsPage() {
           />
         </div>
 
-        {/* Two-Column Layout */}
-        <div className="flex flex-col xl:flex-row gap-6 lg:gap-8">
-          {/* Sidebar Filters - Hidden on mobile, visible on desktop */}
+        <div className="flex items-center gap-4 mb-8">
+          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+            <SlidersHorizontal className="w-4 h-4" />
+            <span className="text-sm font-medium">Filters</span>
+            {Object.values(filters).filter(v => v).length > 0 && (
+              <span className="px-1.5 py-0.5 bg-blue-600 text-white text-xs rounded-full min-w-[18px] text-center">
+                {Object.values(filters).filter(v => v).length}
+              </span>
+            )}
+          </button>
+          <div className="px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <span className="text-sm font-medium text-yellow-800">Top Mentor</span>
+          </div>
+          <div className="ml-auto flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+            <span className="text-sm font-medium text-gray-700">Sort By</span>
+            <ChevronDown className="w-4 h-4 text-gray-600" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           <aside className="hidden xl:block xl:w-80 flex-shrink-0">
             <div className="sticky top-24">
               <FiltersPanel
@@ -147,13 +181,8 @@ export default function MentorsPage() {
             </div>
           </aside>
 
-          {/* Main Content */}
-          <main className="flex-1 min-w-0">
-
-
-
-            {/* Results Count - Desktop only */}
-            <div className="hidden xl:block mb-6">
+          <main className="lg:col-span-2">
+            <div className="hidden lg:block mb-6">
               <p className="text-gray-600">
                 <span className="font-semibold text-gray-900">
                   {filteredMentors.length}
@@ -162,10 +191,11 @@ export default function MentorsPage() {
               </p>
             </div>
 
-            {/* Mentor Cards - Stacked Layout */}
             {loading ? (
-              <div className="flex justify-center py-20">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-800"></div>
+              <div className="space-y-6">
+                {[...Array(4)].map((_, index) => (
+                  <SimpleMentorCard key={index} isLoading={true} />
+                ))}
               </div>
             ) : filteredMentors.length === 0 ? (
               <div className="text-center py-16 px-4">
@@ -195,44 +225,46 @@ export default function MentorsPage() {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="space-y-6">
                   {paginatedMentors.map((mentor) => (
                     <SimpleMentorCard
                       key={mentor.id}
                       mentor={{
                         id: mentor.id,
                         name: mentor.name,
+                        profileImage: mentor.profilePhoto,
                         tagLine: mentor.tagLine,
                         bio: mentor.bio,
                         rating: mentor.rating,
                         reviewsCount: mentor.reviewsCount,
                         sessions: mentor.sessions,
-                        pricing: mentor.pricing, // Added
-                        offerings: mentor.offerings, // Added
-                        attendance: mentor.attendance, // Added
-                        yearsOfExperience: mentor.yearsOfExperience, // Added
-                        college: mentor.college, // Added
-                        exam: mentor.exam, // Added
-                        rank: mentor.rank, // Added
+                        pricing: mentor.pricing,
+                        offerings: mentor.offerings,
+                        attendance: mentor.attendance,
+                        yearsOfExperience: mentor.yearsOfExperience,
+                        college: mentor.college,
+                        exam: mentor.exam,
+                        rank: mentor.rank,
+                        service: mentor.service,
+                        posting: mentor.posting,
                       }}
                     />
-                  ))}
-                </div>
+                  ))}</div>
 
-                {/* Pagination */}
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={setCurrentPage}
-                />
+                <div className="mt-8">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
               </>
             )}
           </main>
 
-
         </div>
       </div>
-    </div >
+    </div>
   );
 }
 
