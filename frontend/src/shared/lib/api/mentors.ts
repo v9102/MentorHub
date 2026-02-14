@@ -24,6 +24,8 @@ const getBaseUrl = () => {
 export const fetchMentors = async (): Promise<MentorProfile[]> => {
   try {
     const baseUrl = getBaseUrl();
+    console.log(`[DEBUG] getBaseUrl result: ${baseUrl}`);
+    console.log(`[DEBUG] Env Vars: NEXT_PUBLIC_APP_URL=${process.env.NEXT_PUBLIC_APP_URL}, VERCEL_URL=${process.env.VERCEL_URL}`);
     console.log(`Fetching mentors from: ${baseUrl}/api/mentor/mentors`);
 
     const response = await fetch(`${baseUrl}/api/mentors`, { cache: 'no-store' });
