@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { mockMentors as mentors, MentorProfile } from "@/app/(public)/mentors/mock";
 import { useRouter } from "next/navigation";
+import { useClerk, useUser } from "@clerk/nextjs";
 
 type Props = {
   mentor: MentorProfile;
@@ -14,6 +15,8 @@ export default function BookingClient({ mentor }: Props) {
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
 
   const router = useRouter();
+  const { user, isLoaded, isSignedIn } = useUser();
+  const clerk = useClerk();
 
   // Calendar state
   const today = new Date();
@@ -71,6 +74,27 @@ export default function BookingClient({ mentor }: Props) {
   };
 
   const canContinue = Boolean(selectedDate && selectedSlot);
+
+  const handleContinue = () => {
+    if (!selectedDate || !selectedSlot) return;
+
+    if (!isLoaded) return;
+
+    if (!isSignedIn) {
+      clerk.openSignIn({
+        redirectUrl: `/book/${mentor.id}/confirm?date=${encodeURIComponent(
+          selectedDate
+        )}&time=${encodeURIComponent(selectedSlot)}`,
+      });
+      return;
+    }
+
+    router.push(
+      `/book/${mentor.id}/confirm?date=${encodeURIComponent(
+        selectedDate
+      )}&time=${encodeURIComponent(selectedSlot)}`
+    );
+  };
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-6 space-y-5">
@@ -202,15 +226,7 @@ export default function BookingClient({ mentor }: Props) {
       <div className="flex justify-end">
         <button
           disabled={!canContinue}
-          onClick={() => {
-            if (!selectedDate || !selectedSlot) return;
-
-            router.push(
-              `/book/${mentor.id}/confirm?date=${encodeURIComponent(
-                selectedDate
-              )}&time=${encodeURIComponent(selectedSlot)}`
-            );
-          }}
+          onClick={handleContinue}
           className={`px-5 py-2 rounded-md text-sm text-white transition ${canContinue
             ? "bg-black hover:bg-gray-800"
             : "bg-gray-300 cursor-not-allowed"
@@ -222,3 +238,4 @@ export default function BookingClient({ mentor }: Props) {
     </div>
   );
 }
+

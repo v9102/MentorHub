@@ -98,9 +98,12 @@ export default function SimpleMentorCard({
   }
 
   return (
-    <Link href={`/mentors/${mentor.id}`} className="block w-full">
-      <div className="bg-white rounded-xl border border-gray-200 hover:shadow-[0_2px_12px_rgba(0,0,0,0.08)] transition-all duration-200 overflow-hidden">
-        <div className="p-5">
+    <div className="block w-full relative group">
+      <div className="bg-white rounded-xl border border-gray-200 hover:shadow-[0_2px_12px_rgba(0,0,0,0.08)] transition-all duration-200 overflow-hidden relative">
+        <Link href={`/mentors/${mentor.id}`} className="absolute inset-0 z-0">
+          <span className="sr-only">View {mentor.name}'s profile</span>
+        </Link>
+        <div className="p-5 relative z-10 pointer-events-none">
           <div className="flex gap-5">
             <div className="relative flex-shrink-0">
               <div className="w-32 h-32 rounded-xl bg-gray-200 flex items-center justify-center overflow-hidden">
@@ -168,35 +171,35 @@ export default function SimpleMentorCard({
                 )}
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex gap-3 relative z-20 pointer-events-auto">
                 {mentor.offerings && mentor.offerings.slice(0, 2).map((offering) => (
-                  <div key={offering.id} className="flex-1 border border-gray-200 rounded-lg p-3 bg-gray-50">
-                    <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
+                  <Link href={`/book/${mentor.id}`} key={offering.id} className="inline-flex flex-col border border-gray-200 rounded-lg px-3 py-1.5 bg-gray-50 hover:bg-gray-100 transition-colors">
+                    <div className="text-xs text-gray-500 mb-0.5 flex items-center gap-1.5">
                       <MessageCircle className="w-3 h-3" />
                       {offering.title}
                     </div>
-                    <div className="flex items-baseline gap-1">
+                    <div className="flex items-baseline gap-1.5">
                       <span className="text-sm font-bold text-gray-900">₹{offering.price}</span>
                       {offering.discount && (
-                        <span className="text-xs text-green-600">-{offering.discount}%</span>
+                        <span className="text-[10px] text-green-600">-{offering.discount}%</span>
                       )}
                     </div>
-                  </div>
+                  </Link>
                 ))}
                 {(!mentor.offerings || mentor.offerings.length === 0) && (
-                  <div className="flex-1 border border-gray-200 rounded-lg p-3 bg-gray-50">
-                    <div className="text-xs text-gray-500 mb-1">1:1 Session</div>
-                    <div className="text-sm font-bold text-gray-900">
+                  <Link href={`/book/${mentor.id}`} className="inline-flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-1.5 bg-gray-50 hover:bg-gray-100 transition-colors">
+                    <span className="text-xs text-gray-500">1:1 Session</span>
+                    <span className="text-sm font-bold text-gray-900">
                       {mentor.pricing === 0 || !mentor.pricing ? 'Free' : `₹${mentor.pricing}`}
-                    </div>
-                  </div>
+                    </span>
+                  </Link>
                 )}
               </div>
             </div>
           </div>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
 
