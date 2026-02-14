@@ -1,22 +1,44 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { mockMentors as mentors, MentorProfile } from "@/app/(public)/mentors/mock";
 import { useRouter } from "next/navigation";
 import { useClerk, useUser } from "@clerk/nextjs";
+import { fetchMentorById } from "@/shared/lib/api/mentors"; // Import API
+import { Skeleton } from "@/shared/ui/skeleton"; // Import Skeleton
 
 type Props = {
-  mentor: MentorProfile;
+  mentor?: MentorProfile; // Make mentor optional
   mentorId: string;
 };
 
-export default function BookingClient({ mentor }: Props) {
+export default function BookingClient({ mentor: initialMentor, mentorId }: Props) {
+  const [mentor, setMentor] = useState<MentorProfile | undefined>(initialMentor);
+  const [isLoading, setIsLoading] = useState(!initialMentor);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
 
   const router = useRouter();
   const { user, isLoaded, isSignedIn } = useUser();
   const clerk = useClerk();
+
+  // Fetch mentor if not provided
+  useEffect(() => {
+    if (!mentor) {
+      const loadMentor = async () => {
+        setIsLoading(true);
+        try {
+          const data = await fetchMentorById(mentorId);
+          setMentor(data);
+        } catch (error) {
+          console.error("Failed to fetch mentor locally:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      loadMentor();
+    }
+  }, [mentor, mentorId]);
 
   // Calendar state
   const today = new Date();
@@ -80,6 +102,9 @@ export default function BookingClient({ mentor }: Props) {
 
     if (!isLoaded) return;
 
+    // Mentor must ideally be loaded here, check safety
+    if (!mentor) return;
+
     if (!isSignedIn) {
       clerk.openSignIn({
         redirectUrl: `/book/${mentor.id}/confirm?date=${encodeURIComponent(
@@ -95,6 +120,28 @@ export default function BookingClient({ mentor }: Props) {
       )}&time=${encodeURIComponent(selectedSlot)}`
     );
   };
+
+  if (isLoading) {
+    return (
+      <div className="max-w-6xl mx-auto px-4 py-6 space-y-5">
+        <Skeleton className="h-8 w-1/3" />
+        <Skeleton className="h-4 w-1/4" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+          <Skeleton className="h-40 w-full rounded-lg" />
+          <Skeleton className="h-96 w-full rounded-lg" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!mentor) {
+    return (
+      <div className="max-w-6xl mx-auto px-4 py-8 text-center">
+        <h2 className="text-xl font-semibold text-gray-900">Mentor not found</h2>
+        <p className="text-gray-500 mt-2">The mentor you are looking for does not exist or has been removed.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-6 space-y-5">
