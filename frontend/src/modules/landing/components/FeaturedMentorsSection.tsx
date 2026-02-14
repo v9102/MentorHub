@@ -107,7 +107,8 @@ export default function FeaturedMentorsSection() {
                                             yearsOfExperience: 3,
                                             sessions: 50 + index * 10,
                                             pricing: mentor.hourlyRate,
-                                            bio: `Mentoring aspirants for ${mentor.exam}. Helping students achieve their dreams with personalized guidance.`
+                                            bio: `Mentoring aspirants for ${mentor.exam}. Helping students achieve their dreams with personalized guidance.`,
+                                            profileImage: mentor.profileImage
                                         }}
                                     />
                                 </motion.div>

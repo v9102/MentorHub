@@ -7,12 +7,16 @@ import { BookOpen, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/shared/lib/utils";
+import { usePathname } from "next/navigation";
 
 export default function Navbar() {
   const { isSignedIn } = useUser();
+  const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const onboardingPath = "/onboarding/profile/basic-info";
+
+
 
   // Handle Scroll Effect
   useEffect(() => {
@@ -80,6 +84,9 @@ export default function Navbar() {
   // When mobile menu is open, we want the navbar to be solid white and full width
   // to seamlessly connect with the menu overlay.
   const isScrolledState = isScrolled && !isMobileMenuOpen;
+
+  // Hide Navbar on booking pages
+  if (pathname?.startsWith("/book/")) return null;
 
   return (
     <>

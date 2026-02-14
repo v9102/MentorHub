@@ -22,6 +22,7 @@ export const featuredMentors = [
         reviews: 215,
         hourlyRate: 1500,
         tags: ["Ethics", "Essay", "Polity"],
+        profileImage: "/mentors/vikram.jpg",
     },
     {
         id: "amit_kumar4",
@@ -33,6 +34,7 @@ export const featuredMentors = [
         reviews: 280,
         hourlyRate: 900,
         tags: ["Maths", "English"],
+        profileImage: "/mentors/amit.jpg",
     },
     {
         id: "rahul_mishra3",
@@ -44,6 +46,7 @@ export const featuredMentors = [
         reviews: 340,
         hourlyRate: 600,
         tags: ["Quant", "Reasoning"],
+        profileImage: "/mentors/rahul.jpg",
     },
     {
         id: "karthik_rajan8",
@@ -55,6 +58,7 @@ export const featuredMentors = [
         reviews: 300,
         hourlyRate: 800,
         tags: ["TN History", "Admin"],
+        profileImage: "/mentors/karthik.jpg",
     },
 ];
 
