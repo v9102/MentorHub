@@ -13,9 +13,9 @@ export default function Home() {
     <div className="min-h-screen bg-white selection:bg-blue-100 selection:text-blue-900 pb-20 sm:pb-0">
       <HeroSection />
       <FeaturedMentorsSection />
+      <TestimonialsSection />
       <HowItWorksSection />
       <WhyChooseUsSection />
-      <TestimonialsSection />
       <FAQSection />
       <FinalCTASection />
       <Footer />
