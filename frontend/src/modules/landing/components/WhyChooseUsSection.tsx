@@ -64,27 +64,27 @@ export default function WhyChooseUsSection() {
     const rightFeatures = [features[1], features[3]];
 
     return (
-        <section ref={containerRef} className="relative bg-white py-24 overflow-hidden">
+        <section ref={containerRef} className="relative bg-white py-24 md:py-32 overflow-hidden">
             {/* Background elements */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-                <div className="absolute top-[10%] left-[-5%] w-[30%] h-[30%] bg-blue-50/50 rounded-full blur-3xl" />
-                <div className="absolute bottom-[10%] right-[-5%] w-[30%] h-[30%] bg-indigo-50/50 rounded-full blur-3xl" />
+                <div className="absolute top-[20%] left-[-10%] w-[40%] h-[40%] bg-blue-50/60 rounded-full blur-[100px] mix-blend-multiply" />
+                <div className="absolute bottom-[10%] right-[-10%] w-[40%] h-[40%] bg-indigo-50/60 rounded-full blur-[100px] mix-blend-multiply" />
             </div>
 
-            <div className="container mx-auto px-4 relative z-10">
+            <div className="container mx-auto px-4 relative z-10 max-w-6xl">
                 <div className="text-center mb-20 max-w-3xl mx-auto">
-                    <span className="text-blue-600 font-bold tracking-wider uppercase text-sm bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
+                    <span className="text-blue-700 font-bold tracking-wider uppercase text-xs px-3 py-1 rounded-full bg-blue-50 border border-blue-100">
                         Why Choose MentoMania
                     </span>
-                    <h2 className="mt-6 text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl mb-6">
+                    <h2 className="mt-8 text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 leading-[1.1] mb-6">
                         From Scattered to <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Structured</span>
                     </h2>
-                    <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+                    <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
                         Stop wasting time on random videos and outdated material. Get a personalized roadmap from those who have already reached the destination.
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-20 items-center max-w-7xl mx-auto">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-16 items-center">
 
                     {/* LEFT COLUMN */}
                     <motion.div
@@ -97,16 +97,13 @@ export default function WhyChooseUsSection() {
                     </motion.div>
 
                     {/* CENTER COLUMN (IMAGE) */}
-                    <div className="relative order-1 lg:order-2 flex justify-center py-10">
+                    <div className="relative order-1 lg:order-2 flex justify-center py-8">
                         <motion.div
                             style={{ y: imageY, opacity: imageOpacity, scale: imageScale }}
-                            className="relative z-10"
+                            className="relative z-10 w-full max-w-[400px] lg:max-w-full"
                         >
                             <div
-                                className="relative rounded-[2.5rem] overflow-hidden bg-white"
-                                style={{
-                                    boxShadow: '0 0 0 8px rgba(255, 255, 255, 0.8), 0 50px 100px -20px rgba(59, 130, 246, 0.25), 0 30px 60px -30px rgba(0, 0, 0, 0.3)'
-                                }}
+                                className="relative rounded-[2.5rem] overflow-hidden bg-white border-[8px] border-white shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)] ring-1 ring-gray-100"
                             >
                                 <Image
                                     src="/whychooseus.png"

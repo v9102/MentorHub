@@ -16,153 +16,150 @@ export default function HeroSection() {
     const { isSignedIn, isLoaded } = useUser();
 
     return (
-        <section className="relative overflow-hidden pt-20 pb-10 md:pt-32 md:pb-16">
-            {/* Premium Background Decor */}
-            <div className="absolute inset-0 -z-10 bg-gradient-to-br from-blue-50/40 via-white to-indigo-50/30" />
-            <div className="absolute top-0 right-0 -z-10 h-[600px] w-[600px] rounded-full bg-gradient-to-bl from-blue-100/40 to-indigo-100/30 blur-3xl" />
-            <div className="absolute bottom-0 left-0 -z-10 h-[500px] w-[500px] rounded-full bg-gradient-to-tr from-indigo-100/40 to-blue-100/30 blur-3xl" />
+        <section className="relative overflow-hidden pt-32 pb-24 md:pt-40 md:pb-32 bg-white">
+            {/* 4. Depth & Modern Feel: Subtle background gradient */}
+            <div className="absolute inset-0 -z-10 bg-gradient-to-b from-white to-gray-50/50" />
 
-            <div className="max-w-6xl mx-auto px-6">
-                <div className="flex flex-col lg:flex-row items-center">
-                    <div className="max-w-xl text-center flex-shrink-0">
+            {/* Subtle Glows */}
+            <div className="absolute top-0 right-0 -z-10 h-[800px] w-[800px] rounded-full bg-blue-50/30 blur-[120px] opacity-60 mix-blend-multiply" />
+            <div className="absolute bottom-0 left-0 -z-10 h-[600px] w-[600px] rounded-full bg-indigo-50/30 blur-[120px] opacity-60 mix-blend-multiply" />
+
+            {/* 3. Spacing & Layout: max-w-6xl, px-6 */}
+            <div className="max-w-6xl mx-auto px-6 relative z-10">
+
+                {/* 3. Layout: Clean Left Alignment, Grid lg:grid-cols-2 */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+
+                    {/* LEFT CONTENT */}
+                    <div className="text-center lg:text-left">
+
+                        {/* 6. Micro-Polish: Trust Badge */}
                         <motion.div
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5 }}
-                            className="inline-flex items-center gap-2 rounded-full border border-blue-200/60 bg-gradient-to-r from-blue-50 to-indigo-50 px-4 py-2 text-sm font-semibold text-blue-700 mb-8 shadow-sm"
+                            transition={{ duration: 0.6, ease: "easeOut" }}
+                            className="inline-flex items-center gap-2 rounded-full border border-gray-200/80 bg-white/60 backdrop-blur-sm px-4 py-1.5 text-sm font-medium text-gray-600 mb-8 shadow-sm"
                         >
-                            <span className="flex h-2 w-2 rounded-full bg-blue-600 animate-pulse relative">
-                                <span className="absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75 animate-ping"></span>
+                            <span className="flex h-2 w-2 rounded-full bg-green-500 relative">
+                                <span className="absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75 animate-ping"></span>
                             </span>
-                            Trusted by 10,000+ Students
+                            <span className="tracking-wide text-gray-700">Trusted by 10,000+ Students</span>
                         </motion.div>
 
+                        {/* 2. Typography: H1 text-5xl lg:text-6xl, leading-tight */}
                         <motion.h1
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.1 }}
-                            className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl lg:text-5xl mb-6 leading-[1.15] [-webkit-font-smoothing:antialiased]"
+                            transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
+                            className="text-5xl font-extrabold tracking-tight text-gray-900 lg:text-6xl mb-6 leading-tight"
                         >
-                            Ace Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 font-extrabold">Dream Exam</span>
+                            Ace Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Dream Exam</span>
                             <br className="hidden sm:block" />
-                            <span className="block sm:inline mt-2 sm:mt-0">With Top Rankers</span>
+                            <span className="block mt-1">With Top Rankers</span>
                         </motion.h1>
 
                         <motion.p
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.2 }}
-                            className="text-base text-gray-500 mb-10 leading-relaxed"
+                            transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+                            className="text-lg text-gray-600 mb-10 leading-relaxed max-w-2xl mx-auto lg:mx-0"
                         >
                             Connect with mentors who serve in IAS, IPS, SBI, and Railways.
                             Get personalized strategy, answer writing reviews, and interview guidance 1-on-1.
                         </motion.p>
 
                         <motion.div
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.3 }}
-                            className="flex flex-col sm:flex-row gap-4 mb-8 justify-center"
+                            transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
+                            className="flex flex-col sm:flex-row gap-4 mb-10 justify-center lg:justify-start"
                         >
-                            <div className="w-full max-w-md relative">
-                                <div className="relative group">
-                                    <select
-                                        onChange={(e) => {
-                                            if (e.target.value) {
-                                                window.location.href = `/mentors?exam=${e.target.value}`;
-                                            }
-                                        }}
-                                        className="w-full h-14 pl-6 pr-12 rounded-full border-2 border-blue-100 bg-white text-gray-900 font-semibold shadow-xl hover:shadow-2xl hover:border-blue-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none cursor-pointer text-base active:scale-[0.99]"
-                                        defaultValue=""
-                                        aria-label="Select your exam"
-                                    >
-                                        <option value="" disabled>Select your exam (e.g., UPSC, SSC)</option>
-                                        {popularExams.map((exam) => (
-                                            <option key={exam.id} value={exam.id}>
-                                                {exam.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none">
-                                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md group-hover:shadow-lg transition-all">
-                                            <Search className="w-5 h-5 text-white" />
-                                        </div>
+                            <div className="w-full max-w-md relative group">
+                                <select
+                                    onChange={(e) => {
+                                        if (e.target.value) {
+                                            window.location.href = `/mentors?exam=${e.target.value}`;
+                                        }
+                                    }}
+                                    className="w-full h-14 pl-6 pr-14 rounded-full border border-gray-200/60 bg-white text-gray-900 font-medium shadow-lg shadow-gray-200/30 hover:shadow-xl hover:shadow-200/40 hover:border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none cursor-pointer text-base"
+                                    defaultValue=""
+                                    aria-label="Select your exam"
+                                >
+                                    <option value="" disabled>Select your exam (e.g., UPSC, SSC)</option>
+                                    {popularExams.map((exam) => (
+                                        <option key={exam.id} value={exam.id}>
+                                            {exam.name}
+                                        </option>
+                                    ))}
+                                </select>
+                                <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
+                                    <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform duration-300">
+                                        <Search className="w-5 h-5 text-white" />
                                     </div>
                                 </div>
                             </div>
                         </motion.div>
                     </div>
 
-                    {/* Right Column: Image - Desktop Only */}
-                    <div className="hidden lg:block flex-shrink-0 ml-0">
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.8, delay: 0.4, type: "spring", stiffness: 100 }}
-                            className="w-full max-w-[480px]"
-                            style={{ perspective: '1200px' }}
-                        >
-                            <div
-                                className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white/80 transition-all duration-500 hover:scale-105 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.25)]"
-                                style={{
-                                    transform: 'rotateY(-15deg)',
-                                    transformStyle: 'preserve-3d',
-                                    boxShadow: '0 25px 50px -12px rgba(59, 130, 246, 0.25)'
-                                }}
-                            >
-                                <Image
-                                    src="/mentorLanding.png"
-                                    alt="Live 1-on-1 mentorship session"
-                                    width={480}
-                                    height={360}
-                                    className="w-full h-auto"
-                                    priority
-                                />
+                    {/* RIGHT IMAGE */}
+                    {/* 1. Image Style: Flat, Rounded-3xl, Shadow-2xl */}
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.98 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+                        className="hidden lg:block relative max-w-[600px] mx-auto"
+                    >
+                        {/* 1. Subtle Radial Glow behind image */}
+                        <div className="absolute inset-0 bg-blue-100/50 blur-[80px] rounded-full scale-90 -z-10" />
 
-                                {/* Live Badge */}
-                                <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-lg flex items-center gap-2 border border-green-100">
-                                    <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse relative">
-                                        <span className="absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75 animate-ping"></span>
-                                    </span>
-                                    <span className="text-xs font-semibold text-gray-900">Live 1-on-1 Sessions</span>
-                                </div>
+                        <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white ring-1 ring-gray-100/50">
+                            <Image
+                                src="/mentorLanding.png"
+                                alt="Live 1-on-1 mentorship session"
+                                width={800}
+                                height={600}
+                                className="w-full h-auto object-cover"
+                                priority
+                            />
 
-                                {/* Stats Badge */}
-                                <div className="absolute bottom-4 right-4 bg-white/95 backdrop-blur-sm rounded-xl px-3 py-2 shadow-xl border border-yellow-100">
-                                    <div className="flex items-center gap-2">
-                                        <div className="flex items-center gap-1">
-                                            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                                            <span className="text-base font-bold text-gray-900">4.9</span>
+                            {/* Live Badge */}
+                            <div className="absolute top-6 left-6 bg-white/95 backdrop-blur-md rounded-full px-4 py-2 shadow-lg flex items-center gap-2 border border-gray-100">
+                                <span className="flex h-2.5 w-2.5 rounded-full bg-green-500 relative">
+                                    <span className="absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75 animate-ping"></span>
+                                </span>
+                                <span className="text-sm font-bold text-gray-900 tracking-wide">Live 1-on-1</span>
+                            </div>
+
+                            {/* Stats Badge */}
+                            <div className="absolute bottom-6 right-6 bg-white/95 backdrop-blur-md rounded-2xl p-5 shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-gray-100">
+                                <div className="flex items-center gap-5">
+                                    <div className="flex flex-col">
+                                        <span className="text-3xl font-bold text-gray-900 leading-none tracking-tight">4.9</span>
+                                        <div className="flex gap-0.5 mt-1.5">
+                                            {[1, 2, 3, 4, 5].map((s) => (
+                                                <Star key={s} className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
+                                            ))}
                                         </div>
-                                        <div className="h-6 w-px bg-gray-200"></div>
-                                        <div className="text-right">
-                                            <div className="text-sm font-bold text-gray-900">10,000+</div>
-                                            <div className="text-[10px] text-gray-500">Students</div>
-                                        </div>
+                                    </div>
+                                    <div className="w-px h-10 bg-gray-200"></div>
+                                    <div className="text-right">
+                                        <div className="text-xl font-bold text-gray-900 leading-none tracking-tight">10k+</div>
+                                        <div className="text-xs font-semibold text-gray-500 mt-1 uppercase tracking-wide">Students</div>
                                     </div>
                                 </div>
                             </div>
-                        </motion.div>
-                    </div>
+                        </div>
+                    </motion.div>
                 </div>
 
                 {isLoaded && isSignedIn && (
                     <motion.div
-                        initial={{ opacity: 0, y: 40 }}
+                        initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.7, delay: 0.5 }}
-                        className="relative mx-auto max-w-5xl rounded-2xl border border-gray-200 bg-white shadow-2xl overflow-hidden mt-16"
+                        transition={{ duration: 0.8, delay: 0.6 }}
+                        className="relative mx-auto max-w-5xl rounded-2xl border border-gray-200 bg-white shadow-xl overflow-hidden mt-24"
                     >
-                        <div className="absolute top-0 left-0 w-full h-8 bg-gray-50 border-b border-gray-100 flex items-center px-4 gap-2 z-10">
-                            <div className="w-3 h-3 rounded-full bg-red-400"></div>
-                            <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-                            <div className="w-3 h-3 rounded-full bg-green-400"></div>
-                        </div>
-
                         <HeroMockUI />
-
-                        {/* Overlay Gradient */}
-                        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent pointer-events-none"></div>
                     </motion.div>
                 )}
             </div>

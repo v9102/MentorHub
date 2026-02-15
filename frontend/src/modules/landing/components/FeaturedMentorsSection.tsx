@@ -17,26 +17,25 @@ export default function FeaturedMentorsSection() {
     }, []);
 
     return (
-        <section className="py-6 md:py-10 bg-gradient-to-b from-gray-50 via-white to-white relative overflow-hidden">
+        <section className="py-24 md:py-32 bg-gradient-to-b from-gray-50 via-white to-white relative overflow-hidden">
             {/* Ambient Background Blob */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-                <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-50/50 rounded-full blur-3xl opacity-60 mix-blend-multiply filter" />
-                <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-orange-50/50 rounded-full blur-3xl opacity-60 mix-blend-multiply filter" />
+                <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-blue-50/50 rounded-full blur-[120px] opacity-60 mix-blend-multiply" />
+                <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-indigo-50/50 rounded-full blur-[120px] opacity-60 mix-blend-multiply" />
             </div>
 
-            <div className="container mx-auto px-4 relative z-10">
-                <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
-                    <div>
-                        <div className="relative inline-block">
+            <div className="container mx-auto px-4 max-w-6xl relative z-10">
+                <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-8">
+                    <div className="max-w-3xl">
+                        <div className="relative inline-block mb-4">
                             <motion.span
                                 initial={{ opacity: 0, y: 10 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                className="text-blue-600 font-semibold tracking-wide uppercase text-sm relative z-10"
+                                className="text-blue-700 font-bold tracking-wider uppercase text-xs px-3 py-1 rounded-full bg-blue-50 border border-blue-100"
                             >
-                                Top Rated
+                                Top Rated Mentors
                             </motion.span>
-                            <div className="absolute -inset-2 bg-blue-100/50 rounded-lg blur-md -z-0"></div>
                         </div>
 
                         <motion.h2
@@ -44,18 +43,18 @@ export default function FeaturedMentorsSection() {
                             whileInView={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
                             viewport={{ once: true }}
-                            className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"
+                            className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 leading-[1.1]"
                         >
-                            Learn from the Best
+                            Learn from the <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Best</span>
                         </motion.h2>
                         <motion.p
                             initial={{ opacity: 0, y: 10 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
                             viewport={{ once: true }}
-                            className="mt-4 max-w-2xl text-lg text-gray-600"
+                            className="mt-6 text-lg text-gray-600 max-w-2xl leading-relaxed"
                         >
-                            Browse mentors who have been in your shoes and succeeded.
+                            Don't just study hard. Study smart with mentors who have been in your shoes and succeeded at the highest levels.
                         </motion.p>
                     </div>
                     <Link href="/mentors">

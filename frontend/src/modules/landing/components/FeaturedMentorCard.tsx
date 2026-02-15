@@ -59,7 +59,7 @@ export default function FeaturedMentorCard({
     }
 
     return (
-        <div className="group relative bg-white rounded-2xl shadow-sm hover:shadow-lg overflow-hidden flex flex-col h-full min-h-[340px] transition-all duration-300 hover:-translate-y-1">
+        <div className="group relative bg-white rounded-3xl border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col h-full min-h-[380px] transition-all duration-300 hover:-translate-y-1">
             {/* Gradient Header */}
             <div className="h-[50px] bg-gradient-to-br from-blue-100 via-blue-200 to-blue-400" />
 

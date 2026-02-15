@@ -30,28 +30,28 @@ const faqs = [
 
 export default function FAQSection() {
     return (
-        <section className="py-24 bg-white relative overflow-hidden">
+        <section className="py-24 md:py-32 bg-white relative overflow-hidden">
             {/* Background Decor */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-                <div className="absolute -top-[20%] -right-[10%] w-[50%] h-[50%] bg-blue-50/50 rounded-full blur-3xl" />
-                <div className="absolute -bottom-[20%] -left-[10%] w-[50%] h-[50%] bg-indigo-50/50 rounded-full blur-3xl" />
+                <div className="absolute -top-[20%] -right-[10%] w-[600px] h-[600px] bg-blue-50/60 rounded-full blur-[100px] mix-blend-multiply" />
+                <div className="absolute -bottom-[20%] -left-[10%] w-[600px] h-[600px] bg-indigo-50/60 rounded-full blur-[100px] mix-blend-multiply" />
             </div>
 
-            <div className="container mx-auto px-4 max-w-3xl relative z-10">
-                <div className="text-center mb-16">
-                    <span className="text-blue-600 font-bold tracking-wider uppercase text-sm bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
+            <div className="container mx-auto px-4 max-w-4xl relative z-10">
+                <div className="text-center mb-20">
+                    <span className="text-blue-700 font-bold tracking-wider uppercase text-xs px-3 py-1 rounded-full bg-blue-50 border border-blue-100">
                         FAQ
                     </span>
                     <motion.h2
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="mt-6 text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl mb-6"
+                        className="mt-8 text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 leading-[1.1] mb-6"
                     >
                         Frequently Asked Questions
                     </motion.h2>
-                    <p className="text-lg text-gray-500 max-w-xl mx-auto">
-                        Everything you need to know about the product and billing. Can't find the answer you're looking for?
+                    <p className="text-lg text-gray-600 max-w-xl mx-auto leading-relaxed">
+                        Everything you need to know about simple booking, pricing, and mentorship.
                     </p>
                 </div>
 
@@ -66,7 +66,7 @@ export default function FAQSection() {
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="bg-gray-50 rounded-2xl p-8 md:p-10 text-center border border-gray-100"
+                    className="bg-gray-50/80 backdrop-blur-sm rounded-3xl p-10 md:p-12 text-center border border-gray-100 shadow-sm"
                 >
                     <div className="flex justify-center -space-x-2 mb-4">
                         {[1, 2, 3].map((i) => (
@@ -96,8 +96,8 @@ function FAQItem({ question, answer, index }: { question: string, answer: string
             transition={{ delay: index * 0.1 }}
             viewport={{ once: true }}
             className={cn(
-                "border rounded-xl bg-white overflow-hidden transition-all duration-300",
-                isOpen ? "border-blue-200 shadow-md ring-1 ring-blue-50" : "border-gray-200 shadow-sm hover:shadow-md hover:border-gray-300"
+                "border rounded-2xl bg-white overflow-hidden transition-all duration-300",
+                isOpen ? "border-blue-200 shadow-lg ring-1 ring-blue-50 scale-[1.01]" : "border-gray-200 shadow-sm hover:shadow-md hover:border-blue-200"
             )}
         >
             <button

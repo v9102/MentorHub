@@ -75,14 +75,19 @@ const testimonials: Testimonial[] = [
 
 export default function TestimonialsSection() {
     return (
-        <section className="py-16 md:py-24 bg-gray-50/50 overflow-hidden">
-            <div className="container mx-auto px-4">
-                <div className="text-center mb-16">
+        <section className="py-24 md:py-32 bg-gray-50/50 overflow-hidden relative">
+            {/* Background elements */}
+            <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+                <div className="absolute top-[40%] left-[20%] w-[600px] h-[600px] bg-blue-100/40 rounded-full blur-[100px] mix-blend-multiply" />
+            </div>
+
+            <div className="container mx-auto px-4 max-w-6xl relative z-10">
+                <div className="text-center mb-20">
                     <motion.h2
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl mb-6"
+                        className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 mb-6 leading-[1.1]"
                     >
                         Success Stories
                     </motion.h2>
@@ -111,7 +116,7 @@ export default function TestimonialsSection() {
                                 viewport={{ once: true }}
                                 className="h-full min-w-[340px] sm:min-w-0 snap-center flex flex-col"
                             >
-                                <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] transition-all duration-300 h-full flex flex-col group relative">
+                                <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_24px_rgba(0,0,0,0.08)] transition-all duration-300 h-full flex flex-col group relative">
 
                                     {/* Mentor Header */}
                                     <div className="flex items-center gap-4 mb-6 relative">
