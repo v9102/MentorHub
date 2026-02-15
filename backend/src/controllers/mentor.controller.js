@@ -3,13 +3,28 @@ import User from "../models/user.js";
 
 export const getMentors = async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+
+    const limit = 20;
+
+    const skip = (page - 1) * limit;
+
     const mentors = await User.find({ role: "mentor" })
-      .select("-password");
+      .select("-password")
+      .skip(skip)
+      .limit(limit);
+
+    const totalMentors = await User.countDocuments({ role: "mentor" });
 
     res.status(200).json({
       success: true,
+      page,
+      limit,
+      totalMentors,
+      totalPages: Math.ceil(totalMentors / limit),
       mentors
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -17,6 +32,7 @@ export const getMentors = async (req, res) => {
     });
   }
 };
+
 
 export const showMentorProfile = async (req, res) => {
   try {
