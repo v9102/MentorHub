@@ -5,19 +5,25 @@ const BACKEND_URL = "";
 
 const getBaseUrl = () => {
   if (typeof window !== "undefined") {
-    // Client-side: use relative path
+    // Client-side: use relative path (relies on Next.js rewrites)
     return "";
   }
+
   // Server-side: use absolute URL
+  // Priority: NEXT_PUBLIC_APP_URL > VERCEL_URL > localhost
   if (process.env.NEXT_PUBLIC_APP_URL) {
+    console.log(`[getBaseUrl] Using NEXT_PUBLIC_APP_URL: ${process.env.NEXT_PUBLIC_APP_URL}`);
     return process.env.NEXT_PUBLIC_APP_URL;
   }
 
   if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}`;
+    const url = `https://${process.env.VERCEL_URL}`;
+    console.log(`[getBaseUrl] Using VERCEL_URL: ${url}`);
+    return url;
   }
 
-  // Fallback to localhost
+  // Fallback to localhost for local development
+  console.log(`[getBaseUrl] Fallback to localhost`);
   return "http://localhost:3000";
 };
 
