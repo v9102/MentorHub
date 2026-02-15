@@ -10,6 +10,7 @@ const isPublicRoute = createRouteMatcher([
   '/become-mentor(.*)',
   '/about(.*)',
   '/onboarding(.*)',
+  '/book(.*)',
   '/api/webhooks(.*)',
   '/api/mentors(.*)',
 ]);

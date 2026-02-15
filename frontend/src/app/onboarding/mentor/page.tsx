@@ -41,11 +41,8 @@ export default function MentorRegistrationPage() {
         try {
             console.log("Submitting Mentor Data:", formData);
 
-            // Sending data to backend
-            // Note: Backend URL handling should ideally be in env vars or proxy
-            // Assuming relative path /api/mentors if proxy is set, or localhost:5000
-
-            const response = await fetch("http://localhost:5000/api/mentors", {
+            // Sending data to backend (via Proxy)
+            const response = await fetch(`/api/mentor/onboarding`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

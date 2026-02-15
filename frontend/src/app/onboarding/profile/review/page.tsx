@@ -10,7 +10,7 @@ export default function ReviewPage() {
 
   const onSubmit = async () => {
     try {
-      const res = await fetch("/api/mentor/onboarding", {
+      const res = await fetch(`/api/mentor/onboarding`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -41,104 +41,104 @@ export default function ReviewPage() {
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 space-y-6">
-          {/* Basic Info */}
-          <Section title="Basic Information">
-            <Item
-              label="Name"
-              value={
-                data.basicInfo
-                  ? `${data.basicInfo.firstName} ${data.basicInfo.lastName}`
-                  : "-"
-              }
-            />
+        {/* Basic Info */}
+        <Section title="Basic Information">
+          <Item
+            label="Name"
+            value={
+              data.basicInfo
+                ? `${data.basicInfo.firstName} ${data.basicInfo.lastName}`
+                : "-"
+            }
+          />
 
-            <Item
-              label="Gender"
-              value={
-                data.basicInfo?.gender ? capitalize(data.basicInfo.gender) : "-"
-              }
-            />
-          </Section>
+          <Item
+            label="Gender"
+            value={
+              data.basicInfo?.gender ? capitalize(data.basicInfo.gender) : "-"
+            }
+          />
+        </Section>
 
-          {/* Professional Info */}
-          <Section title="Professional Background">
-            <Item
-              label="College"
-              value={data.professionalInfo?.college ?? "-"}
-            />
-            <Item label="Branch" value={data.professionalInfo?.branch ?? "-"} />
-            <Item
-              label="Passing Year"
-              value={
-                data.professionalInfo?.passingYear
-                  ? data.professionalInfo.passingYear.toString()
-                  : "-"
-              }
-            />
-          </Section>
+        {/* Professional Info */}
+        <Section title="Professional Background">
+          <Item
+            label="College"
+            value={data.professionalInfo?.college ?? "-"}
+          />
+          <Item label="Branch" value={data.professionalInfo?.branch ?? "-"} />
+          <Item
+            label="Passing Year"
+            value={
+              data.professionalInfo?.passingYear
+                ? data.professionalInfo.passingYear.toString()
+                : "-"
+            }
+          />
+        </Section>
 
-          {/* Expertise */}
-          <Section title="Expertise">
-            <Item
-              label="Subjects"
-              value={
-                data.expertise?.subjects?.length
-                  ? data.expertise.subjects.join(", ")
-                  : "-"
-              }
-            />
-            <Item
-              label="Specializations"
-              value={data.expertise?.specializations ?? "-"}
-            />
-          </Section>
+        {/* Expertise */}
+        <Section title="Expertise">
+          <Item
+            label="Subjects"
+            value={
+              data.expertise?.subjects?.length
+                ? data.expertise.subjects.join(", ")
+                : "-"
+            }
+          />
+          <Item
+            label="Specializations"
+            value={data.expertise?.specializations ?? "-"}
+          />
+        </Section>
 
-          {/* Availability */}
-          <Section title="Availability">
-            <Item
-              label="Days"
-              value={
-                data.availability?.days?.length
-                  ? data.availability.days.join(", ")
-                  : "-"
-              }
-            />
-            <Item
-              label="Time Slots"
-              value={
-                data.availability?.timeSlots?.length
-                  ? data.availability.timeSlots.join(", ")
-                  : "-"
-              }
-            />
-          </Section>
+        {/* Availability */}
+        <Section title="Availability">
+          <Item
+            label="Days"
+            value={
+              data.availability?.days?.length
+                ? data.availability.days.join(", ")
+                : "-"
+            }
+          />
+          <Item
+            label="Time Slots"
+            value={
+              data.availability?.timeSlots?.length
+                ? data.availability.timeSlots.join(", ")
+                : "-"
+            }
+          />
+        </Section>
 
-          {/* Pricing */}
-          <Section title="Pricing">
-            <Item
-              label="Price per session"
-              value={
-                data.pricing?.pricePerSession
-                  ? `₹${data.pricing.pricePerSession} / session`
-                  : "-"
-              }
-            />
-          </Section>
+        {/* Pricing */}
+        <Section title="Pricing">
+          <Item
+            label="Price per session"
+            value={
+              data.pricing?.pricePerSession
+                ? `₹${data.pricing.pricePerSession} / session`
+                : "-"
+            }
+          />
+        </Section>
 
-          {/* Submit */}
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              onSubmit();
-            }}
-            className="pt-4 border-t border-gray-100"
-          >
-            <OnboardingActionButton
-              isValid={true}
-              isSubmitting={false}
-              label="Submit Profile"
-            />
-          </form>
+        {/* Submit */}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            onSubmit();
+          }}
+          className="pt-4 border-t border-gray-100"
+        >
+          <OnboardingActionButton
+            isValid={true}
+            isSubmitting={false}
+            label="Submit Profile"
+          />
+        </form>
       </div>
     </div>
   );

@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  User, 
-  Briefcase, 
-  DollarSign, 
-  Calendar, 
+import {
+  User,
+  Briefcase,
+  DollarSign,
+  Calendar,
   CheckCircle,
   Check
 } from "lucide-react";
@@ -48,7 +48,7 @@ export function OnboardingSidebar() {
       {/* Header */}
       <div className="p-8 border-b border-gray-100">
         <h2 className="text-2xl font-bold bg-gradient-to-r from-[#0066ff] to-[#004bbd] bg-clip-text text-transparent">
-          MentorHub
+          MentoMania
         </h2>
         <p className="text-sm text-gray-500 mt-1 font-medium">Mentor Onboarding</p>
       </div>
@@ -57,7 +57,7 @@ export function OnboardingSidebar() {
       <nav className="flex-1 p-6 space-y-1 overflow-y-auto">
         {STEPS.map((step, index) => {
           const currentIndex = STEPS.findIndex(s => pathname.startsWith(s.path));
-          
+
           const isCompleted = index < currentIndex;
           const isActive = index === currentIndex;
           // const isPending = index > currentIndex;
@@ -73,7 +73,7 @@ export function OnboardingSidebar() {
                 !isActive && !isCompleted && "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
               )}
             >
-              <div 
+              <div
                 className={clsx(
                   "w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors flex-shrink-0",
                   isCompleted && "bg-[#0066ff] border-[#0066ff] text-white",
@@ -81,9 +81,9 @@ export function OnboardingSidebar() {
                   !isActive && !isCompleted && "border-gray-300 text-gray-300 group-hover:border-gray-400 group-hover:text-gray-400"
                 )}
               >
-                  {isCompleted ? <Check className="w-4 h-4" /> : <span>{index + 1}</span>}
+                {isCompleted ? <Check className="w-4 h-4" /> : <span>{index + 1}</span>}
               </div>
-              
+
               <span className={clsx(
                 "font-semibold tracking-wide",
                 isCompleted && "text-[#0066ff]",
@@ -104,9 +104,9 @@ export function OnboardingSidebar() {
 
       {/* Sidebar Footer */}
       <div className="p-6 border-t border-gray-100 bg-gray-50/50">
-         <p className="text-xs text-gray-400 text-center">
-             &copy; {new Date().getFullYear()} MentorHub
-         </p>
+        <p className="text-xs text-gray-400 text-center">
+          &copy; {new Date().getFullYear()} MentoMania
+        </p>
       </div>
     </div>
   );

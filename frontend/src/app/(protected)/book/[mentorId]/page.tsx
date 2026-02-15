@@ -1,4 +1,4 @@
-import { fetchMentorById } from "@/shared/lib/api/mentors";
+// fetchMentorById import removed
 import BookingClient from "./BookingClient";
 
 export default async function BookingPage({
@@ -8,18 +8,5 @@ export default async function BookingPage({
 }) {
   const { mentorId } = await params;
 
-  const mentor = await fetchMentorById(mentorId);
-
-  if (!mentor) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold">Booking not available</h1>
-        <p className="text-gray-600">
-          Mentor not found for booking.
-        </p>
-      </div>
-    );
-  }
-
-  return <BookingClient mentor={mentor} mentorId={mentorId} />;
+  return <BookingClient mentorId={mentorId} />;
 }

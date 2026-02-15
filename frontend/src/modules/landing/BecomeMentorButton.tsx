@@ -9,7 +9,7 @@ export default function BecomeMentorButton() {
 
   const onboardingPath = "/onboarding/profile/basic-info";
 
-  const buttonClasses = "px-8 py-3 bg-white text-blue-800 rounded-3xl border-2 border-blue-800 hover:bg-blue-50 transition-colors cursor-pointer";
+  const buttonClasses = "px-8 py-3 bg-white text-blue-600 rounded-3xl border-2 border-blue-600 hover:bg-blue-50 transition-colors cursor-pointer font-semibold";
 
   if (isSignedIn) {
     return (

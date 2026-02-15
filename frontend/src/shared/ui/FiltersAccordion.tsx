@@ -56,9 +56,8 @@ export default function FiltersAccordion({
 
       {/* Accordion Content */}
       <div
-        className={`transition-all duration-300 ease-in-out ${
-          isOpen ? "max-h-[800px] opacity-100" : "max-h-0 opacity-0"
-        } overflow-hidden`}
+        className={`transition-all duration-300 ease-in-out ${isOpen ? "max-h-[800px] opacity-100" : "max-h-0 opacity-0"
+          } overflow-hidden`}
       >
         <div className="p-4 pt-0 space-y-4 border-t border-gray-100">
           {/* Min Hourly Rate */}
@@ -106,18 +105,19 @@ export default function FiltersAccordion({
               className="w-full border-2 border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:border-blue-500 focus:outline-none transition-colors duration-200 bg-white"
             >
               <option value="">All Subjects</option>
-              <option value="Physics">Physics</option>
-              <option value="Chemistry">Chemistry</option>
-              <option value="Mathematics">Mathematics</option>
-              <option value="Biology">Biology</option>
+              <option value="General Studies">General Studies</option>
+              <option value="Essay">Essay</option>
+              <option value="Ethics">Ethics</option>
               <option value="History">History</option>
-              <option value="Economics">Economics</option>
-              <option value="Accountancy">Accountancy</option>
-              <option value="Business Studies">Business Studies</option>
-              <option value="Legal Reasoning">Legal Reasoning</option>
-              <option value="English">English</option>
+              <option value="Geography">Geography</option>
+              <option value="Polity">Polity</option>
+              <option value="Economy">Economy</option>
               <option value="Quantitative Aptitude">Quantitative Aptitude</option>
-              <option value="DILR">DILR</option>
+              <option value="Reasoning">Reasoning</option>
+              <option value="English">English</option>
+              <option value="Current Affairs">Current Affairs</option>
+              <option value="CSAT">CSAT</option>
+              <option value="Optional Subject">Optional Subject</option>
             </select>
           </div>
 
@@ -134,14 +134,16 @@ export default function FiltersAccordion({
               className="w-full border-2 border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:border-blue-500 focus:outline-none transition-colors duration-200 bg-white"
             >
               <option value="">All Exams</option>
-              <option value="JEE Advanced">JEE Advanced</option>
+              <option value="UPSC CSE">UPSC CSE</option>
+              <option value="SSC CGL">SSC CGL</option>
+              <option value="Banking">Banking (IBPS/SBI)</option>
+              <option value="Railways">Railways (RRB)</option>
+              <option value="State PSC">State PSC</option>
+              <option value="Defence">Defence (NDA/CDS)</option>
+              <option value="RBI Grade B">RBI Grade B</option>
+              <option value="Teaching">Teaching (CTET)</option>
               <option value="JEE Mains">JEE Mains</option>
               <option value="NEET">NEET</option>
-              <option value="GATE">GATE</option>
-              <option value="CAT">CAT</option>
-              <option value="UPSC">UPSC</option>
-              <option value="CLAT">CLAT</option>
-              <option value="CUET">CUET</option>
             </select>
           </div>
 

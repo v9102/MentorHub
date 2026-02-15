@@ -1,5 +1,8 @@
 "use client";
 
+import { Slider } from "./slider";
+import { motion } from "framer-motion";
+
 interface FilterState {
   minHourlyRate: string;
   maxHourlyRate: string;
@@ -29,8 +32,19 @@ export default function FiltersPanel({
     });
   };
 
+  const handleSliderChange = (value: number[]) => {
+    onFiltersChange({
+      ...filters,
+      minHourlyRate: value[0].toString(),
+      maxHourlyRate: value[1].toString(),
+    });
+  };
+
+  const minPrice = filters.minHourlyRate ? parseInt(filters.minHourlyRate) : 0;
+  const maxPrice = filters.maxHourlyRate ? parseInt(filters.maxHourlyRate) : 5000;
+
   return (
-    <div className="bg-white border-2 border-gray-100 rounded-2xl p-6 space-y-5 shadow-sm">
+    <div className="bg-white border-2 border-gray-100 rounded-2xl p-6 space-y-6 shadow-sm">
       {/* Header */}
       <div className="flex items-center justify-between pb-4 border-b border-gray-100">
         <h3 className="font-bold text-lg text-gray-900">Filters</h3>
@@ -39,35 +53,29 @@ export default function FiltersPanel({
         </span>
       </div>
 
-      {/* Min Hourly Rate */}
+      {/* Hourly Rate Slider */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Min Hourly Rate (₹)
-        </label>
-        <input
-          type="number"
-          value={filters.minHourlyRate}
-          onChange={(e) =>
-            onFiltersChange({ ...filters, minHourlyRate: e.target.value })
-          }
-          placeholder="e.g. 500"
-          className="w-full border-2 border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:border-blue-500 focus:outline-none transition-colors duration-200"
-        />
-      </div>
-
-      {/* Max Hourly Rate */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Max Hourly Rate (₹)
-        </label>
-        <input
-          type="number"
-          value={filters.maxHourlyRate}
-          onChange={(e) =>
-            onFiltersChange({ ...filters, maxHourlyRate: e.target.value })
-          }
-          placeholder="e.g. 2000"
-          className="w-full border-2 border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:border-blue-500 focus:outline-none transition-colors duration-200"
+        <div className="flex justify-between items-center mb-4">
+          <label className="text-sm font-medium text-gray-700">
+            Hourly Rate
+          </label>
+          <motion.div
+            key={`${minPrice}-${maxPrice}`}
+            initial={{ scale: 1.1, color: "#2563eb" }}
+            animate={{ scale: 1, color: "#4b5563" }}
+            className="text-sm font-semibold text-gray-600"
+          >
+            ₹{minPrice} - ₹{maxPrice}
+          </motion.div>
+        </div>
+        <Slider
+          defaultValue={[0, 5000]}
+          min={0}
+          max={5000}
+          step={100}
+          value={[minPrice, maxPrice]}
+          onValueChange={handleSliderChange}
+          className="py-4"
         />
       </div>
 
@@ -84,18 +92,19 @@ export default function FiltersPanel({
           className="w-full border-2 border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:border-blue-500 focus:outline-none transition-colors duration-200 bg-white"
         >
           <option value="">All Subjects</option>
-          <option value="Physics">Physics</option>
-          <option value="Chemistry">Chemistry</option>
-          <option value="Mathematics">Mathematics</option>
-          <option value="Biology">Biology</option>
+          <option value="General Studies">General Studies</option>
+          <option value="Essay">Essay</option>
+          <option value="Ethics">Ethics</option>
           <option value="History">History</option>
-          <option value="Economics">Economics</option>
-          <option value="Accountancy">Accountancy</option>
-          <option value="Business Studies">Business Studies</option>
-          <option value="Legal Reasoning">Legal Reasoning</option>
-          <option value="English">English</option>
+          <option value="Geography">Geography</option>
+          <option value="Polity">Polity</option>
+          <option value="Economy">Economy</option>
           <option value="Quantitative Aptitude">Quantitative Aptitude</option>
-          <option value="DILR">DILR</option>
+          <option value="Reasoning">Reasoning</option>
+          <option value="English">English</option>
+          <option value="Current Affairs">Current Affairs</option>
+          <option value="CSAT">CSAT</option>
+          <option value="Optional Subject">Optional Subject</option>
         </select>
       </div>
 
@@ -112,15 +121,16 @@ export default function FiltersPanel({
           className="w-full border-2 border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:border-blue-500 focus:outline-none transition-colors duration-200 bg-white"
         >
           <option value="">All Exams</option>
-          <option value="JEE Advanced">JEE Advanced</option>
+          <option value="UPSC CSE">UPSC CSE</option>
+          <option value="SSC CGL">SSC CGL</option>
+          <option value="Banking">Banking (IBPS/SBI)</option>
+          <option value="Railways">Railways (RRB)</option>
+          <option value="State PSC">State PSC</option>
+          <option value="Defence">Defence (NDA/CDS)</option>
+          <option value="RBI Grade B">RBI Grade B</option>
+          <option value="Teaching">Teaching (CTET)</option>
           <option value="JEE Mains">JEE Mains</option>
           <option value="NEET">NEET</option>
-          <option value="GATE">GATE</option>
-          <option value="CAT">CAT</option>
-          <option value="UPSC">UPSC</option>
-          <option value="CLAT">CLAT</option>
-          <option value="CUET">CUET</option>
-          <option value="IIT JAM">IIT JAM</option>
         </select>
       </div>
 
@@ -146,7 +156,7 @@ export default function FiltersPanel({
       {/* Reset Button */}
       <button
         onClick={handleReset}
-        className="w-full mt-4 px-4 py-2.5 text-sm font-semibold text-orange-600 bg-orange-50 border-2 border-orange-200 rounded-lg hover:bg-orange-100 hover:border-orange-300 transition-all duration-200"
+        className="w-full mt-4 px-4 py-2.5 text-sm font-semibold text-gray-600 bg-gray-50 border-2 border-gray-200 rounded-lg hover:bg-gray-100 hover:text-gray-900 transition-all duration-200"
       >
         Reset Filters
       </button>

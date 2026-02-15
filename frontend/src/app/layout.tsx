@@ -3,6 +3,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/shared/ui/Navbar";
+import ScrollProgress from "@/shared/ui/ScrollProgress";
 import { MentorOnboardingProvider } from "@/shared/lib/context/MentorOnboardingContext";
 
 const geistSans = Geist({
@@ -16,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MentorHub",
+  title: "MentoMania",
   description: "Mentorship platform",
 };
 
@@ -32,6 +33,7 @@ export default function RootLayout({
           <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}
           >
+            <ScrollProgress />
             <Navbar />
             <main>{children}</main>
           </body>
