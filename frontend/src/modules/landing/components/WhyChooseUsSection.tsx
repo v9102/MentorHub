@@ -65,17 +65,26 @@ export default function WhyChooseUsSection() {
 
     return (
         <section ref={containerRef} className="relative bg-white py-24 overflow-hidden">
-            <div className="container mx-auto px-4">
-                <div className="text-center mb-20">
-                    <span className="text-orange-500 font-bold tracking-wide uppercase text-sm">
-                        OUR OFFERINGS
+            {/* Background elements */}
+            <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+                <div className="absolute top-[10%] left-[-5%] w-[30%] h-[30%] bg-blue-50/50 rounded-full blur-3xl" />
+                <div className="absolute bottom-[10%] right-[-5%] w-[30%] h-[30%] bg-indigo-50/50 rounded-full blur-3xl" />
+            </div>
+
+            <div className="container mx-auto px-4 relative z-10">
+                <div className="text-center mb-20 max-w-3xl mx-auto">
+                    <span className="text-blue-600 font-bold tracking-wider uppercase text-sm bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
+                        Why Choose MentoMania
                     </span>
-                    <h2 className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                        From Scattered to Structured – Towards Your Goal
+                    <h2 className="mt-6 text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl mb-6">
+                        From Scattered to <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Structured</span>
                     </h2>
+                    <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+                        Stop wasting time on random videos and outdated material. Get a personalized roadmap from those who have already reached the destination.
+                    </p>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-center max-w-7xl mx-auto">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-20 items-center max-w-7xl mx-auto">
 
                     {/* LEFT COLUMN */}
                     <motion.div
@@ -88,20 +97,53 @@ export default function WhyChooseUsSection() {
                     </motion.div>
 
                     {/* CENTER COLUMN (IMAGE) */}
-                    <div className="relative order-1 lg:order-2 flex justify-center">
+                    <div className="relative order-1 lg:order-2 flex justify-center py-10">
                         <motion.div
                             style={{ y: imageY, opacity: imageOpacity, scale: imageScale }}
-                            className="relative z-10 rounded-tl-[4rem] rounded-br-[4rem] overflow-hidden shadow-2xl"
+                            className="relative z-10"
                         >
-                            <div className="absolute inset-0 bg-blue-600 top-20 -z-10 mx-4" />
-                            <Image
-                                src="/student-success.png"
-                                alt="Student with books"
-                                width={400}
-                                height={500}
-                                className="w-auto h-[500px] object-cover"
-                                priority
-                            />
+                            <div
+                                className="relative rounded-[2.5rem] overflow-hidden bg-white"
+                                style={{
+                                    boxShadow: '0 0 0 8px rgba(255, 255, 255, 0.8), 0 50px 100px -20px rgba(59, 130, 246, 0.25), 0 30px 60px -30px rgba(0, 0, 0, 0.3)'
+                                }}
+                            >
+                                <Image
+                                    src="/whychooseus.png"
+                                    alt="Student successfully studying with mentorship"
+                                    width={450}
+                                    height={550}
+                                    className="w-auto h-[500px] object-cover block"
+                                    priority
+                                />
+
+                                {/* Decorative badge */}
+                                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-md px-6 py-3 rounded-2xl shadow-xl border border-blue-50 flex items-center gap-3 whitespace-nowrap">
+                                    <div className="flex -space-x-3">
+                                        {[
+                                            '/mentors/amit.jpg',
+                                            '/mentors/karthik.jpg',
+                                            '/mentors/rahul.jpg'
+                                        ].map((src, i) => (
+                                            <div key={i} className="relative w-8 h-8 rounded-full border-2 border-white overflow-hidden">
+                                                <Image
+                                                    src={src}
+                                                    alt="Mentor Avatar"
+                                                    fill
+                                                    className="object-cover"
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="text-sm">
+                                        <span className="font-bold text-gray-900 block">500+ Top Mentors</span>
+                                        <span className="text-xs text-gray-500">Ready to guide you</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Abstract background graphical element behind image */}
+                            <div className="absolute inset-0 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-[2.5rem] -z-10 rotate-6 scale-[0.9] opacity-20 blur-xl"></div>
                         </motion.div>
                     </div>
 
@@ -124,13 +166,20 @@ export default function WhyChooseUsSection() {
 // Helper component to safely render icons and avoid JSX parsing errors
 function FeatureItem({ feature, align }: { feature: Feature, align: 'left' | 'right' }) {
     const Icon = feature.icon;
+    const isLeft = align === 'left';
+
     return (
-        <div className={`flex flex-col items-center lg:items-${align === 'left' ? 'start' : 'end'} text-center lg:text-${align}`}>
-            <div className="w-14 h-14 rounded-full bg-white border border-gray-100 shadow-sm flex items-center justify-center mb-4 text-gray-700">
-                <Icon className="w-6 h-6" />
+        <div className={`flex flex-col lg:flex-row gap-5 items-center lg:items-start text-center lg:text-left ${!isLeft ? 'lg:flex-row-reverse lg:text-right' : ''}`}>
+            <div className="flex-shrink-0 relative group">
+                <div className="absolute inset-0 bg-blue-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition-opacity duration-300"></div>
+                <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-white to-blue-50 border border-blue-100 shadow-sm flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform duration-300">
+                    <Icon className="w-7 h-7" strokeWidth={1.5} />
+                </div>
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">{feature.title}</h3>
-            <p className="text-gray-500 leading-relaxed max-w-xs">{feature.description}</p>
+            <div className="flex-1 space-y-2">
+                <h3 className="text-xl font-bold text-gray-900">{feature.title}</h3>
+                <p className="text-gray-500 leading-relaxed font-medium">{feature.description}</p>
+            </div>
         </div>
     );
 }
