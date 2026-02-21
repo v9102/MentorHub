@@ -1,3 +1,10 @@
-export default function Page() {
-    return <h1>TODO: About Page</h1>;
+import ComingSoon from "@/shared/ui/ComingSoon";
+
+export default function AboutPage() {
+    return (
+        <ComingSoon
+            title="About Us"
+            description="We're building the most transparent platform for government exam aspirants. Our story is coming soon."
+        />
+    );
 }

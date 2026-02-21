@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Twitter, Linkedin, Instagram, ArrowRight, Mail } from 'lucide-react';
+import { Instagram, Mail, Phone } from 'lucide-react';
 
 export default function Footer() {
     return (
@@ -51,16 +51,43 @@ export default function Footer() {
                         <p className="text-sm leading-relaxed text-gray-500">
                             The #1 platform connecting government exam aspirants with rank-holder mentors. Crack UPSC, SSC, and Banking exams with personalized guidance.
                         </p>
-                        <div className="flex gap-3">
-                            {[Twitter, Linkedin, Instagram].map((Icon, i) => (
-                                <Link
-                                    key={i}
-                                    href="#"
+
+                        <a
+                            href="tel:+917258889250"
+                            className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-blue-600 transition-colors w-fit"
+                        >
+                            <Phone className="w-4 h-4" />
+                            <span>+91 72588 89250</span>
+                        </a>
+
+                        <div className="flex gap-3 relative">
+                            <div className="group relative">
+                                <a
+                                    href="https://www.instagram.com/mentomania?utm_source=qr"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                     className="w-9 h-9 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 hover:bg-white hover:border-blue-200 hover:text-blue-600 hover:shadow-sm transition-all duration-300"
+                                    aria-label="Instagram"
                                 >
-                                    <Icon className="w-4 h-4" />
-                                </Link>
-                            ))}
+                                    <Instagram className="w-4 h-4" />
+                                </a>
+
+                                {/* QR Code Hover Card */}
+                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-48 p-4 bg-white border border-gray-100 rounded-3xl shadow-floating opacity-0 translate-y-3 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 ease-out z-50">
+                                    <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-gray-50 border border-gray-50 mb-3 shadow-inner">
+                                        <Image
+                                            src="/instagram.jpg"
+                                            alt="Instagram QR Code"
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    </div>
+                                    <p className="text-[11px] uppercase tracking-wider font-semibold text-center text-gray-500">Scan to Follow</p>
+
+                                    {/* Small Triangle */}
+                                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white border-b border-r border-gray-100 rotate-45 shadow-[2px_2px_4px_rgb(0_0_0/0.02)]"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

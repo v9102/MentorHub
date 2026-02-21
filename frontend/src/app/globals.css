@@ -175,3 +175,13 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  /* Two reusable shadow tokens — use these everywhere, nothing else */
+  .shadow-soft {
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.04);
+  }
+  .shadow-floating {
+    box-shadow: 0 4px 16px -2px rgb(0 0 0 / 0.08), 0 2px 6px -2px rgb(0 0 0 / 0.04);
+  }
+}
