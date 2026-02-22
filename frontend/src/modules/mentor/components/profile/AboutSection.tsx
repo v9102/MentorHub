@@ -43,7 +43,7 @@ export const AboutSection = ({ mentor }: AboutSectionProps) => {
                     <div>
                         <h3 className="text-sm font-medium text-gray-500 mb-2">Subjects</h3>
                         <div className="flex flex-wrap gap-2">
-                            {mentor.subjects.map((subject) => (
+                            {mentor.subjects?.map((subject) => (
                                 <Badge key={subject} variant="secondary" className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700">
                                     {subject}
                                 </Badge>
@@ -54,7 +54,7 @@ export const AboutSection = ({ mentor }: AboutSectionProps) => {
                     <div>
                         <h3 className="text-sm font-medium text-gray-500 mb-2">Specializations</h3>
                         <div className="flex flex-wrap gap-2">
-                            {mentor.specializations.map((spec) => (
+                            {mentor.specializations?.map((spec) => (
                                 <Badge key={spec} variant="outline" className="px-3 py-1 border-blue-200 text-blue-700 bg-blue-50/50">
                                     {spec}
                                 </Badge>

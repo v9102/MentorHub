@@ -22,6 +22,8 @@ type MentorCardData = {
   };
   isVerified?: boolean;
   pricing?: number;
+  sessionDuration?: number;
+  isFreeTrialEnabled?: boolean;
   tagLine?: string;
   bio: string;
   rating?: number;
@@ -33,7 +35,8 @@ type MentorCardData = {
   sessions?: number;
   attendance?: number;
   responseTime?: string;
-
+  subjects?: string[];
+  specializations?: string[];
 
   service?: string;
   posting?: string;
@@ -143,7 +146,7 @@ export default function SimpleMentorCard({
             </div>
 
             <div className="flex-1 min-w-0">
-              <div className="flex items-start justify-between mb-4">
+              <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center gap-3">
                   <h3 className="text-2xl font-bold tracking-tight text-gray-900 group-hover:text-blue-600 transition-colors">
                     {mentor.name}
@@ -158,19 +161,19 @@ export default function SimpleMentorCard({
                   )}
                 </div>
               </div>
-
-              {badges.length > 0 ? (
-                <div className="flex flex-wrap gap-2 mb-5">
-                  {badges.slice(0, 2).map((badge, index) => (
-                    <TagBadge key={index} text={badge.text} variant={badge.variant as "primary" | "secondary" | "accent"} />
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-gray-600 mb-5 font-medium line-clamp-1">
-                  {(mentor.service || mentor.exam) && `Selected in ${mentor.service || mentor.exam}`}
-                  {mentor.posting && ` • ${mentor.posting}`}
-                </p>
+              {mentor.tagLine && (
+                <p className="text-sm text-blue-600 font-medium mb-3 line-clamp-1">{mentor.tagLine}</p>
               )}
+
+              {/* Exam / College / Subject badges */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                {badges.slice(0, 2).map((badge, index) => (
+                  <TagBadge key={index} text={badge.text} variant={badge.variant as "primary" | "secondary" | "accent"} />
+                ))}
+                {mentor.subjects?.slice(0, 2).map((subject, index) => (
+                  <TagBadge key={`sub-${index}`} text={subject} variant="secondary" />
+                ))}
+              </div>
 
               <p className="text-gray-600 text-sm leading-relaxed line-clamp-2 mb-6 pr-4">
                 {mentor.bio}
@@ -205,8 +208,16 @@ export default function SimpleMentorCard({
 
               <div className="flex items-center justify-between mt-8 pt-6 border-t border-border-subtle relative z-20 pointer-events-auto">
                 <div>
-                  <div className="text-xs text-gray-500 font-medium uppercase tracking-wider mb-1">Session Starting From</div>
-                  <div className="text-xl font-bold text-gray-900 tracking-tight">₹{mentor.pricing || 199}</div>
+                  <div className="text-xs text-gray-500 font-medium uppercase tracking-wider mb-1">Session From</div>
+                  <div className="flex items-baseline gap-2">
+                    <div className="text-xl font-bold text-gray-900 tracking-tight">₹{mentor.pricing || 199}</div>
+                    {mentor.sessionDuration && (
+                      <span className="text-xs text-gray-400">· {mentor.sessionDuration} min</span>
+                    )}
+                  </div>
+                  {mentor.isFreeTrialEnabled && (
+                    <span className="text-xs text-green-600 font-semibold">Free Trial Available</span>
+                  )}
                 </div>
                 <Link
                   href={`/book/${mentor.id}`}

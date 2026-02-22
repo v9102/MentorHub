@@ -17,10 +17,18 @@ const getIcon = (iconName?: string) => {
     }
 };
 
+interface Offering {
+    id: string;
+    title: string;
+    price: number;
+    discount?: number;
+    icon?: string;
+}
+
 export const ServicesSection = ({ mentor }: ServicesSectionProps) => {
-    const offerings = mentor.offerings || [
-        { id: "default-1", title: "1:1 Mentorship Session", price: mentor.pricing, icon: "video" }
-    ];
+    const offerings: Offering[] = mentor.offerings?.length
+        ? (mentor.offerings as Offering[])
+        : [{ id: "default-1", title: "1:1 Mentorship Session", price: mentor.pricing ?? 0, icon: "video" }];
 
     return (
         <div className="bg-white rounded-2xl p-6 border shadow-sm">

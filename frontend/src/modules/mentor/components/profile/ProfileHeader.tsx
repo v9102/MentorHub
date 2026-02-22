@@ -25,7 +25,7 @@ export const ProfileHeader = ({ mentor }: ProfileHeaderProps) => {
                     <div className="relative -mt-16 md:-mt-20 shrink-0 flex justify-center md:block w-32 h-32 md:w-48 md:h-48 mx-auto md:mx-0">
                         <div className="relative w-full h-full rounded-full border-4 border-white shadow-xl overflow-hidden bg-white z-20">
                             <Image
-                                src={mentor.profilePhoto}
+                                src={mentor.profilePhoto ?? "/mentors/default_avatar.jpg"}
                                 alt={mentor.name}
                                 width={192}
                                 height={192}

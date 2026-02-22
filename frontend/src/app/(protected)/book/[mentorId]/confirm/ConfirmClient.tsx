@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { mockMentors as mentors, MentorProfile } from "@/app/(public)/mentors/mock";
+import { type MentorProfile } from "@/app/(public)/mentors/mock";
+
 import { CheckCircle, Loader2 } from "lucide-react";
 
 type Props = {

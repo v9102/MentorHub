@@ -1,4 +1,4 @@
-import { mockMentors, MentorProfile } from "@/app/(public)/mentors/mock";
+import { type MentorProfile } from "@/app/(public)/mentors/mock";
 
 // Backend URL is now handled via Next.js Rewrites (Proxy)
 const BACKEND_URL = "";
@@ -71,12 +71,21 @@ export const fetchMentors = async (): Promise<MentorProfile[]> => {
             ? `${basic.currentRole} at ${basic.currentOrganisation}`
             : (mentor.tagLine || "Mentor"),
 
-          bio: basic.about || mentor.bio || "No bio available.",
+          // Construct a meaningful bio from DB fields when no explicit about/bio exists
+          bio: basic.about || mentor.bio || (
+            basic.currentRole && basic.currentOrganisation
+              ? `${basic.currentRole} at ${basic.currentOrganisation}${expertise.subjects?.length ? '. Specialises in ' + expertise.subjects.join(', ') + '.' : '.'}`
+              : expertise.subjects?.length
+                ? `Mentor specialising in ${expertise.subjects.join(', ')}.`
+                : "Helping students achieve their goals through personalised guidance."
+          ),
 
           // Education & Experience
           college: professional.college || "N/A",
           yearOfPassing: professional.passingYear || 0,
           yearsOfExperience: basic.workExperience || 0,
+          highestQualification: professional.highestQualification,
+          branch: professional.branch,
 
           // Expertise
           subjects: expertise.subjects || [],
@@ -92,6 +101,8 @@ export const fetchMentors = async (): Promise<MentorProfile[]> => {
 
           // Pricing & Availability
           pricing: pricing.pricePerSession || 0,
+          sessionDuration: pricing.sessionDuration,
+          isFreeTrialEnabled: pricing.isFreeTrialEnabled ?? false,
           availability: [
             ...(availability.days || []),
             ...(availability.timeSlots || [])
@@ -112,8 +123,19 @@ export const fetchMentors = async (): Promise<MentorProfile[]> => {
           posting: mentor.posting,
           rank: mentor.rank,
           attempts: mentor.attempts,
-          exam: mentor.exam || "General", // Default to General if not specified
+          exam: mentor.exam || expertise.subjects?.[0] || "General",
           optionalSubject: mentor.optionalSubject,
+
+          isVerified: mentor.isVerified ?? mentor.role === "mentor",
+
+          /** Pass through the full raw nested object so components can read it */
+          mentorProfile: {
+            basicInfo: basic,
+            professionalInfo: professional,
+            expertise,
+            availability,
+            pricing,
+          },
 
         } as MentorProfile;
       });

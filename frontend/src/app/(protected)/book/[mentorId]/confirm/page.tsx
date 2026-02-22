@@ -24,7 +24,7 @@ export default async function ConfirmPage({
       mentor={mentor}
       sessionDate="07 Jan 26"
       sessionTime="09:00 PM IST"
-      price={mentor.pricing}
+      price={mentor.pricing ?? 199}
     />
   );
 }

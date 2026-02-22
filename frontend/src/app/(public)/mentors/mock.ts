@@ -1,3 +1,36 @@
+/** Raw nested structure matching the MongoDB document schema */
+export type MentorProfileNested = {
+  basicInfo?: {
+    gender?: string;
+    currentOrganisation?: string;
+    industry?: string;
+    currentRole?: string;
+    workExperience?: number;
+    profilePhoto?: string;
+    about?: string;
+  };
+  professionalInfo?: {
+    highestQualification?: string;
+    college?: string;
+    branch?: string;
+    passingYear?: number;
+  };
+  expertise?: {
+    subjects?: string[];
+    specializations?: string;
+  };
+  availability?: {
+    days?: string[];
+    timeSlots?: string[];
+  };
+  pricing?: {
+    pricePerSession?: number;
+    sessionDuration?: number;
+    isFreeTrialEnabled?: boolean;
+  };
+};
+
+/** Flat view used by UI components — populated by the API mapper */
 export type MentorProfile = {
   id: string;
   name: string;
@@ -8,26 +41,38 @@ export type MentorProfile = {
   exam: string;
 
   // Govt Exam Specific Fields
-  service?: string; // e.g., IAS, IPS, IFS, IRS
-  posting?: string; // e.g., District Magistrate, SP
-  rank?: number; // AIR
-  attempts?: number; // Number of attempts to clear
-  optionalSubject?: string; // For UPSC mainly
+  service?: string;
+  posting?: string;
+  rank?: number;
+  attempts?: number;
+  optionalSubject?: string;
 
-  // Generic
-  college?: string; // Kept for educational background
+  // Generic education / experience
+  college?: string;
   yearOfPassing?: number;
   subjects?: string[];
   specializations?: string[];
   yearsOfExperience?: number;
   studentsHelped?: number;
+
+  // Metrics
   rating?: number;
   reviewsCount?: number;
   sessions?: number;
   attendance?: number;
   responseTime?: string;
+
+  // Pricing & availability (flattened for UI)
   pricing?: number;
+  sessionDuration?: number;
+  isFreeTrialEnabled?: boolean;
   availability?: string[];
+
+  // Education extras
+  highestQualification?: string;
+  branch?: string;
+
+  // Rich structures
   testimonials?: {
     studentName: string;
     text: string;
@@ -41,6 +86,9 @@ export type MentorProfile = {
     discount?: number;
     icon?: string;
   }[];
+
+  /** Raw nested mentorProfile from DB — available when data comes from the real API */
+  mentorProfile?: MentorProfileNested;
 };
 
 export const mockMentors: Record<string, MentorProfile> = {

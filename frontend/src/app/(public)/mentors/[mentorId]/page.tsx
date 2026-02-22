@@ -88,7 +88,7 @@ export default async function MentorProfilePage({
               <div className="bg-white rounded-2xl p-6 border shadow-sm">
                 <h3 className="font-bold text-sm text-gray-400 uppercase tracking-wider mb-4">Availability</h3>
                 <div className="flex flex-wrap gap-2">
-                  {mentor.availability.map((slot, i) => (
+                  {mentor.availability?.map((slot, i) => (
                     <div key={i} className="text-xs font-bold px-3 py-1.5 bg-green-50 text-green-700 rounded-lg border border-green-100">
                       {slot}
                     </div>
