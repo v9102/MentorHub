@@ -16,9 +16,22 @@ export type MentorProfessionalInfo = {
   passingYear: number;
 };
 
+export type MentorExamItem = {
+  examName: string; // e.g. 'UPSC', 'Bank', 'NEET', 'JEE', 'CAT', 'SSC'
+  mainsAppeared?: number; // UPSC
+  recentInterview?: boolean; // UPSC
+  bankName?: string; // Bank
+  postSelected?: string; // Bank
+  college?: string; // NEET, JEE, CAT
+  rank?: number; // NEET, JEE
+  percentile?: number; // CAT
+  selectionYear?: number; // Bank, NEET, JEE, CAT, SSC
+};
+
 export type MentorExpertiseInfo = {
   subjects: string[];
   specializations: string;
+  exams?: MentorExamItem[];
 };
 
 export type MentorAvailabilityInfo = {

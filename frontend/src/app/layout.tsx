@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/shared/ui/Navbar";
+import ConditionalNavbar from "@/shared/ui/ConditionalNavbar";
 import ScrollProgress from "@/shared/ui/ScrollProgress";
 import { MentorOnboardingProvider } from "@/shared/lib/context/MentorOnboardingContext";
 
@@ -34,7 +34,7 @@ export default function RootLayout({
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}
           >
             <ScrollProgress />
-            <Navbar />
+            <ConditionalNavbar />
             <main>{children}</main>
           </body>
         </html>

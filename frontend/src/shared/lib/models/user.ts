@@ -48,6 +48,17 @@ const UserSchema = new mongoose.Schema({
         expertise: {
             subjects: [String],
             specializations: String,
+            exams: [{
+                examName: String,
+                mainsAppeared: Number,
+                recentInterview: Boolean,
+                bankName: String,
+                postSelected: String,
+                college: String,
+                rank: Number,
+                percentile: Number,
+                selectionYear: Number,
+            }],
         },
         availability: {
             days: [String],
