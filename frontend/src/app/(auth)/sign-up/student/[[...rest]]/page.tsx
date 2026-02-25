@@ -1,12 +1,15 @@
 import { SignUp } from "@clerk/nextjs";
+import AuthLayout from "@/components/auth/AuthLayout";
+import { clerkThemeValues } from "@/lib/clerk-theme";
 
 export default function StudentSignUpPage() {
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50 py-6">
+    <AuthLayout>
       <SignUp
         signInUrl="/sign-in"
         redirectUrl="/dashboard/student/dashboard"
+        appearance={clerkThemeValues}
       />
-    </div>
+    </AuthLayout>
   );
 }

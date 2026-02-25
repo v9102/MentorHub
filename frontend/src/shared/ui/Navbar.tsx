@@ -85,8 +85,14 @@ export default function Navbar() {
   // to seamlessly connect with the menu overlay.
   const isScrolledState = isScrolled && !isMobileMenuOpen;
 
-  // Hide Navbar on booking pages
-  if (pathname?.startsWith("/book/")) return null;
+  // Hide Navbar on booking and auth pages
+  if (
+    pathname?.startsWith("/book/") ||
+    pathname?.startsWith("/sign-in") ||
+    pathname?.startsWith("/sign-up")
+  ) {
+    return null;
+  }
 
   return (
     <>

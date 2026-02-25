@@ -1,0 +1,45 @@
+# MentorHub2 Project Guidelines & Best Practices
+
+## Core Principle: IMMUTABILITY OF CORE WORKINGS
+**🚨 CRITICAL RULE**: No matter what, the core principle and architecture of the project available in the `mentorhub2` directory MUST NEVER CHANGE.
+- Existing database schemas, core architectural patterns, and existing business logic must remain structurally intact.
+- Modifications should be purely additive, UI/UX-focused, or performance-enhancing without breaking backward compatibility or altering the fundamental data flow.
+
+## 1. Security Guidelines
+- **Authentication & Authorization**:
+  - Always verify Clerk authentication tokens on protected routes in both frontend and backend.
+  - Apply strict Role-Based Access Control (RBAC) where applicable before handling data.
+- **Data Validation & Sanitization**:
+  - Use Zod (or equivalent) for strict validation of all incoming API payloads on the backend.
+  - Never trust client-side data.
+  - Prevent NoSQL injections by always interacting with Mongoose using expected data types and parameterized queries.
+- **Environment Variables**:
+  - NEVER expose sensitive keys (e.g., Firebase Admin SDK credentials, Razorpay secret, DB connection strings) to the frontend.
+  - Use `NEXT_PUBLIC_` strictly for safe, client-side only variables.
+
+## 2. API Call Minimization & Optimization
+- **Caching & State Management**:
+  - Use aggressive caching strategies on the frontend (e.g., React Query, SWR, Next.js App Router caching).
+  - Avoid redundant fetches. Re-use cached data when a user navigates back and forth between screens.
+- **Debouncing & Throttling**:
+  - Implement reliable debouncing for any search inputs or autocomplete functions to drastically reduce requests per keystroke.
+- **Pagination & Infinite Scrolling**:
+  - Never fetch entire collections at once. Always implement cursor or offset-based pagination.
+- **Batching**:
+  - Where possible, batch multiple related data reads into a single API endpoint to reduce network overhead.
+
+## 3. Professional UI/UX Development Standards
+- **Aesthetic Excellence**:
+  - The UI must look premium, modern, and aligned with the existing MentorHub branding.
+  - Strictly avoid generic or default browser styling.
+- **Responsiveness**:
+  - Embrace mobile-first design leveraging Tailwind CSS v4. Ensure all pages look pristine across mobile, tablet, and desktop viewports.
+- **Interactivity & Micro-animations**:
+  - Implement meaningful, smooth micro-animations for interactions (buttons, loading states, modal transitions) utilizing Framer Motion.
+  - Use hover effects, subtle active states, and focus rings to enhance the interactive experience.
+- **Robust Error & Loading States**:
+  - Never leave a user staring at a blank screen. Provide professional skeleton loaders and spinners during asynchronous actions.
+  - All forms and buttons should communicate submission status and graceful error handling via aesthetically pleasing toasts or inline alerts.
+
+## Enforcement
+As an AI coding assistant, every code change proposed and implemented must be verified against these 4 pillars (Core Principle, Security, API Optimization, UI/UX Excellence). Any deviation must be explicitly flagged and authorized.
