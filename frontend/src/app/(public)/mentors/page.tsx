@@ -155,8 +155,8 @@ function FilterDropdown({
                   setOpen(false);
                 }}
                 className={`w-full text-left px-4 py-2.5 text-[13px] transition-colors ${value === opt.value
-                    ? "bg-gray-50 text-gray-900 font-semibold"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  ? "bg-gray-50 text-gray-900 font-semibold"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   }`}
               >
                 {opt.label}
@@ -453,8 +453,8 @@ export default function MentorsPage() {
                         setSortOpen(false);
                       }}
                       className={`w-full text-left px-4 py-2.5 text-[13px] transition-colors ${sortBy === opt.value
-                          ? "bg-gray-50 text-gray-900 font-semibold"
-                          : "text-gray-600 hover:bg-gray-50"
+                        ? "bg-gray-50 text-gray-900 font-semibold"
+                        : "text-gray-600 hover:bg-gray-50"
                         }`}
                     >
                       {opt.label}

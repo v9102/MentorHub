@@ -27,8 +27,8 @@ export default function OnboardingLayoutWrapper({
       </header>
 
       {/* Scrollable content area */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 md:px-8 pb-12">
-        <div className="max-w-5xl mx-auto">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 md:px-8 pb-12 flex flex-col items-center">
+        <div className="w-full max-w-2xl">
           {children}
         </div>
       </div>
