@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { SignedIn, SignedOut, UserButton, ClerkLoading, useUser, SignUpButton, SignInButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, UserButton, ClerkLoading, useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import { BookOpen, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -73,11 +73,9 @@ export default function Navbar() {
     }
 
     return (
-      <SignUpButton mode="modal" forceRedirectUrl={onboardingPath}>
-        <button className={classes} onClick={mobile ? closeMenu : undefined}>
-          {content}
-        </button>
-      </SignUpButton>
+      <Link href="/sign-up/mentor" className={classes} onClick={mobile ? closeMenu : undefined}>
+        {content}
+      </Link>
     )
   }
 
@@ -145,17 +143,13 @@ export default function Navbar() {
               </div>
             </ClerkLoading>
             <SignedOut>
-              <SignInButton mode="modal" forceRedirectUrl="/dashboard/student">
-                <button className="px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100 cursor-pointer text-sm font-medium transition-colors">
-                  Sign In
-                </button>
-              </SignInButton>
+              <Link href="/sign-in?redirect=/dashboard/student" className="px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100 cursor-pointer text-sm font-medium transition-colors">
+                Sign In
+              </Link>
 
-              <SignUpButton mode="modal" forceRedirectUrl="/dashboard/student">
-                <button className="px-5 py-2.5 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-all cursor-pointer font-medium shadow-sm hover:shadow text-sm">
-                  Get Started
-                </button>
-              </SignUpButton>
+              <Link href="/sign-up/student" className="px-5 py-2.5 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-all cursor-pointer font-medium shadow-sm hover:shadow text-sm">
+                Get Started
+              </Link>
             </SignedOut>
 
             <SignedIn>
@@ -207,16 +201,12 @@ export default function Navbar() {
 
                 <SignedOut>
                   <div className="pt-4 flex flex-col gap-3">
-                    <SignInButton mode="modal" forceRedirectUrl="/dashboard/student">
-                      <button className="w-full py-3 rounded-lg text-gray-700 bg-gray-100 font-semibold active:bg-gray-200">
-                        Sign In
-                      </button>
-                    </SignInButton>
-                    <SignUpButton mode="modal" forceRedirectUrl="/dashboard/student">
-                      <button className="w-full py-3 rounded-lg bg-blue-600 text-white font-semibold shadow-md active:bg-blue-700">
-                        Get Started
-                      </button>
-                    </SignUpButton>
+                    <Link href="/sign-in?redirect=/dashboard/student" className="w-full py-3 rounded-lg text-gray-700 bg-gray-100 font-semibold active:bg-gray-200 text-center" onClick={closeMenu}>
+                      Sign In
+                    </Link>
+                    <Link href="/sign-up/student" className="w-full py-3 rounded-lg bg-blue-600 text-white font-semibold shadow-md active:bg-blue-700 text-center" onClick={closeMenu}>
+                      Get Started
+                    </Link>
                   </div>
                 </SignedOut>
               </div>

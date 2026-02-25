@@ -13,8 +13,17 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
 
             {/* Floating Header */}
             <div className="absolute top-0 left-0 w-full p-6 md:px-12 flex justify-between items-center z-20 pointer-events-none">
-                <Link href="/" className="pointer-events-auto flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-md">
-                    <Image src="/logo.png" alt="Mentomania Logo" width={180} height={40} className="h-8 w-auto object-contain drop-shadow-sm" />
+                <Link href="/" className="pointer-events-auto flex items-center -ml-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-md">
+                    <Image
+                        src="/logo.png"
+                        alt="MentoMania Logo"
+                        width={48}
+                        height={48}
+                        className="w-12 h-12 object-contain -mt-2 drop-shadow-sm"
+                    />
+                    <span className="font-bold text-2xl text-slate-900 -ml-1.5 pt-1">
+                        ento<span className="text-blue-600">Mania</span>
+                    </span>
                 </Link>
 
                 <Link
