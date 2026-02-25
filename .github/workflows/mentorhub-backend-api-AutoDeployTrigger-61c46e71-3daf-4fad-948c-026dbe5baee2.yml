@@ -1,0 +1,49 @@
+name: Trigger auto deployment for mentorhub-backend-api
+
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo
+  push:
+    branches: 
+      [ main ]
+    paths:
+    - '**'
+    - '.github/workflows/mentorhub-backend-api-AutoDeployTrigger-61c46e71-3daf-4fad-948c-026dbe5baee2.yml'
+
+  # Allow manual trigger 
+  workflow_dispatch:      
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions: 
+      id-token: write #This is required for requesting the OIDC JWT Token
+      contents: read #Required when GH token is used to authenticate with private repo
+
+    steps:
+      - name: Checkout to the branch
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.MENTORHUBBACKENDAPI_AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.MENTORHUBBACKENDAPI_AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.MENTORHUBBACKENDAPI_AZURE_SUBSCRIPTION_ID }}
+
+      - name: Build and push container image to registry
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          appSourcePath: ${{ github.workspace }}/backend
+          _dockerfilePathKey_: _dockerfilePath_
+          _targetLabelKey_: _targetLabel_
+          registryUrl: mentorhubacr9692.azurecr.io
+          registryUsername: ${{ secrets.MENTORHUBBACKENDAPI_REGISTRY_USERNAME }}
+          registryPassword: ${{ secrets.MENTORHUBBACKENDAPI_REGISTRY_PASSWORD }}
+          containerAppName: mentorhub-backend-api
+          resourceGroup: mentomania-backend
+          imageToBuild: mentorhubacr9692.azurecr.io/mentorhub-backend-api:${{ github.sha }}
+          _buildArgumentsKey_: |
+            _buildArgumentsValues_
+
+
