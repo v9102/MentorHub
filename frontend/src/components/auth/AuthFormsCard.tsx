@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence, Variants } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence, Variants, useReducedMotion } from "framer-motion";
 import { useSignIn, useSignUp, useUser } from "@clerk/nextjs";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -61,10 +61,15 @@ export default function AuthFormsCard({ initialView }: AuthFormsCardProps) {
     // and forces a hard page remount, destroying the Framer Motion animation tree. 
     // By keeping it isolated to state, the animation runs gracefully without unmounting the page wrapper.
 
+    // +1 = going right (sign-in → sign-up), -1 = going left (sign-up → sign-in)
+    const direction = useRef(1);
+
     // Tab switching handler
     const switchView = (newView: AuthView) => {
         // Prevent switching if currently verifying OTP
         if (verifying) return;
+        // Set slide direction before updating view
+        direction.current = newView === "sign-in" ? -1 : 1;
         setView(newView);
         // Clear errors when switching
         setSignInError("");
@@ -169,25 +174,32 @@ export default function AuthFormsCard({ initialView }: AuthFormsCardProps) {
     };
 
     // --- Animation Variants ---
-    const formVariants: Variants = {
-        hidden: { opacity: 0, x: 20 },
-        visible: {
-            opacity: 1,
+    // Slide direction: +1 = slide in from right (login→signup), -1 = slide in from left (signup→login)
+    const SLIDE_DISTANCE = 60;
+    const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+    const slideVariants: Variants = {
+        enter: (dir: number) => ({
+            x: dir * SLIDE_DISTANCE,
+            opacity: 0,
+        }),
+        center: {
             x: 0,
-            transition: {
-                duration: 0.5,
-                ease: [0.22, 1, 0.36, 1],
-                staggerChildren: 0.08
-            }
+            opacity: 1,
+            transition: { duration: 0.65, ease: EASE, staggerChildren: 0.07 },
         },
-        exit: { opacity: 0, x: -20, transition: { duration: 0.3, ease: "easeIn" } }
+        exit: (dir: number) => ({
+            x: dir * -SLIDE_DISTANCE,
+            opacity: 0,
+            transition: { duration: 0.45, ease: "easeIn" },
+        }),
     };
 
     const itemVariants: Variants = {
-        hidden: { opacity: 0, y: 10 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }
+        enter: { opacity: 0, y: 10 },
+        center: { opacity: 1, y: 0, transition: { duration: 0.4, ease: EASE } },
+        exit: { opacity: 0, y: -6, transition: { duration: 0.2 } },
     };
-
     return (
         <motion.div layout transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }} className="w-full sm:w-[400px]">
 
@@ -249,26 +261,27 @@ export default function AuthFormsCard({ initialView }: AuthFormsCardProps) {
             )}
 
             {/* Main Form Content Area - Animate Presence handles crossfading */}
-            <motion.div layout className="relative">
-                <AnimatePresence mode="popLayout" initial={false}>
+            <motion.div layout className="relative overflow-hidden">
+                <AnimatePresence mode="popLayout" initial={false} custom={direction.current}>
 
                     {verifying && (
                         <motion.form
                             key="verify-form"
-                            variants={formVariants}
-                            initial="hidden"
-                            animate="visible"
+                            custom={direction.current}
+                            variants={slideVariants}
+                            initial="enter"
+                            animate="center"
                             exit="exit"
                             onSubmit={handleVerify}
                             className="space-y-5"
                         >
                             {signUpError && (
-                                <motion.div variants={itemVariants} className="bg-red-50 text-red-600 p-3 rounded-xl text-sm border border-red-100 font-medium">
+                                <motion.div variants={itemVariants} initial="enter" animate="center" exit="exit" className="bg-red-50 text-red-600 p-3 rounded-xl text-sm border border-red-100 font-medium">
                                     {signUpError}
                                 </motion.div>
                             )}
 
-                            <motion.div variants={itemVariants} className="space-y-2">
+                            <motion.div variants={itemVariants} initial="enter" animate="center" exit="exit" className="space-y-2">
                                 <label className="text-slate-800 font-semibold text-sm">Verification Code</label>
                                 <div className="relative flex items-center">
                                     <input
@@ -298,9 +311,10 @@ export default function AuthFormsCard({ initialView }: AuthFormsCardProps) {
                     {!verifying && view === "sign-in" && (
                         <motion.div
                             key="login-form"
-                            variants={formVariants}
-                            initial="hidden"
-                            animate="visible"
+                            custom={direction.current}
+                            variants={slideVariants}
+                            initial="enter"
+                            animate="center"
                             exit="exit"
                         >
                             <form onSubmit={handleSignInSubmit} className="space-y-5">
@@ -397,9 +411,10 @@ export default function AuthFormsCard({ initialView }: AuthFormsCardProps) {
                     {!verifying && (view === "sign-up-student" || view === "sign-up-mentor") && (
                         <motion.div
                             key="signup-form"
-                            variants={formVariants}
-                            initial="hidden"
-                            animate="visible"
+                            custom={direction.current}
+                            variants={slideVariants}
+                            initial="enter"
+                            animate="center"
                             exit="exit"
                         >
                             {/* Role Switcher if they want to swap between student and mentor natively */}
