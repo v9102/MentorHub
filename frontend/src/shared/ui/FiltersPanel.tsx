@@ -2,6 +2,7 @@
 
 import { Slider } from "./slider";
 import { motion } from "framer-motion";
+import { Trophy } from "lucide-react";
 
 interface FilterState {
   minHourlyRate: string;
@@ -49,10 +50,37 @@ export default function FiltersPanel({
     <div className="bg-surface-background border-2 border-border-subtle rounded-2xl p-6 space-y-6 shadow-soft">
       {/* Header */}
       <div className="flex items-center justify-between pb-4 border-b border-border-subtle">
-        <h3 className="text-lg">Filters</h3>
-        <span className="text-sm font-semibold text-blue-600">
+        <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
+        <span className="text-sm font-medium text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">
           {mentorCount} {mentorCount === 1 ? "mentor" : "mentors"}
         </span>
+      </div>
+
+      {/* Top Mentor Toggle */}
+      <div className="flex items-center justify-between py-2">
+        <div className="flex items-center gap-3">
+          <div className={`p-2 rounded-lg transition-colors ${filters.isTopMentor ? "bg-amber-100" : "bg-gray-100"}`}>
+            <Trophy className={`w-4 h-4 ${filters.isTopMentor ? "text-amber-600" : "text-gray-500"}`} />
+          </div>
+          <div>
+            <label className="text-sm font-medium text-gray-900 cursor-pointer select-none" htmlFor="top-mentor-toggle">
+              Top Mentors
+            </label>
+            <p className="text-xs text-gray-500">Verified & high-rated</p>
+          </div>
+        </div>
+        <button
+          id="top-mentor-toggle"
+          type="button"
+          onClick={() => onFiltersChange({ ...filters, isTopMentor: !filters.isTopMentor })}
+          className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${filters.isTopMentor ? 'bg-amber-500' : 'bg-gray-200'}`}
+        >
+          <span className="sr-only">Toggle Top Mentor</span>
+          <span
+            aria-hidden="true"
+            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${filters.isTopMentor ? 'translate-x-5' : 'translate-x-0'}`}
+          />
+        </button>
       </div>
 
       {/* Hourly Rate Slider */}
