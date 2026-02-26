@@ -4,7 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import {
     ArrowLeft,
-    School,
     FileText,
     Users,
     User,
@@ -14,12 +13,6 @@ import {
     Briefcase,
     ShieldCheck,
     Brain,
-    FolderOpen,
-    File,
-    Link as LinkIcon,
-    BadgeAlert,
-    ExternalLink,
-    Eye,
     Menu,
     X
 } from "lucide-react";
@@ -140,7 +133,7 @@ export default function AdminReviewApplication() {
                         <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                             <button className="rounded-xl border border-red-200 bg-white px-4 py-2 sm:px-6 sm:py-2.5 text-sm sm:text-base font-bold text-red-600 shadow-sm transition-all hover:bg-red-50 hover:border-red-300 active:scale-95 focus:ring-4 focus:ring-red-500/20 h-auto sm:h-10">
                                 <span className="hidden sm:inline">Deny Application</span>
-                                <span className="sm:inline hidden">Deny</span>
+                                <span className="sm:hidden">Deny</span>
                             </button>
                             <button className="rounded-xl bg-primary px-4 py-2 sm:px-6 sm:py-2.5 text-sm sm:text-base font-bold text-white shadow-lg shadow-primary/30 transition-all hover:-translate-y-0.5 hover:bg-primary/90 active:translate-y-0 active:scale-95 focus:ring-4 focus:ring-primary/20 h-auto sm:h-10">
                                 <span className="hidden sm:inline">Approve Application</span>
