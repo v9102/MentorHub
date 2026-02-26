@@ -88,6 +88,26 @@ body {
   --color-app-background: var(--app-background);
   --color-surface-background: var(--surface-background);
   --color-border-subtle: var(--border-subtle);
+
+  /* ── Mento brand colour palette (mirrors final_website tailwind.config) ── */
+  --color-mento-50: #eff6ff;
+  --color-mento-100: #dbeafe;
+  --color-mento-200: #bfdbfe;
+  --color-mento-300: #93c5fd;
+  --color-mento-400: #60a5fa;
+  --color-mento-500: #3b82f6;
+  --color-mento-600: #2563eb;
+  --color-mento-700: #1d4ed8;
+  --color-mento-800: #1e40af;
+  --color-mento-900: #1e3a8a;
+
+  /* ── Mento border token (mirrors --mento-border from final_website) ── */
+  --color-mento-border: #e2e8f0;
+
+  /* ── Mento box-shadow tokens ── */
+  --shadow-mento: 0 4px 14px -3px rgba(37, 99, 235, 0.20), 0 2px 6px -2px rgba(37, 99, 235, 0.10);
+  --shadow-mento-lg: 0 25px 50px -12px rgba(37, 99, 235, 0.15), 0 0 0 1px rgba(37, 99, 235, 0.05);
+  --shadow-mento-hover: 0 30px 60px -15px rgba(37, 99, 235, 0.20), 0 0 0 1px rgba(37, 99, 235, 0.08);
 }
 
 body {
@@ -111,7 +131,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--color-mento-600);
 }
 
 /* Firefox */
@@ -197,7 +217,7 @@ body {
 
 @layer utilities {
 
-  /* Two reusable shadow tokens — use these everywhere, nothing else */
+  /* ── Shadow tokens ────────────────────────────────────────────────── */
   .shadow-soft {
     box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.04);
   }
@@ -205,4 +225,135 @@ body {
   .shadow-floating {
     box-shadow: 0 4px 16px -2px rgb(0 0 0 / 0.08), 0 2px 6px -2px rgb(0 0 0 / 0.04);
   }
+
+  /* Mento card shadows — from final_website index.css */
+  .shadow-card {
+    box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.06), 0 4px 16px -4px rgba(37, 99, 235, 0.08);
+  }
+
+  .shadow-card-hover {
+    box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.10), 0 8px 20px -8px rgba(37, 99, 235, 0.15);
+  }
+
+  .shadow-mento {
+    box-shadow: var(--shadow-mento);
+  }
+
+  .shadow-mento-lg {
+    box-shadow: var(--shadow-mento-lg);
+  }
+
+  .shadow-mento-hover {
+    box-shadow: var(--shadow-mento-hover);
+  }
+
+  /* ── Card interaction helper (transition only — no colour) ───────── */
+  .card-modern {
+    transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+  }
+}
+
+/* ── Keyframes from final_website/index.css ───────────────────────────────── */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+
+  50% {
+    transform: translate(8px, -8px);
+  }
+}
+
+@keyframes floatSlow {
+
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+
+  50% {
+    transform: translate(-6px, 6px);
+  }
+}
+
+@keyframes pulseSlow {
+
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ── Animation utility classes ─────────────────────────────────────────────── */
+.animate-fadeIn {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.4s ease-out forwards;
+}
+
+.animate-float {
+  animation: float 8s ease-in-out infinite;
+}
+
+.animate-float-slow {
+  animation: floatSlow 10s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulseSlow 3s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+/* ── Global focus ring using mento primary ─────────────────────────────────── */
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--color-mento-600);
+  outline-offset: 2px;
 }
