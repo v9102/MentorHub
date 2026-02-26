@@ -1,0 +1,104 @@
+
+> mentor@0.1.0 build
+> next build
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ ÔÜá Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\Users\rajra\package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\package-lock.json
+   * C:\Users\rajra\Desktop\unstop\mentorhub2\package-lock.json
+
+   Ôû▓ Next.js 16.0.10 (Turbopack)
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ Ô£ô Compiled successfully in 20.2s
+   Running TypeScript ...
+   Collecting page data using 11 workers ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   Generating static pages using 11 workers (0/47) ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   Generating static pages using 11 workers (11/47) 
+   Generating static pages using 11 workers (23/47) 
+   Generating static pages using 11 workers (35/47) 
+ Ô£ô Generating static pages using 11 workers (47/47) in 5.6s
+   Finalizing page optimization ...
+
+Route (app)
+Ôöî Ôùï /
+Ôö£ Ôùï /_not-found
+Ôö£ Ôùï /about
+Ôö£ Ôùï /admin/applications/review
+Ôö£ ãÆ /api/mentor/onboarding
+Ôö£ ãÆ /api/sessions/[sessionId]
+Ôö£ ãÆ /api/sessions/create
+Ôö£ ãÆ /api/sessions/join
+Ôö£ ãÆ /api/sessions/list
+Ôö£ ãÆ /api/webhooks/clerk
+Ôö£ Ôùï /blogs
+Ôö£ ãÆ /book/[mentorId]
+Ôö£ ãÆ /book/[mentorId]/confirm
+Ôö£ ãÆ /call/[roomId]
+Ôö£ Ôùï /careers
+Ôö£ Ôùï /community
+Ôö£ Ôùï /contact
+Ôö£ Ôùï /cookie
+Ôö£ ãÆ /dashboard
+Ôö£ ãÆ /dashboard/availability
+Ôö£ ãÆ /dashboard/company
+Ôö£ ãÆ /dashboard/mentor
+Ôö£ ãÆ /dashboard/mentor/availability
+Ôö£ ãÆ /dashboard/mentor/company
+Ôö£ ãÆ /dashboard/mentor/preview
+Ôö£ ãÆ /dashboard/mentor/profile
+Ôö£ ãÆ /dashboard/mentor/sessions
+Ôö£ ãÆ /dashboard/mentor/students
+Ôö£ ãÆ /dashboard/preview
+Ôö£ ãÆ /dashboard/profile
+Ôö£ ãÆ /dashboard/sessions
+Ôö£ ãÆ /dashboard/student
+Ôö£ ãÆ /dashboard/students
+Ôö£ ãÆ /exam/[examId]
+Ôö£ Ôùï /faq
+Ôö£ Ôùï /how-it-works
+Ôö£ Ôùï /mentors
+Ôö£ ãÆ /mentors/[mentorId]
+Ôö£ Ôùï /onboarding/mentor
+Ôö£ Ôùï /onboarding/mentor-setup
+Ôö£ Ôùï /onboarding/profile/basic-info
+Ôö£ Ôùï /onboarding/profile/expertise
+Ôö£ Ôùï /onboarding/profile/review
+Ôö£ Ôùï /onboarding/profile/submitted
+Ôö£ Ôùï /onboarding/profile/verification
+Ôö£ Ôùï /partners
+Ôö£ Ôùï /pricing
+Ôö£ Ôùï /privacy
+Ôö£ ãÆ /session/[sessionId]
+Ôö£ ãÆ /sign-in/[[...rest]]
+Ôö£ ãÆ /sign-up/mentor/[[...rest]]
+Ôö£ ãÆ /sign-up/student/[[...rest]]
+Ôö£ Ôùï /sso-callback
+Ôö£ Ôùï /terms
+Ôöö Ôùï /test
+
+
+ãÆ Proxy (Middleware)
+
+Ôùï  (Static)   prerendered as static content
+ãÆ  (Dynamic)  server-rendered on demand
+

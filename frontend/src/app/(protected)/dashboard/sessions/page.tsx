@@ -190,8 +190,8 @@ export default function SessionsPage() {
                                     </defs>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                                     <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "#64748b", fontSize: 12, fontWeight: 600 }} dy={10} />
-                                    <YAxis axisLine={false} tickLine={false} tick={{ fill: "#64748b", fontSize: 12 }} tickFormatter={(v: number) => `${v}h`} />
-                                    <Tooltip cursor={{ fill: "#f8fafc" }} contentStyle={{ borderRadius: "16px", border: "none", boxShadow: "0 10px 15px -3px rgb(0 0 0/.1)", padding: "12px 16px", fontWeight: "bold", color: "#1e293b" }} formatter={(v: number) => [`${v} hours`, "Mentored"]} />
+                                    <YAxis axisLine={false} tickLine={false} tick={{ fill: "#64748b", fontSize: 12 }} tickFormatter={(v: any) => `${v}h`} />
+                                    <Tooltip cursor={{ fill: "#f8fafc" }} contentStyle={{ borderRadius: "16px", border: "none", boxShadow: "0 10px 15px -3px rgb(0 0 0/.1)", padding: "12px 16px", fontWeight: "bold", color: "#1e293b" }} formatter={(v: any) => [`${v} hours`, "Mentored"]} />
                                     <Bar dataKey="hours" fill="url(#bg2)" radius={[6, 6, 6, 6]} barSize={36} />
                                 </BarChart>
                             </ResponsiveContainer>
