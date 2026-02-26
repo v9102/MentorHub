@@ -34,7 +34,7 @@ export default function AdminReviewApplication() {
             {/* Sidebar Navigation */}
             <aside className={`fixed inset-y-0 left-0 z-50 w-72 transform flex-col border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-transform duration-300 ease-in-out md:static md:translate-x-0 md:flex ${isMenuOpen ? "translate-x-0 flex" : "-translate-x-full hidden md:flex"}`}>
                 <div className="flex items-center justify-between gap-3 p-6">
-                    <Link href="/admin" className="flex items-center -ml-2" onClick={() => setIsMenuOpen(false)}>
+                    <Link href="/" className="flex items-center -ml-2" onClick={() => setIsMenuOpen(false)}>
                         <Image
                             src="/logo.png"
                             alt="MentoMania Logo"
