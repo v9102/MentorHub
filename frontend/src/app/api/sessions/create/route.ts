@@ -1,7 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 
+interface SessionData {
+  sessionId: string;
+  mentorId: string;
+  studentId: string;
+  mentorName: string;
+  studentName: string;
+  price: number;
+  duration: number;
+  paymentStatus: string;
+  bookingStatus: string;
+  scheduledAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 // Mock session storage (in-memory for now, replace with Firestore later)
-const sessions = new Map<string, any>();
+const sessions = new Map<string, SessionData>();
 
 export async function POST(request: NextRequest) {
   try {
@@ -32,10 +47,11 @@ export async function POST(request: NextRequest) {
 
     // Also store in global for access across routes
     if (typeof global !== 'undefined') {
-      if (!(global as any).sessions) {
-        (global as any).sessions = new Map();
+      const globalObj = global as typeof global & { sessions?: Map<string, SessionData> };
+      if (!globalObj.sessions) {
+        globalObj.sessions = new Map();
       }
-      (global as any).sessions.set(sessionId, session);
+      globalObj.sessions.set(sessionId, session);
     }
 
     return NextResponse.json({

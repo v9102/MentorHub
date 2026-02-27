@@ -94,7 +94,22 @@ interface MentorState {
     location: string; experience: string; gender: string;
     about: string; upiId: string; accountNumber: string;
     bankName: string; ifsc: string;
+
+    currentOrganisation: string;
+    industry: string;
+    workExperience: string;
+    highestQualification: string;
+    college: string;
+    branch: string;
+    passingYear: string;
+    subjects: string;
+    specializations: string;
+    pricePerSession: string;
+    isVerified: boolean;
+    verificationIdType: string;
+
     availability: Array<{ id: number; day: string; startTime: string; endTime: string }>;
+    examDetails: Array<any>;
 }
 
 // ── Mock upcoming sessions (verbatim from EditProfile.jsx) ────────────────────
@@ -132,18 +147,21 @@ export default function EditProfile() {
         phone: (user?.publicMetadata?.phone as string) ?? "",
         location: (user?.publicMetadata?.location as string) ?? "",
         experience: (user?.publicMetadata?.experience as string) ?? "",
-        gender: (user?.publicMetadata?.gender as string) ?? "",
+        gender: (user?.publicMetadata?.gender as string) ?? "Male",
         about: (user?.publicMetadata?.about as string) ?? "",
         upiId: (user?.publicMetadata?.upiId as string) ?? "",
         accountNumber: (user?.publicMetadata?.accountNumber as string) ?? "",
         bankName: (user?.publicMetadata?.bankName as string) ?? "",
         ifsc: (user?.publicMetadata?.ifsc as string) ?? "",
-        availability: [
-            { id: 1, day: "Monday", startTime: "10:00 AM", endTime: "11:00 AM" },
-            { id: 2, day: "Wednesday", startTime: "02:00 PM", endTime: "03:00 PM" },
-        ],
+        currentOrganisation: "", industry: "", workExperience: "",
+        highestQualification: "", college: "", branch: "", passingYear: "",
+        subjects: "", specializations: "", pricePerSession: "",
+        isVerified: false, verificationIdType: "",
+        availability: [],
+        examDetails: []
     });
     const [profileImageUrl, setProfileImageUrl] = useState<string>(user?.imageUrl ?? AVATAR_ASSETS.Male);
+    const [isLoadingProfile, setIsLoadingProfile] = useState(true);
 
     const [activeSection, setActiveSection] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
@@ -164,8 +182,56 @@ export default function EditProfile() {
     ];
 
     useEffect(() => {
-        setMounted(true);
+        setTimeout(() => setMounted(true), 0);
+        fetchMentorProfile();
     }, []);
+
+    const fetchMentorProfile = async () => {
+        try {
+            const res = await fetch("/api/dashboard/profile");
+            const data = await res.json();
+            if (data.success && data.mentor) {
+                const profile = data.mentor.mentorProfile || {};
+                const basic = profile.basicInfo || {};
+                const prof = profile.professionalInfo || {};
+                const exp = profile.expertise || {};
+                const ver = profile.verification || {};
+                const prc = profile.pricing || {};
+                const exams = profile.examDetails || [];
+
+                setMentor(prev => ({
+                    ...prev,
+                    name: data.mentor.name || prev.name,
+                    email: data.mentor.email || prev.email,
+                    gender: basic.gender || prev.gender,
+                    currentOrganisation: basic.currentOrganisation || "",
+                    industry: basic.industry || "",
+                    title: basic.currentRole || prev.title,
+                    workExperience: basic.workExperience?.toString() || "",
+                    highestQualification: prof.highestQualification || "",
+                    college: prof.college || "",
+                    branch: prof.branch || "",
+                    passingYear: prof.passingYear?.toString() || "",
+                    subjects: exp.subjects?.join(", ") || "",
+                    specializations: exp.specializations || "",
+                    pricePerSession: prc.pricePerSession?.toString() || "",
+                    isVerified: ver.isVerified || false,
+                    verificationIdType: ver.idType || "",
+                    about: profile.bio || prev.about,
+                    availability: profile.availability?.length ? profile.availability : prev.availability,
+                    examDetails: exams
+                }));
+
+                if (basic.profilePhoto || data.mentor.imageUrl) {
+                    setProfileImageUrl(basic.profilePhoto || data.mentor.imageUrl);
+                }
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoadingProfile(false);
+        }
+    };
 
     useEffect(() => {
         return () => { if (bannerImageUrl) URL.revokeObjectURL(bannerImageUrl); };

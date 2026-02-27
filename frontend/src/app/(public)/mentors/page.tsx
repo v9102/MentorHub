@@ -236,7 +236,7 @@ export default function MentorsPage() {
 
   /* ── Filtering + sorting ── */
   const filteredMentors = useMemo(() => {
-    let result = mentors.filter((m) => {
+    const result = mentors.filter((m) => {
       const q = debouncedSearch.trim().toLowerCase();
       if (
         q &&

@@ -1,4 +1,5 @@
 "use client";
+import { useId } from "react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 interface DataPoint {
@@ -33,7 +34,8 @@ export function PremiumAreaChart({
     height = 300,
     valuePrefix = "",
 }: PremiumAreaChartProps) {
-    const gradientId = `colorGradient-${Math.random().toString(36).substr(2, 9)}`;
+    const baseId = useId().replace(/:/g, "");
+    const gradientId = `colorGradient-${baseId}`;
 
     return (
         <div style={{ height, width: "100%" }}>
