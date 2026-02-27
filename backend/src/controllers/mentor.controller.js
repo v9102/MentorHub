@@ -287,7 +287,7 @@ export const upcomingSessions = async (req, res) => {
   }
 };
 
-import User from "../models/User.js";
+import User from "../models/user.js";
 const generateUpcomingSessionsFromAvailability = (availability) => {
   const today = new Date();
   const sessions = [];
