@@ -56,102 +56,105 @@ export default function DashboardSidebar({
 
     return (
         <>
-            {/* Mobile overlay */}
-            {isMobileMenuOpen && (
-                <div
-                    className="fixed inset-0 bg-black/20 z-30 md:hidden backdrop-blur-sm"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                />
-            )}
+            {/* Mobile overlay — full-screen tap to close */}
+            <div
+                className={`fixed inset-0 bg-black/30 z-30 md:hidden backdrop-blur-sm transition-opacity duration-300 ${
+                    isMobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+                }`}
+                onClick={() => setIsMobileMenuOpen(false)}
+                aria-hidden="true"
+            />
 
-            {/* Sidebar */}
+            {/* Sidebar — Mobile: full drawer, Desktop: collapsible rail */}
             <aside
                 className={`
-          fixed inset-y-0 left-0 z-40 bg-white border-r border-slate-200/60
-          flex flex-col shadow-[4px_0_24px_rgba(0,0,0,0.04)]
-          transition-all duration-300 ease-in-out
-          ${isCollapsed ? "w-[80px]" : "w-[260px] xl:w-[280px]"}
-          ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
-        `}
+                    fixed inset-y-0 left-0 z-40 bg-white border-r border-slate-200/60
+                    flex flex-col shadow-xl md:shadow-[4px_0_24px_rgba(0,0,0,0.01)]
+                    transition-transform duration-300 ease-out
+                    w-[280px] sm:w-[300px]
+                    ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
+                    md:translate-x-0 md:transition-[width] md:duration-300
+                    ${isCollapsed ? "md:w-[80px]" : "md:w-[260px] xl:w-[300px]"}
+                `}
             >
-                {/* Collapse toggle */}
+                {/* Desktop collapse toggle */}
                 <button
                     onClick={() => setIsCollapsed(!isCollapsed)}
-                    className="absolute -right-3 top-9 bg-white border border-slate-200 rounded-full p-1 shadow-sm hover:bg-slate-50 text-slate-500 z-50 hidden md:flex"
+                    className="absolute -right-3 top-9 bg-white border border-slate-200 rounded-full p-1.5 shadow-sm hover:bg-slate-50 text-slate-500 z-50 hidden md:flex items-center justify-center"
                     aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
                 >
                     {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
                 </button>
 
-                {/* Mobile close */}
+                {/* Mobile close — larger touch target (min 44px) */}
                 <button
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 md:hidden"
+                    className="absolute top-3 right-3 p-3 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors md:hidden"
                     aria-label="Close menu"
                 >
-                    <X size={20} />
+                    <X size={22} />
                 </button>
 
                 {/* Logo */}
-                <div className={`px-6 py-7 flex items-end ${isCollapsed ? "justify-center px-2" : ""}`}>
-                    <svg viewBox="0 0 54 60" className="w-[34px] h-[38px] shrink-0" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <linearGradient id="sg" x1="0" y1="0" x2="54" y2="60" gradientUnits="userSpaceOnUse">
-                                <stop offset="0%" stopColor="#27272a" />
-                                <stop offset="100%" stopColor="#a1a1aa" />
-                            </linearGradient>
-                        </defs>
-                        <circle cx="12" cy="10" r="6.5" fill="url(#sg)" />
-                        <circle cx="42" cy="21" r="5" fill="url(#sg)" />
-                        <g fill="url(#sg)">
-                            <path d="M5 24 C5 18 19 18 19 24 L19 60 L5 60 Z" />
-                            <path d="M37 34 C37 28 47 28 47 34 L47 60 L37 60 Z" />
-                        </g>
-                        <g stroke="url(#sg)" strokeLinecap="round">
-                            <path d="M12 24 L27 45" strokeWidth="11" />
-                            <path d="M42 34 L27 45" strokeWidth="9" />
-                        </g>
-                    </svg>
-                    {!isCollapsed && (
-                        <span className="text-[26px] font-bold tracking-tight leading-none mb-[2px] -ml-1">
-                            <span className="text-slate-900">ento</span>
-                            <span className="text-blue-600">Mania</span>
-                        </span>
-                    )}
-                </div>
+                <Link
+                    href="/"
+                    className={`px-5 py-6 flex items-center ${isCollapsed ? "md:justify-center md:px-2" : ""}`}
+                >
+                    <Image
+                        src="/logo.png"
+                        alt="MentoMania Logo"
+                        width={48}
+                        height={48}
+                        className="w-10 h-10 sm:w-12 sm:h-12 object-contain shrink-0"
+                    />
+                    <span
+                        className={`text-2xl sm:text-[26px] xl:text-[30px] font-bold tracking-tight leading-none -ml-1 sm:-ml-1.5 pt-0.5 sm:pt-1 transition-all ${
+                            isCollapsed ? "md:hidden" : ""
+                        }`}
+                    >
+                        <span className="text-slate-900">ento</span>
+                        <span className="text-blue-600">Mania</span>
+                    </span>
+                </Link>
 
-                {/* User snippet */}
-                <div className={`px-5 pb-5 ${isCollapsed ? "px-2" : ""}`}>
+                {/* User snippet — enhanced touch target */}
+                <div className={`px-4 sm:px-5 pb-5 sm:pb-6 ${isCollapsed ? "md:px-2" : ""}`}>
                     <div
-                        onClick={() => router.push("/dashboard/profile")}
+                        onClick={() => {
+                            router.push("/dashboard/profile");
+                            setIsMobileMenuOpen(false);
+                        }}
                         role="button"
                         tabIndex={0}
-                        onKeyDown={(e) => e.key === "Enter" && router.push("/dashboard/profile")}
-                        className={`flex items-center gap-3 p-2.5 rounded-xl border border-slate-100 shadow-sm
-              transition-all hover:shadow-md cursor-pointer
-              ${isCollapsed ? "justify-center border-transparent shadow-none hover:bg-slate-100" : ""}`}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                router.push("/dashboard/profile");
+                                setIsMobileMenuOpen(false);
+                            }
+                        }}
+                        className={`flex items-center gap-3 p-3 rounded-xl border border-slate-100 shadow-sm
+                            transition-all hover:shadow-md active:scale-[0.98] cursor-pointer
+                            ${isCollapsed ? "md:justify-center md:border-transparent md:shadow-none md:hover:bg-slate-100" : ""}`}
                     >
-                        <div className="w-9 h-9 rounded-full bg-blue-50 overflow-hidden shrink-0 relative">
+                        <div className="w-10 h-10 sm:w-9 sm:h-9 rounded-full bg-blue-50 overflow-hidden shrink-0 relative">
                             <Image
                                 src={profileImageUrl ?? "https://api.dicebear.com/9.x/toon-head/svg?seed=Vivian"}
                                 alt={name}
-                                width={36}
-                                height={36}
+                                width={40}
+                                height={40}
                                 className="w-full h-full object-cover"
                                 unoptimized
                             />
                         </div>
-                        {!isCollapsed && (
-                            <div className="overflow-hidden flex-1">
-                                <h3 className="text-sm font-semibold text-slate-800 truncate">{name}</h3>
-                                <p className="text-xs text-slate-500 truncate">{title}</p>
-                            </div>
-                        )}
+                        <div className={`overflow-hidden flex-1 ${isCollapsed ? "md:hidden" : ""}`}>
+                            <h3 className="text-sm sm:text-base xl:text-base font-semibold text-slate-800 truncate">{name}</h3>
+                            <p className="text-xs sm:text-sm xl:text-sm text-slate-500 truncate">{title}</p>
+                        </div>
                     </div>
                 </div>
 
-                {/* Nav — 4 items only */}
-                <nav className="flex-1 px-4 space-y-0.5 overflow-y-auto pb-6" aria-label="Dashboard navigation">
+                {/* Nav — enhanced touch targets for mobile (min 48px height) */}
+                <nav className="flex-1 px-3 sm:px-4 space-y-1 overflow-y-auto pb-6 overscroll-contain" aria-label="Dashboard navigation">
                     {navItems.map((item) => {
                         const active = isActive(item);
                         const Icon = item.icon;
@@ -161,43 +164,44 @@ export default function DashboardSidebar({
                                 href={item.to}
                                 onClick={() => setIsMobileMenuOpen(false)}
                                 title={isCollapsed ? item.label : undefined}
-                                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150
-                  ${active
-                                        ? "bg-blue-50 text-blue-700"
+                                className={`flex items-center gap-3 px-3 sm:px-3 py-3.5 sm:py-2.5 xl:py-3.5 rounded-xl sm:rounded-lg text-base sm:text-sm xl:text-base font-medium transition-all duration-200 active:scale-[0.98]
+                                    ${active
+                                        ? "bg-blue-50/80 text-blue-700"
                                         : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                                     }
-                  ${isCollapsed ? "justify-center" : ""}`}
+                                    ${isCollapsed ? "md:justify-center" : ""}`}
                             >
                                 <Icon
-                                    className={`w-[18px] h-[18px] shrink-0 ${active ? "text-blue-600" : "text-slate-400"}`}
+                                    className={`w-5 h-5 sm:w-5 sm:h-5 xl:w-6 xl:h-6 shrink-0 ${active ? "text-blue-600" : "text-slate-400"}`}
                                     strokeWidth={active ? 2.5 : 2}
                                 />
-                                {!isCollapsed && item.label}
+                                <span className={isCollapsed ? "md:hidden" : ""}>{item.label}</span>
                             </Link>
                         );
                     })}
                 </nav>
             </aside>
 
-            {/* Mobile top bar */}
-            <header className="h-14 flex items-center justify-between px-5 md:hidden bg-white border-b border-slate-200 sticky top-0 z-20">
-                <span className="text-xl font-bold">
+            {/* Mobile top bar — fixed at top, larger touch target for menu button */}
+            <header className="fixed top-0 left-0 right-0 h-16 flex items-center justify-between px-4 md:hidden bg-white/95 backdrop-blur-sm border-b border-slate-200 z-20">
+                <Link href="/" className="text-xl font-bold">
                     <span className="text-slate-900">Mento</span>
                     <span className="text-blue-600">Mania</span>
-                </span>
+                </Link>
                 <button
                     onClick={() => setIsMobileMenuOpen(true)}
-                    className="p-2 text-slate-600 hover:bg-slate-100 rounded-lg"
+                    className="p-3 -mr-1 text-slate-600 hover:bg-slate-100 active:bg-slate-200 rounded-xl transition-colors"
                     aria-label="Open menu"
                 >
-                    <Menu size={22} />
+                    <Menu size={24} />
                 </button>
             </header>
 
             {/* Desktop sidebar spacer */}
             <div
-                className={`hidden md:block shrink-0 transition-all duration-300 ${isCollapsed ? "w-[80px]" : "w-[260px] xl:w-[280px]"
-                    }`}
+                className={`hidden md:block shrink-0 transition-all duration-300 ${
+                    isCollapsed ? "w-[80px]" : "w-[260px] xl:w-[300px]"
+                }`}
             />
         </>
     );
