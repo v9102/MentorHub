@@ -35,6 +35,7 @@ interface MentorProfile {
     languages?: string[];
     verification?: {
         isVerified: boolean;
+        applicationStatus?: string;
         idType?: string;
         idNumber?: string;
     };
@@ -105,17 +106,26 @@ export default function AdminReviewApplication() {
         }
     };
 
-    const handleReject = () => {
-        // Here we could implement a DELETE or PATCH request to mark as rejected
-        // For now, let's just remove them from the UI list as a demonstration,
-        // since the prompt asked for "Reject Button" functionality.
+    const handleReject = async () => {
         if (!selectedMentorId) return;
-        const updatedList = applications.filter((app) => app._id !== selectedMentorId);
-        setApplications(updatedList);
-        if (updatedList.length > 0) {
-            setSelectedMentorId(updatedList[0]._id);
-        } else {
-            setSelectedMentorId(null);
+        setIsActionLoading(true);
+        try {
+            const res = await fetch(`/api/admin/mentor/${selectedMentorId}/reject`, {
+                method: "PATCH",
+            });
+            if (res.ok) {
+                const updatedList = applications.filter((app) => app._id !== selectedMentorId);
+                setApplications(updatedList);
+                if (updatedList.length > 0) {
+                    setSelectedMentorId(updatedList[0]._id);
+                } else {
+                    setSelectedMentorId(null);
+                }
+            }
+        } catch (error) {
+            console.error("Failed to reject mentor", error);
+        } finally {
+            setIsActionLoading(false);
         }
     };
 

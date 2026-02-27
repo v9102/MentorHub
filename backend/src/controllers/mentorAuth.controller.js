@@ -30,6 +30,10 @@ export const becomeMentor = async (req, res) => {
       expertise,
       availability,
       pricing,
+      verification: {
+        isVerified: false,
+        applicationStatus: "pending",
+      }
     };
 
     await user.save();

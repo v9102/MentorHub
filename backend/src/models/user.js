@@ -85,10 +85,10 @@ const UserSchema = new mongoose.Schema({
   },
 
   languages: [{
-  type: String,
-  trim: true,
-  index: true
-}]
+    type: String,
+    trim: true,
+    index: true
+  }]
   ,
   mentorProfile: {
 
@@ -135,24 +135,52 @@ const UserSchema = new mongoose.Schema({
     },
 
     availability: [
-  {
-    day: {
-      type: String,
-      enum: [
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday"
-      ],
-      required: true,
-      index: true
-    },
-
-    slots: [
       {
+        day: {
+          type: String,
+          enum: [
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday"
+          ],
+          required: true,
+          index: true
+        },
+
+        slots: [
+          {
+            startTime: {
+              type: String,
+              required: true
+            },
+
+            endTime: {
+              type: String,
+              required: true
+            },
+
+            sessionDuration: {
+              type: Number,
+              required: true,
+              default: 15
+            }
+          }
+        ]
+      }
+    ],
+
+    upcomingSessions: [
+      {
+        date: {
+          type: Date,
+          required: true,
+          index: true
+        },
+
         startTime: {
           type: String,
           required: true
@@ -165,50 +193,22 @@ const UserSchema = new mongoose.Schema({
 
         sessionDuration: {
           type: Number,
-          required: true,
-          default: 15
+          required: true
+        },
+
+        isBooked: {
+          type: Boolean,
+          default: false,
+          index: true
+        },
+
+        bookedBy: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          default: null
         }
-    }
-            ]
-        }
+      }
     ],
-    
-    upcomingSessions: [
-  {
-    date: {
-      type: Date,
-      required: true,
-      index: true
-    },
-
-    startTime: {
-      type: String,
-      required: true
-    },
-
-    endTime: {
-      type: String,
-      required: true
-    },
-
-    sessionDuration: {
-      type: Number,
-      required: true
-    },
-
-    isBooked: {
-      type: Boolean,
-      default: false,
-      index: true
-    },
-
-    bookedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      default: null
-    }
-  }
-],
 
     pricing: {
       pricePerSession: {
@@ -234,6 +234,23 @@ const UserSchema = new mongoose.Schema({
     totalReviews: {
       type: Number,
       default: 0
+    },
+
+    verification: {
+      idType: String,
+      idNumber: String,
+      documentUrl: String,
+      isVerified: {
+        type: Boolean,
+        default: false,
+        index: true
+      },
+      applicationStatus: {
+        type: String,
+        enum: ["pending", "approved", "rejected"],
+        default: "pending",
+        index: true
+      }
     }
 
   },
@@ -255,7 +272,7 @@ UserSchema.index({
   "mentorProfile.expertise.subjects": "text",
   "mentorProfile.expertise.specializations": "text",
   "mentorProfile.examDetails.examName": "text",
-  languages:"text",
+  languages: "text",
   "mentorProfile.examDetails.college": "text"
 });
 

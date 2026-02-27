@@ -7,13 +7,19 @@ export const getMentors = async (req, res) => {
     const limit = 20;
     const skip = (page - 1) * limit;
 
+    // We only want to block mentors that are EXPLICITLY set to isVerified: false.
+    // Legacy mentors where this field isn't set should gracefully pass through.
+    const verifyFilter = {
+      "mentorProfile.verification.isVerified": { $ne: false }
+    };
+
     const [mentors, totalMentors] = await Promise.all([
-      User.find({ role: "mentor" })
+      User.find({ role: "mentor", ...verifyFilter })
         .select("name username imageUrl mentorProfile.basicInfo mentorProfile.pricing mentorProfile.rating")
         .skip(skip)
         .limit(limit)
         .lean(),
-      User.countDocuments({ role: "mentor" })
+      User.countDocuments({ role: "mentor", ...verifyFilter })
     ]);
 
     res.status(200).json({
@@ -132,11 +138,12 @@ export const searchMentors = async (req, res) => {
       maxExperience
     } = req.query;
 
-    let filter = { role: "mentor" };
+    let filter = {
+      role: "mentor",
+      "mentorProfile.verification.isVerified": { $ne: false }
+    };
 
-    if (q?.trim()) {
-      filter.$text = { $search: q.trim() };
-    }
+    // Text search logic handled dynamically closer to User.find
 
     if (industry) {
       filter["mentorProfile.basicInfo.industry"] = industry;
@@ -158,16 +165,21 @@ export const searchMentors = async (req, res) => {
       if (maxExperience) filter["mentorProfile.basicInfo.workExperience"].$lte = Number(maxExperience);
     }
 
+    let searchFilter = filter;
+    if (q?.trim()) {
+      searchFilter = { ...filter, $text: { $search: q.trim() } };
+    }
+
     const [mentors, total] = await Promise.all([
       User.find(
-        filter,
+        searchFilter,
         q ? { score: { $meta: "textScore" } } : {}
       )
         .sort(q ? { score: { $meta: "textScore" } } : { "mentorProfile.rating": -1 })
         .skip(skip)
         .limit(limit)
         .lean(),
-      User.countDocuments(filter)
+      User.countDocuments(searchFilter)
     ]);
 
     res.status(200).json({

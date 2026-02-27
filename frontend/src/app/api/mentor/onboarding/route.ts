@@ -11,7 +11,7 @@ function validateOnboardingData(data: any): { valid: boolean; errors: string[] }
   } else {
     const firstName = data.basicInfo.firstName;
     const lastName = data.basicInfo.lastName;
-    
+
     if (!firstName || (typeof firstName === 'string' && !firstName.trim())) {
       errors.push("First name is required");
     }
@@ -60,10 +60,10 @@ export async function POST(req: Request) {
     const validation = validateOnboardingData(data);
     if (!validation.valid) {
       return NextResponse.json(
-        { 
-          success: false, 
-          error: `Validation failed: ${validation.errors.join(", ")}`, 
-          details: validation.errors 
+        {
+          success: false,
+          error: `Validation failed: ${validation.errors.join(", ")}`,
+          details: validation.errors
         },
         { status: 400 }
       );
@@ -109,7 +109,7 @@ export async function POST(req: Request) {
         subjects: data.expertise.subjects || [],
         specializations: data.expertise.specializations || "",
       };
-      
+
       if (data.expertise.examExpertise || data.expertise.rankOrScore) {
         mentorProfile.examDetails = [{
           examName: data.expertise.examExpertise || "",
@@ -146,6 +146,12 @@ export async function POST(req: Request) {
         idType: data.verification.idType,
         idNumber: data.verification.idNumber,
         isVerified: false,
+        applicationStatus: "pending",
+      };
+    } else {
+      mentorProfile.verification = {
+        isVerified: false,
+        applicationStatus: "pending",
       };
     }
 

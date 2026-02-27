@@ -1,7 +1,6 @@
 import { type MentorProfile } from "@/app/(public)/mentors/mock";
 
 // Backend URL is now handled via Next.js Rewrites (Proxy)
-const BACKEND_URL = "";
 
 const getBaseUrl = () => {
   if (typeof window !== "undefined") {
@@ -26,6 +25,7 @@ const getBaseUrl = () => {
 /**
  * Transform raw mentor data from backend to MentorProfile format
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const transformMentorData = (mentor: any): MentorProfile => {
   const mp = mentor.mentorProfile || {};
   const basic = mp.basicInfo || {};
@@ -152,7 +152,7 @@ export const transformMentorData = (mentor: any): MentorProfile => {
 export const fetchMentors = async (): Promise<MentorProfile[]> => {
   try {
     const baseUrl = getBaseUrl();
-    const response = await fetch(`${baseUrl}/api/mentors`, { 
+    const response = await fetch(`${baseUrl}/api/mentors`, {
       next: { revalidate: 300 } // Cache for 5 minutes on server
     });
 
@@ -179,7 +179,7 @@ export const fetchMentors = async (): Promise<MentorProfile[]> => {
 export const fetchMentorById = async (id: string): Promise<MentorProfile | undefined> => {
   try {
     const baseUrl = getBaseUrl();
-    
+
     // Try to fetch single mentor from dedicated endpoint
     const response = await fetch(`${baseUrl}/api/mentors/${id}`, {
       next: { revalidate: 300 } // Cache for 5 minutes on server
@@ -202,7 +202,7 @@ export const fetchMentorById = async (id: string): Promise<MentorProfile | undef
     if (process.env.NODE_ENV === 'development') {
       console.error(`Error fetching mentor ${id}:`, error);
     }
-    
+
     // Fallback to fetching all mentors
     try {
       const allMentors = await fetchMentors();

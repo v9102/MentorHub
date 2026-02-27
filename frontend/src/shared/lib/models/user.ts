@@ -139,7 +139,6 @@ const UserSchema = new mongoose.Schema({
             type: Number,
             default: 0,
         },
-        // Verification fields
         verification: {
             idType: String,
             idNumber: String,
@@ -147,8 +146,14 @@ const UserSchema = new mongoose.Schema({
             isVerified: {
                 type: Boolean,
                 default: false,
+                index: true,
             },
-            verifiedAt: Date,
+            applicationStatus: {
+                type: String,
+                enum: ["pending", "approved", "rejected"],
+                default: "pending",
+                index: true,
+            },
         },
     },
     isProfileComplete: {
