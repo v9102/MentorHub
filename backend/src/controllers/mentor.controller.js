@@ -3,17 +3,26 @@ import { generateAvailabilityMatrix } from "../utils/availabilityMatrix.js";
 
 export const getMentors = async (req, res) => {
   try {
-    const page = Number(req.query.page) || 1;
+    const page = Math.max(Number(req.query.page) || 1, 1);
     const limit = 20;
     const skip = (page - 1) * limit;
 
+    const filter = {
+      role: "mentor",
+      isProfileComplete: true
+    };
+
     const [mentors, totalMentors] = await Promise.all([
-      User.find({ role: "mentor" })
-        .select("name username imageUrl mentorProfile.basicInfo mentorProfile.pricing mentorProfile.rating")
+      User.find(filter)
+        .sort({ createdAt: -1 })
+        .select(
+          "name username imageUrl mentorProfile.basicInfo mentorProfile.pricing mentorProfile.rating"
+        )
         .skip(skip)
         .limit(limit)
         .lean(),
-      User.countDocuments({ role: "mentor" })
+
+      User.countDocuments(filter)
     ]);
 
     res.status(200).json({
@@ -25,8 +34,11 @@ export const getMentors = async (req, res) => {
     });
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, msg: "Server error" });
+    console.error("Get Mentors Error:", error);
+    res.status(500).json({
+      success: false,
+      msg: "Server error"
+    });
   }
 };
 
@@ -248,50 +260,74 @@ export const upcomingSessions = async (req, res) => {
 };
 
 
+const parseTimeTo24Hour = (timeStr) => {
+  // If already 24-hour format like "12:00"
+  if (/^\d{1,2}:\d{2}$/.test(timeStr)) {
+    return timeStr;
+  }
+
+  // Extract time like "8 PM" from "Night (8 PM – 12 AM)"
+  const match = timeStr.match(/(\d{1,2})\s?(AM|PM)/i);
+  if (!match) return null;
+
+  let hour = parseInt(match[1], 10);
+  const modifier = match[2].toUpperCase();
+
+  if (modifier === "PM" && hour !== 12) hour += 12;
+  if (modifier === "AM" && hour === 12) hour = 0;
+
+  return `${hour.toString().padStart(2, "0")}:00`;
+};
+
 const generateUpcomingSessionsFromAvailability = (availability) => {
   const today = new Date();
   const sessions = [];
+
   for (let i = 0; i < 7; i++) {
     const date = new Date();
     date.setDate(today.getDate() + i);
-    const dayName =
-      date.toLocaleDateString("en-US", {
-        weekday: "long"
-      });
-    const dayAvailability =
-      availability.find(d => d.day === dayName);
+
+    const dayName = date.toLocaleDateString("en-US", {
+      weekday: "long"
+    });
+
+    const dayAvailability = availability.find(d => d.day === dayName);
     if (!dayAvailability) continue;
+
     for (const slot of dayAvailability.slots) {
+
+      const startStr = parseTimeTo24Hour(slot.startTime);
+      const endStr = parseTimeTo24Hour(slot.endTime);
+
+      if (!startStr || !endStr) continue;
+
+      const [sh, sm] = startStr.split(":").map(Number);
+      const [eh, em] = endStr.split(":").map(Number);
+
       let start = new Date(date);
       let end = new Date(date);
-      const [sh, sm] = slot.startTime.split(":");
-      const [eh, em] = slot.endTime.split(":");
-      start.setHours(sh, sm, 0);
-      end.setHours(eh, em, 0);
+
+      start.setHours(sh, sm, 0, 0);
+      end.setHours(eh, em, 0, 0);
+
       while (start < end) {
         const sessionEnd = new Date(start);
-        sessionEnd.setMinutes(
-          sessionEnd.getMinutes() +
-          slot.sessionDuration
-        );
+        sessionEnd.setMinutes(sessionEnd.getMinutes() + slot.sessionDuration);
+
         sessions.push({
           date: new Date(start),
-          startTime:
-            start.toTimeString().slice(0, 5),
-          endTime:
-            sessionEnd.toTimeString().slice(0, 5),
-          sessionDuration:
-            slot.sessionDuration,
+          startTime: start.toTimeString().slice(0, 5),   // "HH:mm"
+          endTime: sessionEnd.toTimeString().slice(0, 5),
+          sessionDuration: slot.sessionDuration,
           isBooked: false,
           bookedBy: null
         });
-        start.setMinutes(
-          start.getMinutes() +
-          slot.sessionDuration
-        );
+
+        start.setMinutes(start.getMinutes() + slot.sessionDuration);
       }
     }
   }
+
   return sessions;
 };
 
@@ -324,7 +360,6 @@ export const saveAvailability = async (req, res) => {
     const newSessions =
       generateUpcomingSessionsFromAvailability(availability);
 
-    // Only future + unbooked sessions regenerated
     const bookedSessions =
       mentor.mentorProfile.upcomingSessions.filter(s => s.isBooked);
 
@@ -428,3 +463,4 @@ export const getSessionHistory = async (req, res) => {
   }
 
 };
+

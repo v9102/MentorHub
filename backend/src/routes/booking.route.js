@@ -1,10 +1,9 @@
 import express from "express";
+import { requireAuth } from "@clerk/express";
 import { createBooking } from "../controllers/booking.controller.js";
-import protect from "../middleware/auth.js";
 
 const router = express.Router();
 
-router.post("/",protect, createBooking);
-
+router.post("/", requireAuth(), createBooking);
 
 export default router;

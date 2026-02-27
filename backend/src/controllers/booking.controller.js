@@ -1,145 +1,101 @@
 import mongoose from "mongoose";
-import Booking from "../models/Booking.js";
 import User from "../models/user.js";
+import Booking from "../models/Booking.js";
 
 export const createBooking = async (req, res) => {
-  const session = await mongoose.startSession();
-
   try {
-    await session.withTransaction(async () => {
+    const { mentorId, date, startTime } = req.body;
 
-      const clerkUserId = req.auth.userId;
-
-      if (!clerkUserId) {
-        throw new Error("Unauthorized");
-      }
-      const student = await User.findOne({
-        clerkId: clerkUserId
-      }).session(session);
-
-      if (!student) {
-        throw new Error("User not found");
-      }
-
-      if (student.role !== "student") {
-        throw new Error("Only students can book sessions");
-      }
-
-      const { mentorId, date, startTime } = req.body;
-
-      if (!mentorId || !date || !startTime) {
-        throw new Error("mentorId, date, startTime required");
-      }
-
-      const sessionDate = new Date(date);
-
-      const mentor = await User.findOne({
-        _id: mentorId,
-        role: "mentor"
-      }).session(session);
-
-      if (!mentor) {
-        throw new Error("Mentor not found");
-      }
-
-      const upcomingSession = mentor.mentorProfile.upcomingSessions.find(
-        (s) =>
-          new Date(s.date).toISOString().split("T")[0] ===
-            sessionDate.toISOString().split("T")[0] &&
-          s.startTime === startTime
-      );
-
-      if (!upcomingSession) {
-        throw new Error("Session not available");
-      }
-
-      if (upcomingSession.isBooked) {
-        throw new Error("Session already booked");
-      }
-
-      const booking = await Booking.create(
-        [{
-          mentor: mentor._id,
-          student: student._id,
-          sessionDate: upcomingSession.date,
-          startTime: upcomingSession.startTime,
-          endTime: upcomingSession.endTime,
-          sessionDuration: upcomingSession.sessionDuration,
-          price: mentor.mentorProfile.pricing?.pricePerSession || 0
-        }],
-        { session }
-      );
-
-      const updateResult = await User.updateOne(
-        {
-          _id: mentor._id,
-          "mentorProfile.upcomingSessions.date": upcomingSession.date,
-          "mentorProfile.upcomingSessions.startTime": startTime,
-          "mentorProfile.upcomingSessions.isBooked": false
-        },
-        {
-          $set: {
-            "mentorProfile.upcomingSessions.$.isBooked": true,
-            "mentorProfile.upcomingSessions.$.bookedBy": student._id
-          }
-        },
-        { session }
-      );
-
-      if (updateResult.modifiedCount === 0) {
-        throw new Error("Slot already booked");
-      }
-
-      res.status(201).json({
-        success: true,
-        msg: "Booking successful",
-        booking: booking[0]
+    if (!mentorId || !date || !startTime) {
+      return res.status(400).json({
+        success: false,
+        msg: "mentorId, date, startTime required"
       });
+    }
 
+    const mentor = await User.findOne({
+      _id: mentorId,
+      role: "mentor"
+    });
+
+    if (!mentor) {
+      return res.status(404).json({
+        success: false,
+        msg: "Mentor not found"
+      });
+    }
+
+    if (!mentor.mentorProfile?.upcomingSessions?.length) {
+      return res.status(400).json({
+        success: false,
+        msg: "No sessions available"
+      });
+    }
+
+    const convertTo24Hour = (timeStr) => {
+      const clean = timeStr.replace(" IST", "").trim();
+      const [time, modifier] = clean.split(" ");
+      let [hours, minutes] = time.split(":").map(Number);
+
+      if (modifier === "PM" && hours !== 12) hours += 12;
+      if (modifier === "AM" && hours === 12) hours = 0;
+
+      return `${hours.toString().padStart(2, "0")}:${minutes
+        .toString()
+        .padStart(2, "0")}`;
+    };
+
+    const cleanTime = convertTo24Hour(startTime);
+
+    const incomingDate = new Date(date);
+    incomingDate.setHours(0, 0, 0, 0);
+
+    const sessionIndex = mentor.mentorProfile.upcomingSessions.findIndex(
+      (s) => {
+        const dbDate = new Date(s.date);
+        dbDate.setHours(0, 0, 0, 0);
+
+        return (
+          dbDate.getTime() === incomingDate.getTime() &&
+          s.startTime === cleanTime &&
+          !s.isBooked
+        );
+      }
+    );
+
+    if (sessionIndex === -1) {
+      return res.status(400).json({
+        success: false,
+        msg: "Session not available"
+      });
+    }
+
+    const selectedSession =
+      mentor.mentorProfile.upcomingSessions[sessionIndex];
+
+    const booking = await Booking.create({
+      mentor: mentor._id,
+      sessionDate: selectedSession.date,
+      startTime: selectedSession.startTime,
+      endTime: selectedSession.endTime,
+      sessionDuration: selectedSession.sessionDuration,
+      price: mentor.mentorProfile.pricing?.pricePerSession || 0,
+      status: "confirmed"
+    });
+
+    mentor.mentorProfile.upcomingSessions[sessionIndex].isBooked = true;
+    await mentor.save();
+
+    return res.status(200).json({
+      success: true,
+      booking
     });
 
   } catch (error) {
-
-    console.error("Booking Error:", error.message);
-
-    if (
-      error.message === "mentorId, date, startTime required" ||
-      error.message === "Session not available" ||
-      error.message === "Session already booked" ||
-      error.message === "Slot already booked"
-    ) {
-      return res.status(400).json({
-        success: false,
-        msg: error.message
-      });
-    }
-
-    if (
-      error.message === "Mentor not found" ||
-      error.message === "User not found"
-    ) {
-      return res.status(404).json({
-        success: false,
-        msg: error.message
-      });
-    }
-
-    if (
-      error.message === "Unauthorized" ||
-      error.message === "Only students can book sessions"
-    ) {
-      return res.status(401).json({
-        success: false,
-        msg: error.message
-      });
-    }
-
+    console.error("Booking Error:", error);
     return res.status(500).json({
       success: false,
       msg: "Server error"
     });
-
-  } finally {
-    session.endSession();
   }
 };

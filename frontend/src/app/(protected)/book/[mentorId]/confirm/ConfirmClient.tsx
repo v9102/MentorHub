@@ -32,6 +32,7 @@ export default function ConfirmClient({ mentor, sessionDate, sessionTime, price 
     return match ? match[1] : "10:00";
   };
 
+  console.log("Backend URL:", process.env.NEXT_PUBLIC_BACKEND_URL);
   const handlePayment = async () => {
     setProcessing(true);
     setError(null);
@@ -44,7 +45,7 @@ export default function ConfirmClient({ mentor, sessionDate, sessionTime, price 
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // Call backend booking API to persist to database
-      const response = await fetch("/api/pay-now/", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/pay-now`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
