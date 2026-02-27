@@ -39,12 +39,12 @@ export default function ConfirmClient({ mentor, sessionDate, sessionTime, price 
     try {
       // Get auth token for backend
       const token = await getToken();
-      
+
       // Simulate payment processing delay (remove in production with real payment)
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // Call backend booking API to persist to database
-      const response = await fetch("/api/booking", {
+      const response = await fetch("/api/pay-now/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
