@@ -19,40 +19,18 @@ export async function GET(request: NextRequest) {
     }
 
     const token = await getToken();
-    
-    // First get the user's MongoDB ID from the mentors list
-    const mentorsResponse = await fetch(`${BACKEND_URL}/api/mentor/mentors`, {
-      headers: { "Content-Type": "application/json" },
-    });
 
-    if (!mentorsResponse.ok) {
-      return NextResponse.json(
-        { success: false, msg: "Failed to fetch mentors" },
-        { status: 500 }
-      );
-    }
-
-    const mentorsData = await mentorsResponse.json();
-    const mentors = mentorsData.mentors || [];
-    const currentMentor = mentors.find((m: any) => m.clerkId === userId);
-
-    if (!currentMentor) {
-      return NextResponse.json(
-        { success: false, msg: "Mentor profile not found" },
-        { status: 404 }
-      );
-    }
-
-    // Now fetch the full profile with availability matrix
-    const profileResponse = await fetch(`${BACKEND_URL}/api/mentor/mentor/${currentMentor._id}`, {
+    // Fetch the full profile directly from our new getOwnProfile backend endpoint
+    const profileResponse = await fetch(`${BACKEND_URL}/api/mentor/mentor/profile`, {
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`,
       },
+      cache: 'no-store'
     });
 
     const responseText = await profileResponse.text();
-    
+
     let data;
     try {
       data = JSON.parse(responseText);
@@ -91,7 +69,7 @@ export async function PUT(request: NextRequest) {
 
     const token = await getToken();
     const body = await request.json();
-    
+
     const backendResponse = await fetch(`${BACKEND_URL}/api/mentor/mentor/profile`, {
       method: "PUT",
       headers: {
@@ -102,7 +80,7 @@ export async function PUT(request: NextRequest) {
     });
 
     const responseText = await backendResponse.text();
-    
+
     let data;
     try {
       data = JSON.parse(responseText);

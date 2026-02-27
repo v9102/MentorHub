@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { SignedIn, SignedOut, UserButton, ClerkLoading, useUser } from "@clerk/nextjs";
+import { SignedIn, SignedOut, ClerkLoading, useUser } from "@clerk/nextjs";
+import { ProfileButton } from "@/shared/ui/ProfileButton";
 import Image from "next/image";
 import { BookOpen, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -52,7 +53,7 @@ export default function Navbar() {
     { href: "/about", label: "About" },
   ];
 
-  const BecomeMentorLink = ({ mobile = false }) => {
+  const renderBecomeMentorLink = (mobile = false) => {
     const classes = mobile
       ? "text-lg font-medium text-gray-900 py-2 block"
       : "text-gray-600 hover:text-blue-600 relative group font-medium transition-colors";
@@ -131,7 +132,7 @@ export default function Navbar() {
               </Link>
             ))}
 
-            <BecomeMentorLink />
+            {renderBecomeMentorLink()}
           </div>
 
           {/* Desktop Auth */}
@@ -153,14 +154,14 @@ export default function Navbar() {
             </SignedOut>
 
             <SignedIn>
-              <UserButton afterSignOutUrl="/" />
+              <ProfileButton />
             </SignedIn>
           </div>
 
           {/* Mobile Menu Button */}
           <div className="flex items-center gap-4 md:hidden">
             <SignedIn>
-              <UserButton afterSignOutUrl="/" />
+              <ProfileButton />
             </SignedIn>
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -196,7 +197,7 @@ export default function Navbar() {
                       {link.label}
                     </Link>
                   ))}
-                  <BecomeMentorLink mobile />
+                  {renderBecomeMentorLink(true)}
                 </div>
 
                 <SignedOut>

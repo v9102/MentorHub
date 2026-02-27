@@ -33,6 +33,7 @@ export const transformMentorData = (mentor: any): MentorProfile => {
   const expertise = mp.expertise || {};
   const availability = mp.availability || {};
   const pricing = mp.pricing || {};
+  const verification = mp.verification || {};
 
   return {
     id: mentor.clerkId || mentor.id || mentor._id,
@@ -130,7 +131,8 @@ export const transformMentorData = (mentor: any): MentorProfile => {
     })()?.replace(" CSE", "").replace(" CGL", ""),
     optionalSubject: mentor.optionalSubject,
 
-    isVerified: mentor.isVerified ?? mentor.role === "mentor",
+    // Verification status from backend (nested in mentorProfile)
+    isVerified: verification?.isVerified ?? true,
 
     /** Pass through the full raw nested object so components can read it */
     mentorProfile: {

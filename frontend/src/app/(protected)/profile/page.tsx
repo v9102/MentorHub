@@ -101,16 +101,16 @@ export default function ProfilePage() {
                                 <div>
                                     <p className="text-xs text-slate-500">Member Since</p>
                                     <p className="font-semibold text-slate-900">
-                                        {new Date(user.createdAt ?? Date.now()).toLocaleDateString("en-US", {
+                                        {user.createdAt ? new Date(user.createdAt).toLocaleDateString("en-US", {
                                             month: "short",
                                             year: "numeric",
-                                        })}
+                                        }) : "Recently"}
                                     </p>
                                 </div>
                             </div>
                         </div>
 
-                     
+
                     </div>
                 </div>
 

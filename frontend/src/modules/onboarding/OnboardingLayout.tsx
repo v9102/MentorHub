@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { UserButton } from "@clerk/nextjs";
+import { ProfileButton } from "@/shared/ui/ProfileButton";
 import { ArrowLeft } from "lucide-react";
 
 export default function OnboardingLayoutWrapper({
@@ -23,7 +23,7 @@ export default function OnboardingLayoutWrapper({
           Back
         </button>
 
-        <UserButton afterSignOutUrl="/" />
+        <ProfileButton />
       </header>
 
       {/* Scrollable content area */}

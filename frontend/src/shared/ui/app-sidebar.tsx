@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation"
 import { Calendar, Home, Inbox, MessageCircle, Search, Settings, User } from "lucide-react"
-import { UserButton } from "@clerk/nextjs"
+import { ProfileButton } from "@/shared/ui/ProfileButton"
 
 import {
   Sidebar,
@@ -59,21 +59,21 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <div className="px-4 py-2 mb-4">
-             <h1 className="text-xl font-bold text-blue-800">
-                Mentor<span className="text-orange-600">Hub</span>
-             </h1>
+            <h1 className="text-xl font-bold text-blue-800">
+              Mentor<span className="text-orange-600">Hub</span>
+            </h1>
           </div>
           <SidebarGroupLabel className="px-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-               Menu
+            Menu
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="px-2">
               {items.map((item) => {
                 // Check if active (exact match or subpath)
                 // For /student (Dashboard), we want exact match if possible, or handle specifically
-                const isActive = item.url === "/dashboard/student" 
-                    ? pathname === "/dashboard/student" 
-                    : pathname.startsWith(item.url);
+                const isActive = item.url === "/dashboard/student"
+                  ? pathname === "/dashboard/student"
+                  : pathname.startsWith(item.url);
 
                 return (
                   <SidebarMenuItem key={item.title}>
@@ -90,12 +90,12 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      
+
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
             <div className="flex items-center gap-3 p-3 bg-sidebar-accent/10 rounded-lg">
-                <UserButton showName />
+              <ProfileButton showName />
             </div>
           </SidebarMenuItem>
         </SidebarMenu>
