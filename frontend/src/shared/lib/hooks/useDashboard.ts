@@ -71,6 +71,19 @@ export interface DashboardProfile {
   availabilityMatrix?: any;
 }
 
+// Custom error class for better error handling
+class FetchError extends Error {
+  status: number;
+  info?: { success: boolean; msg: string };
+  
+  constructor(message: string, status: number, info?: { success: boolean; msg: string }) {
+    super(message);
+    this.name = 'FetchError';
+    this.status = status;
+    this.info = info;
+  }
+}
+
 // Authenticated fetcher that includes the Clerk token
 const createAuthFetcher = (getToken: () => Promise<string | null>) => {
   return async (url: string) => {
@@ -83,7 +96,26 @@ const createAuthFetcher = (getToken: () => Promise<string | null>) => {
     });
     
     if (!res.ok) {
-      const error = new Error("An error occurred while fetching the data.");
+      // Try to parse error response for more context
+      let errorInfo: { success: boolean; msg: string } | undefined;
+      try {
+        errorInfo = await res.json();
+      } catch {
+        // Ignore JSON parse errors
+      }
+      
+      // Handle specific error cases gracefully
+      if (res.status === 404 && errorInfo?.msg === "User not found") {
+        // User exists in Clerk but not in backend database yet
+        // Return empty data instead of throwing
+        return { success: true, sessions: [], count: 0 };
+      }
+      
+      const error = new FetchError(
+        errorInfo?.msg || "An error occurred while fetching the data.",
+        res.status,
+        errorInfo
+      );
       throw error;
     }
     

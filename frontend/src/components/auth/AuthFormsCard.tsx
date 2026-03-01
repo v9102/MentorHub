@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSignIn, useSignUp, useUser } from "@clerk/nextjs";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Mail, Lock, Eye, EyeOff, User, ChevronRight, ArrowRight } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, User, ChevronRight, ArrowRight, Loader2 } from "lucide-react";
 
 export type AuthView = "sign-in" | "sign-up-student" | "sign-up-mentor";
 
@@ -13,8 +13,132 @@ interface AuthFormsCardProps {
     initialView: AuthView;
 }
 
+// ============ TYPES ============
+interface FieldErrors {
+    email?: string;
+    password?: string;
+    firstName?: string;
+    lastName?: string;
+    general?: string;
+}
+
+interface AuthErrorResult {
+    field: keyof FieldErrors;
+    message: string;
+    showSignUpLink?: boolean;
+    showSignInLink?: boolean;
+}
+
+// ============ HELPER FUNCTIONS ============
+
+/** Validate email format */
+const isValidEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email.trim());
+};
+
+/** Parse Clerk error and return user-friendly message with action links */
+const parseAuthError = (err: unknown, context: "sign-in" | "sign-up"): AuthErrorResult => {
+    const error = err as { errors?: Array<{ code?: string; longMessage?: string; message?: string }> };
+    const errorCode = error.errors?.[0]?.code;
+    const errorMessage = error.errors?.[0]?.longMessage || error.errors?.[0]?.message || "";
+
+    if (context === "sign-in") {
+        // User not found - suggest signup
+        if (errorCode === "form_identifier_not_found" || errorMessage.includes("not found") || errorMessage.includes("Couldn't find")) {
+            return {
+                field: "email",
+                message: "No account found with this email.",
+                showSignUpLink: true,
+            };
+        }
+        // Wrong password
+        if (errorCode === "form_password_incorrect" || errorMessage.includes("password") || errorMessage.includes("incorrect")) {
+            return {
+                field: "password",
+                message: "Incorrect password. Please try again.",
+            };
+        }
+    }
+
+    if (context === "sign-up") {
+        // Email already exists - suggest signin
+        if (errorCode === "form_identifier_exists" || errorMessage.includes("already exists") || errorMessage.includes("already taken") || errorMessage.includes("already in use")) {
+            return {
+                field: "email",
+                message: "This account already exists.",
+                showSignInLink: true,
+            };
+        }
+        // Weak/compromised password
+        if (errorCode === "form_password_pwned" || errorCode === "form_password_length_too_short") {
+            return {
+                field: "password",
+                message: "Password is too weak. Please choose a stronger password.",
+            };
+        }
+    }
+
+    // Generic error
+    return {
+        field: "general",
+        message: errorMessage || "Something went wrong. Please try again.",
+    };
+};
+
+// ============ SPINNER COMPONENT ============
+const Spinner = ({ className = "" }: { className?: string }) => (
+    <Loader2 className={`w-4 h-4 animate-spin ${className}`} />
+);
+
+// ============ ERROR MESSAGE COMPONENT ============
+interface InlineErrorProps {
+    message: string;
+    showSignUpLink?: boolean;
+    showSignInLink?: boolean;
+    onSwitchToSignUp?: () => void;
+    onSwitchToSignIn?: () => void;
+}
+
+const InlineError = ({ message, showSignUpLink, showSignInLink, onSwitchToSignUp, onSwitchToSignIn }: InlineErrorProps) => (
+    <motion.p
+        initial={{ opacity: 0, y: -4 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -4 }}
+        className="text-red-500 text-xs mt-1.5 flex items-center gap-1 flex-wrap"
+    >
+        <span>{message}</span>
+        {showSignUpLink && onSwitchToSignUp && (
+            <button
+                type="button"
+                onClick={onSwitchToSignUp}
+                className="text-[#1DA1F2] hover:underline font-medium cursor-pointer"
+            >
+                Create one?
+            </button>
+        )}
+        {showSignInLink && onSwitchToSignIn && (
+            <button
+                type="button"
+                onClick={onSwitchToSignIn}
+                className="text-[#1DA1F2] hover:underline font-medium cursor-pointer"
+            >
+                Login instead
+            </button>
+        )}
+    </motion.p>
+);
+
+// ============ CONSTANTS ============
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
+// ============ EXTENDED FIELD ERRORS TYPE ============
+interface ExtendedFieldErrors extends FieldErrors {
+    _showSignUpLink?: boolean;
+    _showSignInLink?: boolean;
+}
+
+// ============ MAIN COMPONENT ============
 export default function AuthFormsCard({ initialView }: AuthFormsCardProps) {
     const [view, setView] = useState<AuthView>(initialView);
     const router = useRouter();
@@ -41,7 +165,7 @@ export default function AuthFormsCard({ initialView }: AuthFormsCardProps) {
     const [signInEmail, setSignInEmail] = useState("");
     const [signInPassword, setSignInPassword] = useState("");
     const [showSignInPassword, setShowSignInPassword] = useState(false);
-    const [signInError, setSignInError] = useState("");
+    const [signInErrors, setSignInErrors] = useState<ExtendedFieldErrors>({});
     const [isSignInLoading, setIsSignInLoading] = useState(false);
 
     // ---- Sign Up State ----
@@ -51,109 +175,233 @@ export default function AuthFormsCard({ initialView }: AuthFormsCardProps) {
     const [signUpEmail, setSignUpEmail] = useState("");
     const [signUpPassword, setSignUpPassword] = useState("");
     const [showSignUpPassword, setShowSignUpPassword] = useState(false);
-    const [signUpError, setSignUpError] = useState("");
+    const [signUpErrors, setSignUpErrors] = useState<ExtendedFieldErrors>({});
     const [isSignUpLoading, setIsSignUpLoading] = useState(false);
     const [verifying, setVerifying] = useState(false);
     const [code, setCode] = useState("");
+    const [verifyError, setVerifyError] = useState("");
 
     const isSignIn = view === "sign-in";
 
-    const switchView = (newView: AuthView) => {
+    // ---- Clear errors on input change ----
+    const handleSignInEmailChange = useCallback((value: string) => {
+        setSignInEmail(value);
+        if (signInErrors.email || signInErrors._showSignUpLink) {
+            setSignInErrors(prev => ({ ...prev, email: undefined, _showSignUpLink: undefined }));
+        }
+    }, [signInErrors.email, signInErrors._showSignUpLink]);
+
+    const handleSignInPasswordChange = useCallback((value: string) => {
+        setSignInPassword(value);
+        if (signInErrors.password) {
+            setSignInErrors(prev => ({ ...prev, password: undefined }));
+        }
+    }, [signInErrors.password]);
+
+    const handleSignUpEmailChange = useCallback((value: string) => {
+        setSignUpEmail(value);
+        if (signUpErrors.email || signUpErrors._showSignInLink) {
+            setSignUpErrors(prev => ({ ...prev, email: undefined, _showSignInLink: undefined }));
+        }
+    }, [signUpErrors.email, signUpErrors._showSignInLink]);
+
+    const handleSignUpPasswordChange = useCallback((value: string) => {
+        setSignUpPassword(value);
+        if (signUpErrors.password) {
+            setSignUpErrors(prev => ({ ...prev, password: undefined }));
+        }
+    }, [signUpErrors.password]);
+
+    const handleFirstNameChange = useCallback((value: string) => {
+        setFirstName(value);
+        if (signUpErrors.firstName) {
+            setSignUpErrors(prev => ({ ...prev, firstName: undefined }));
+        }
+    }, [signUpErrors.firstName]);
+
+    const handleLastNameChange = useCallback((value: string) => {
+        setLastName(value);
+        if (signUpErrors.lastName) {
+            setSignUpErrors(prev => ({ ...prev, lastName: undefined }));
+        }
+    }, [signUpErrors.lastName]);
+
+    // ---- View Switching ----
+    const switchView = useCallback((newView: AuthView) => {
         if (verifying) return;
         setView(newView);
-        setSignInError("");
-        setSignUpError("");
-    };
+        setSignInErrors({});
+        setSignUpErrors({});
+    }, [verifying]);
 
-    // ---- Handlers ----
+    const switchToSignIn = useCallback(() => {
+        switchView("sign-in");
+        // Pre-fill email if available
+        if (signUpEmail) {
+            setSignInEmail(signUpEmail);
+        }
+    }, [switchView, signUpEmail]);
+
+    const switchToSignUp = useCallback(() => {
+        switchView("sign-up-student");
+        // Pre-fill email if available
+        if (signInEmail) {
+            setSignUpEmail(signInEmail);
+        }
+    }, [switchView, signInEmail]);
+
+    // ---- Sign In Handler ----
     const handleSignInSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!isSignInLoaded) return;
+        
+        // Prevent double submission
+        if (isSignInLoading || !isSignInLoaded) return;
+        
+        setSignInErrors({});
+
+        // Client-side email validation
+        const trimmedEmail = signInEmail.trim();
+        if (!trimmedEmail) {
+            setSignInErrors({ email: "Email is required" });
+            return;
+        }
+        if (!isValidEmail(trimmedEmail)) {
+            setSignInErrors({ email: "Please enter a valid email address" });
+            return;
+        }
+        if (!signInPassword) {
+            setSignInErrors({ password: "Password is required" });
+            return;
+        }
+
         setIsSignInLoading(true);
-        setSignInError("");
+
         try {
-            const result = await signIn.create({ identifier: signInEmail, password: signInPassword });
+            const result = await signIn.create({ 
+                identifier: trimmedEmail, 
+                password: signInPassword 
+            });
+            
             if (result.status === "complete") {
                 await setSignInActive({ session: result.createdSessionId });
+                // Redirect handled by useEffect
             } else {
-                setSignInError("Sign in requires further verification.");
+                setSignInErrors({ general: "Sign in requires further verification." });
                 setIsSignInLoading(false);
             }
-        } catch (err: any) {
-            const errorCode = err.errors?.[0]?.code;
-            if (errorCode === "form_identifier_not_found") {
-                setSignUpEmail(signInEmail);
-                switchView("sign-up-student");
-                setSignUpError("No account found with this email. Please create one.");
-            } else {
-                setSignInError(err.errors?.[0]?.longMessage || "Failed to sign in.");
-            }
+        } catch (err: unknown) {
+            const errorResult = parseAuthError(err, "sign-in");
+            setSignInErrors({
+                [errorResult.field]: errorResult.message,
+                _showSignUpLink: errorResult.showSignUpLink,
+            });
             setIsSignInLoading(false);
         }
     };
 
     const handleSignInGoogle = () => {
-        if (!isSignInLoaded) return;
+        if (!isSignInLoaded || isSignInLoading) return;
         signIn.authenticateWithRedirect({
             strategy: "oauth_google",
             redirectUrl: "/sso-callback",
-            redirectUrlComplete: `/sign-in?redirect=${encodeURIComponent(redirectUrl)}`,
+            redirectUrlComplete: redirectUrl !== "/" ? redirectUrl : "/profile",
         });
     };
 
+    // ---- Sign Up Handler ----
     const handleSignUpSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!isSignUpLoaded) return;
+        
+        // Prevent double submission
+        if (isSignUpLoading || !isSignUpLoaded) return;
+        
+        setSignUpErrors({});
+
+        // Client-side validation
+        const errors: FieldErrors = {};
+        
+        if (!firstName.trim()) {
+            errors.firstName = "First name is required";
+        }
+        if (!lastName.trim()) {
+            errors.lastName = "Last name is required";
+        }
+        
+        const trimmedEmail = signUpEmail.trim();
+        if (!trimmedEmail) {
+            errors.email = "Email is required";
+        } else if (!isValidEmail(trimmedEmail)) {
+            errors.email = "Please enter a valid email address";
+        }
+        
+        if (!signUpPassword) {
+            errors.password = "Password is required";
+        } else if (signUpPassword.length < 8) {
+            errors.password = "Password must be at least 8 characters";
+        }
+
+        if (Object.keys(errors).length > 0) {
+            setSignUpErrors(errors);
+            return;
+        }
+
         setIsSignUpLoading(true);
-        setSignUpError("");
+
         try {
-            await signUp.create({ firstName, lastName, emailAddress: signUpEmail, password: signUpPassword });
+            await signUp.create({ 
+                firstName: firstName.trim(), 
+                lastName: lastName.trim(), 
+                emailAddress: trimmedEmail, 
+                password: signUpPassword 
+            });
             await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
             setVerifying(true);
-        } catch (err: any) {
-            const errorCode = err.errors?.[0]?.code;
-            if (errorCode === "form_identifier_exists") {
-                setSignInEmail(signUpEmail);
-                switchView("sign-in");
-                setSignInError("Account already exists with this email. Please sign in.");
-            } else {
-                setSignUpError(err.errors?.[0]?.longMessage || "Failed to create account.");
-            }
+        } catch (err: unknown) {
+            const errorResult = parseAuthError(err, "sign-up");
+            setSignUpErrors({
+                [errorResult.field]: errorResult.message,
+                _showSignInLink: errorResult.showSignInLink,
+            });
         } finally {
             setIsSignUpLoading(false);
         }
     };
 
+    // ---- Verify Handler ----
     const handleVerify = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!isSignUpLoaded) return;
+        if (!isSignUpLoaded || isSignUpLoading) return;
+        
         setIsSignUpLoading(true);
-        setSignUpError("");
+        setVerifyError("");
+        
         try {
             const result = await signUp.attemptEmailAddressVerification({ code });
             if (result.status === "complete") {
                 await setSignUpActive({ session: result.createdSessionId });
                 router.push(view === "sign-up-mentor" ? "/onboarding/profile/basic-info" : "/profile");
             } else {
-                setSignUpError("Verification incomplete. Please try again.");
+                setVerifyError("Verification incomplete. Please try again.");
             }
-        } catch (err: any) {
-            setSignUpError(err.errors?.[0]?.longMessage || "Invalid verification code.");
+        } catch (err: unknown) {
+            const error = err as { errors?: Array<{ longMessage?: string }> };
+            setVerifyError(error.errors?.[0]?.longMessage || "Invalid verification code.");
         } finally {
             setIsSignUpLoading(false);
         }
     };
 
     const handleSignUpGoogle = () => {
-        if (!isSignUpLoaded) return;
+        if (!isSignUpLoaded || isSignUpLoading) return;
+        const redirectTarget = view === "sign-up-mentor" ? "/onboarding/profile/basic-info" : "/profile";
         signUp.authenticateWithRedirect({
             strategy: "oauth_google",
             redirectUrl: "/sso-callback",
-            redirectUrlComplete: view === "sign-up-mentor" ? "/onboarding/profile/basic-info" : "/profile",
+            redirectUrlComplete: redirectTarget,
         });
     };
 
-    // ---- Shared UI ----
+    // ---- Shared UI Components ----
     const GoogleIcon = () => (
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
             <path d="M22.56 12.25C22.56 11.47 22.49 10.72 22.36 10H12V14.26H17.92C17.66 15.63 16.88 16.81 15.71 17.59V20.34H19.28C21.36 18.42 22.56 15.6 22.56 12.25Z" fill="#4285F4" />
@@ -163,7 +411,8 @@ export default function AuthFormsCard({ initialView }: AuthFormsCardProps) {
         </svg>
     );
 
-    const inputClass = "w-full h-[50px] pl-11 pr-4 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1DA1F2]/25 focus:border-[#1DA1F2] transition-all duration-200 text-sm";
+    const baseInputClass = "w-full h-[50px] pl-11 pr-4 bg-white border rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1DA1F2]/25 focus:border-[#1DA1F2] transition-all duration-200 text-sm";
+    const inputClass = (hasError?: boolean) => `${baseInputClass} ${hasError ? "border-red-300 focus:border-red-400 focus:ring-red-200/50" : "border-slate-200"}`;
 
     return (
         <div className="w-full space-y-3">
@@ -176,14 +425,13 @@ export default function AuthFormsCard({ initialView }: AuthFormsCardProps) {
                     : "border-slate-200 bg-white/70"
                     }`}
             >
-                {/* Card Header - always visible */}
+                {/* Card Header */}
                 <button
                     type="button"
                     onClick={() => switchView("sign-in")}
                     className="w-full flex items-center justify-between px-6 py-4 cursor-pointer group"
                 >
                     <div className="flex items-center gap-3">
-
                         <div className="text-left">
                             <p className={`font-semibold text-[15px] transition-colors duration-200 ${isSignIn ? "text-slate-900" : "text-slate-500 group-hover:text-slate-700"}`}>
                                 Sign In
@@ -217,7 +465,8 @@ export default function AuthFormsCard({ initialView }: AuthFormsCardProps) {
                                 <button
                                     type="button"
                                     onClick={handleSignInGoogle}
-                                    className="w-full h-[46px] flex items-center justify-center gap-2.5 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition-all duration-200 text-sm font-medium text-slate-700 hover:shadow-sm cursor-pointer"
+                                    disabled={isSignInLoading}
+                                    className="w-full h-[46px] flex items-center justify-center gap-2.5 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition-all duration-200 text-sm font-medium text-slate-700 hover:shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <GoogleIcon />
                                     Continue with Google
@@ -230,37 +479,97 @@ export default function AuthFormsCard({ initialView }: AuthFormsCardProps) {
                                 </div>
 
                                 <form onSubmit={handleSignInSubmit} className="space-y-3">
-                                    {signInError && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: -6 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            className="bg-red-50 text-red-600 px-3 py-2.5 rounded-lg text-xs font-medium border border-red-100"
-                                        >
-                                            {signInError}
-                                        </motion.div>
-                                    )}
-                                    <div className="relative flex items-center">
-                                        <Mail className="absolute left-3.5 w-4 h-4 text-slate-400 pointer-events-none" />
-                                        <input type="email" value={signInEmail} onChange={e => setSignInEmail(e.target.value)} placeholder="Email address" className={inputClass} required />
+                                    {/* General Error */}
+                                    <AnimatePresence>
+                                        {signInErrors.general && (
+                                            <motion.div
+                                                initial={{ opacity: 0, y: -6 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: -6 }}
+                                                className="bg-red-50 text-red-500 px-3 py-2.5 rounded-lg text-xs font-medium border border-red-100"
+                                            >
+                                                {signInErrors.general}
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+
+                                    {/* Email Field */}
+                                    <div>
+                                        <div className="relative flex items-center">
+                                            <Mail className="absolute left-3.5 w-4 h-4 text-slate-400 pointer-events-none" />
+                                            <input 
+                                                type="email" 
+                                                value={signInEmail} 
+                                                onChange={e => handleSignInEmailChange(e.target.value)} 
+                                                placeholder="Email address" 
+                                                className={inputClass(!!signInErrors.email)} 
+                                                disabled={isSignInLoading}
+                                                autoComplete="email"
+                                            />
+                                        </div>
+                                        <AnimatePresence>
+                                            {signInErrors.email && (
+                                                <InlineError 
+                                                    message={signInErrors.email}
+                                                    showSignUpLink={signInErrors._showSignUpLink}
+                                                    onSwitchToSignUp={switchToSignUp}
+                                                />
+                                            )}
+                                        </AnimatePresence>
                                     </div>
-                                    <div className="relative flex items-center">
-                                        <Lock className="absolute left-3.5 w-4 h-4 text-slate-400 pointer-events-none" />
-                                        <input type={showSignInPassword ? "text" : "password"} value={signInPassword} onChange={e => setSignInPassword(e.target.value)} placeholder="Password" className={`${inputClass} pr-11`} required />
-                                        <button type="button" onClick={() => setShowSignInPassword(!showSignInPassword)} className="absolute right-3.5 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
-                                            {showSignInPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                        </button>
+
+                                    {/* Password Field */}
+                                    <div>
+                                        <div className="relative flex items-center">
+                                            <Lock className="absolute left-3.5 w-4 h-4 text-slate-400 pointer-events-none" />
+                                            <input 
+                                                type={showSignInPassword ? "text" : "password"} 
+                                                value={signInPassword} 
+                                                onChange={e => handleSignInPasswordChange(e.target.value)} 
+                                                placeholder="Password" 
+                                                className={`${inputClass(!!signInErrors.password)} pr-11`}
+                                                disabled={isSignInLoading}
+                                                autoComplete="current-password"
+                                            />
+                                            <button 
+                                                type="button" 
+                                                onClick={() => setShowSignInPassword(!showSignInPassword)} 
+                                                className="absolute right-3.5 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                                                tabIndex={-1}
+                                            >
+                                                {showSignInPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                            </button>
+                                        </div>
+                                        <AnimatePresence>
+                                            {signInErrors.password && (
+                                                <InlineError message={signInErrors.password} />
+                                            )}
+                                        </AnimatePresence>
                                     </div>
+
                                     <div className="flex justify-end">
                                         <Link href="#" className="text-[#1DA1F2] text-xs font-medium hover:underline">Forgot password?</Link>
                                     </div>
+
+                                    {/* Submit Button */}
                                     <motion.button
-                                        whileHover={{ scale: 1.01 }}
-                                        whileTap={{ scale: 0.98 }}
+                                        whileHover={!isSignInLoading ? { scale: 1.01 } : {}}
+                                        whileTap={!isSignInLoading ? { scale: 0.98 } : {}}
                                         type="submit"
                                         disabled={isSignInLoading}
-                                        className="w-full h-[46px] bg-[#1DA1F2] hover:bg-[#1a90d9] text-white font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:shadow-md disabled:opacity-60"
+                                        className="w-full h-[46px] bg-[#1DA1F2] hover:bg-[#1a90d9] text-white font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
                                     >
-                                        {isSignInLoading ? "Signing in..." : <>Sign In <ArrowRight className="w-4 h-4" /></>}
+                                        {isSignInLoading ? (
+                                            <>
+                                                <Spinner />
+                                                <span>Signing in...</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <span>Sign In</span>
+                                                <ArrowRight className="w-4 h-4" />
+                                            </>
+                                        )}
                                     </motion.button>
                                 </form>
                             </div>
@@ -277,14 +586,13 @@ export default function AuthFormsCard({ initialView }: AuthFormsCardProps) {
                     : "border-slate-200 bg-white/70"
                     }`}
             >
-                {/* Card Header - always visible */}
+                {/* Card Header */}
                 <button
                     type="button"
                     onClick={() => switchView("sign-up-student")}
                     className="w-full flex items-center justify-between px-6 py-4 cursor-pointer group"
                 >
                     <div className="flex items-center gap-3">
-
                         <div className="text-left">
                             <p className={`font-semibold text-[15px] transition-colors duration-200 ${!isSignIn ? "text-slate-900" : "text-slate-500 group-hover:text-slate-700"}`}>
                                 Create Account
@@ -320,28 +628,54 @@ export default function AuthFormsCard({ initialView }: AuthFormsCardProps) {
                                     <form onSubmit={handleVerify} className="space-y-4">
                                         <div className="text-center py-2">
                                             <p className="text-sm text-slate-600 font-medium">Check your email</p>
-                                            <p className="text-xs text-slate-400 mt-1">We sent a 6-digit code to <span className="font-semibold text-slate-600">{signUpEmail}</span></p>
+                                            <p className="text-xs text-slate-400 mt-1">
+                                                We sent a 6-digit code to{" "}
+                                                <span className="font-semibold text-slate-600">{signUpEmail}</span>
+                                            </p>
                                         </div>
-                                        {signUpError && (
-                                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-red-50 text-red-600 px-3 py-2.5 rounded-lg text-xs font-medium border border-red-100">
-                                                {signUpError}
-                                            </motion.div>
-                                        )}
+                                        
+                                        <AnimatePresence>
+                                            {verifyError && (
+                                                <motion.div 
+                                                    initial={{ opacity: 0 }} 
+                                                    animate={{ opacity: 1 }}
+                                                    exit={{ opacity: 0 }}
+                                                    className="bg-red-50 text-red-500 px-3 py-2.5 rounded-lg text-xs font-medium border border-red-100"
+                                                >
+                                                    {verifyError}
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                        
                                         <input
                                             type="text"
                                             value={code}
-                                            onChange={e => setCode(e.target.value)}
+                                            onChange={e => {
+                                                setCode(e.target.value);
+                                                if (verifyError) setVerifyError("");
+                                            }}
                                             placeholder="Enter 6-digit code"
                                             className="w-full h-[50px] px-4 bg-white border border-slate-200 rounded-xl text-center text-xl tracking-[0.3em] font-mono text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#1DA1F2]/25 focus:border-[#1DA1F2] transition-all"
                                             maxLength={6}
-                                            required
+                                            disabled={isSignUpLoading}
+                                            autoComplete="one-time-code"
                                         />
+                                        
                                         <motion.button
-                                            whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
-                                            type="submit" disabled={isSignUpLoading || code.length < 6}
-                                            className="w-full h-[46px] bg-[#1DA1F2] hover:bg-[#1a90d9] text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                                            whileHover={!isSignUpLoading ? { scale: 1.01 } : {}}
+                                            whileTap={!isSignUpLoading ? { scale: 0.98 } : {}}
+                                            type="submit" 
+                                            disabled={isSignUpLoading || code.length < 6}
+                                            className="w-full h-[46px] bg-[#1DA1F2] hover:bg-[#1a90d9] text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                                         >
-                                            {isSignUpLoading ? "Verifying..." : "Verify Email"}
+                                            {isSignUpLoading ? (
+                                                <>
+                                                    <Spinner />
+                                                    <span>Verifying...</span>
+                                                </>
+                                            ) : (
+                                                <span>Verify Email</span>
+                                            )}
                                         </motion.button>
                                     </form>
                                 ) : (
@@ -353,7 +687,8 @@ export default function AuthFormsCard({ initialView }: AuthFormsCardProps) {
                                                     key={v}
                                                     type="button"
                                                     onClick={() => switchView(v)}
-                                                    className={`w-1/2 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer ${view === v ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                                                    disabled={isSignUpLoading}
+                                                    className={`w-1/2 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer disabled:cursor-not-allowed ${view === v ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                                                 >
                                                     {v === "sign-up-student" ? "Student" : "Mentor"}
                                                 </button>
@@ -364,7 +699,8 @@ export default function AuthFormsCard({ initialView }: AuthFormsCardProps) {
                                         <button
                                             type="button"
                                             onClick={handleSignUpGoogle}
-                                            className="w-full h-[46px] flex items-center justify-center gap-2.5 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition-all duration-200 text-sm font-medium text-slate-700 hover:shadow-sm cursor-pointer"
+                                            disabled={isSignUpLoading}
+                                            className="w-full h-[46px] flex items-center justify-center gap-2.5 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition-all duration-200 text-sm font-medium text-slate-700 hover:shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
                                             <GoogleIcon />
                                             Continue with Google
@@ -377,38 +713,135 @@ export default function AuthFormsCard({ initialView }: AuthFormsCardProps) {
                                         </div>
 
                                         <form onSubmit={handleSignUpSubmit} className="space-y-3">
-                                            {signUpError && (
-                                                <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} className="bg-red-50 text-red-600 px-3 py-2.5 rounded-lg text-xs font-medium border border-red-100">
-                                                    {signUpError}
-                                                </motion.div>
-                                            )}
+                                            {/* General Error */}
+                                            <AnimatePresence>
+                                                {signUpErrors.general && (
+                                                    <motion.div 
+                                                        initial={{ opacity: 0, y: -6 }} 
+                                                        animate={{ opacity: 1, y: 0 }}
+                                                        exit={{ opacity: 0, y: -6 }}
+                                                        className="bg-red-50 text-red-500 px-3 py-2.5 rounded-lg text-xs font-medium border border-red-100"
+                                                    >
+                                                        {signUpErrors.general}
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+
+                                            {/* Name Fields */}
                                             <div className="grid grid-cols-2 gap-2">
-                                                <div className="relative flex items-center">
-                                                    <User className="absolute left-3.5 w-4 h-4 text-slate-400 pointer-events-none" />
-                                                    <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)} placeholder="First name" className={inputClass} required />
+                                                <div>
+                                                    <div className="relative flex items-center">
+                                                        <User className="absolute left-3.5 w-4 h-4 text-slate-400 pointer-events-none" />
+                                                        <input 
+                                                            type="text" 
+                                                            value={firstName} 
+                                                            onChange={e => handleFirstNameChange(e.target.value)} 
+                                                            placeholder="First name" 
+                                                            className={inputClass(!!signUpErrors.firstName)}
+                                                            disabled={isSignUpLoading}
+                                                            autoComplete="given-name"
+                                                        />
+                                                    </div>
+                                                    <AnimatePresence>
+                                                        {signUpErrors.firstName && (
+                                                            <InlineError message={signUpErrors.firstName} />
+                                                        )}
+                                                    </AnimatePresence>
                                                 </div>
-                                                <div className="relative flex items-center">
-                                                    <User className="absolute left-3.5 w-4 h-4 text-slate-400 pointer-events-none" />
-                                                    <input type="text" value={lastName} onChange={e => setLastName(e.target.value)} placeholder="Last name" className={inputClass} required />
+                                                <div>
+                                                    <div className="relative flex items-center">
+                                                        <User className="absolute left-3.5 w-4 h-4 text-slate-400 pointer-events-none" />
+                                                        <input 
+                                                            type="text" 
+                                                            value={lastName} 
+                                                            onChange={e => handleLastNameChange(e.target.value)} 
+                                                            placeholder="Last name" 
+                                                            className={inputClass(!!signUpErrors.lastName)}
+                                                            disabled={isSignUpLoading}
+                                                            autoComplete="family-name"
+                                                        />
+                                                    </div>
+                                                    <AnimatePresence>
+                                                        {signUpErrors.lastName && (
+                                                            <InlineError message={signUpErrors.lastName} />
+                                                        )}
+                                                    </AnimatePresence>
                                                 </div>
                                             </div>
-                                            <div className="relative flex items-center">
-                                                <Mail className="absolute left-3.5 w-4 h-4 text-slate-400 pointer-events-none" />
-                                                <input type="email" value={signUpEmail} onChange={e => setSignUpEmail(e.target.value)} placeholder="Email address" className={inputClass} required />
+
+                                            {/* Email Field */}
+                                            <div>
+                                                <div className="relative flex items-center">
+                                                    <Mail className="absolute left-3.5 w-4 h-4 text-slate-400 pointer-events-none" />
+                                                    <input 
+                                                        type="email" 
+                                                        value={signUpEmail} 
+                                                        onChange={e => handleSignUpEmailChange(e.target.value)} 
+                                                        placeholder="Email address" 
+                                                        className={inputClass(!!signUpErrors.email)}
+                                                        disabled={isSignUpLoading}
+                                                        autoComplete="email"
+                                                    />
+                                                </div>
+                                                <AnimatePresence>
+                                                    {signUpErrors.email && (
+                                                        <InlineError 
+                                                            message={signUpErrors.email}
+                                                            showSignInLink={signUpErrors._showSignInLink}
+                                                            onSwitchToSignIn={switchToSignIn}
+                                                        />
+                                                    )}
+                                                </AnimatePresence>
                                             </div>
-                                            <div className="relative flex items-center">
-                                                <Lock className="absolute left-3.5 w-4 h-4 text-slate-400 pointer-events-none" />
-                                                <input type={showSignUpPassword ? "text" : "password"} value={signUpPassword} onChange={e => setSignUpPassword(e.target.value)} placeholder="Create password" className={`${inputClass} pr-11`} required />
-                                                <button type="button" onClick={() => setShowSignUpPassword(!showSignUpPassword)} className="absolute right-3.5 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
-                                                    {showSignUpPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                                </button>
+
+                                            {/* Password Field */}
+                                            <div>
+                                                <div className="relative flex items-center">
+                                                    <Lock className="absolute left-3.5 w-4 h-4 text-slate-400 pointer-events-none" />
+                                                    <input 
+                                                        type={showSignUpPassword ? "text" : "password"} 
+                                                        value={signUpPassword} 
+                                                        onChange={e => handleSignUpPasswordChange(e.target.value)} 
+                                                        placeholder="Create password" 
+                                                        className={`${inputClass(!!signUpErrors.password)} pr-11`}
+                                                        disabled={isSignUpLoading}
+                                                        autoComplete="new-password"
+                                                    />
+                                                    <button 
+                                                        type="button" 
+                                                        onClick={() => setShowSignUpPassword(!showSignUpPassword)} 
+                                                        className="absolute right-3.5 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                                                        tabIndex={-1}
+                                                    >
+                                                        {showSignUpPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                                    </button>
+                                                </div>
+                                                <AnimatePresence>
+                                                    {signUpErrors.password && (
+                                                        <InlineError message={signUpErrors.password} />
+                                                    )}
+                                                </AnimatePresence>
                                             </div>
+
+                                            {/* Submit Button */}
                                             <motion.button
-                                                whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
-                                                type="submit" disabled={isSignUpLoading}
-                                                className="w-full h-[46px] bg-[#1DA1F2] hover:bg-[#1a90d9] text-white font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:shadow-md disabled:opacity-60"
+                                                whileHover={!isSignUpLoading ? { scale: 1.01 } : {}}
+                                                whileTap={!isSignUpLoading ? { scale: 0.98 } : {}}
+                                                type="submit" 
+                                                disabled={isSignUpLoading}
+                                                className="w-full h-[46px] bg-[#1DA1F2] hover:bg-[#1a90d9] text-white font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
                                             >
-                                                {isSignUpLoading ? "Creating account..." : <>Create Account <ArrowRight className="w-4 h-4" /></>}
+                                                {isSignUpLoading ? (
+                                                    <>
+                                                        <Spinner />
+                                                        <span>Creating account...</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <span>Create Account</span>
+                                                        <ArrowRight className="w-4 h-4" />
+                                                    </>
+                                                )}
                                             </motion.button>
                                         </form>
                                     </>
@@ -422,9 +855,9 @@ export default function AuthFormsCard({ initialView }: AuthFormsCardProps) {
             {/* Footer */}
             <p className="text-center text-[12px] text-slate-400 leading-relaxed font-medium pt-1">
                 By continuing, you agree to our{" "}
-                <Link href="#" className="underline hover:text-slate-600 transition-colors">Terms</Link>
+                <Link href="/terms" className="underline hover:text-slate-600 transition-colors">Terms</Link>
                 {" "}and{" "}
-                <Link href="#" className="underline hover:text-slate-600 transition-colors">Privacy Policy</Link>.
+                <Link href="/privacy" className="underline hover:text-slate-600 transition-colors">Privacy Policy</Link>.
             </p>
         </div>
     );

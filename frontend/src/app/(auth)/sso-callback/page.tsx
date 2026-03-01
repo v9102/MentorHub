@@ -1,7 +1,13 @@
-import { AuthenticateWithRedirectCallback } from '@clerk/nextjs'
+"use client";
+
+import { AuthenticateWithRedirectCallback } from '@clerk/nextjs';
+import { useEffect } from 'react';
 
 export default function SSOCallback() {
-    // Handle the redirect flow by rendering the
-    // prebuilt component.
-    return <AuthenticateWithRedirectCallback />
+    useEffect(() => {
+        // Clear any auth-related session storage to prevent loops
+        sessionStorage.removeItem('clerk-redirect');
+    }, []);
+
+    return <AuthenticateWithRedirectCallback />;
 }

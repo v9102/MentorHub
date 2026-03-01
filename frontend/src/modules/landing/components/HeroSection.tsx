@@ -239,7 +239,7 @@ export default function HeroSection() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3, delay: 0.3, ease: 'easeOut' }}
-                        className="relative mx-auto max-w-5xl rounded-2xl border border-gray-100 bg-white shadow-floating overflow-hidden mt-24"
+                        className="relative mx-auto max-w-2xl rounded-2xl border border-gray-100 bg-white shadow-floating overflow-hidden mt-14"
                     >
                         <HeroMockUI />
                     </motion.div>
@@ -251,11 +251,8 @@ export default function HeroSection() {
 
 
 function HeroMockUI() {
-    const { isSignedIn, user } = useUser();
+    const { user } = useUser();
     const { sessions, isLoading } = useUpcomingSessions();
-
-    console.log("[UpcomingMeetingBanner] Total sessions:", sessions?.length);
-    console.log("[UpcomingMeetingBanner] Sessions data:", JSON.stringify(sessions?.slice(0, 2)));
 
     // Soonest upcoming confirmed/pending session
     const session = sessions.find(
@@ -289,34 +286,18 @@ function HeroMockUI() {
     // Skeleton while loading
     if (isLoading) {
         return (
-            <div className="p-4 pt-10 bg-gray-50 flex justify-center items-center min-h-[300px]">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
-                    <div className="bg-white p-5 rounded-xl shadow-soft border border-gray-100">
-                        <div className="flex items-center gap-3 mb-5">
-                            <div className="h-11 w-11 rounded-full bg-gray-100 animate-pulse" />
-                            <div>
-                                <div className="h-3.5 w-28 bg-gray-100 rounded animate-pulse mb-2" />
-                                <div className="h-3 w-20 bg-gray-100 rounded animate-pulse" />
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                            <div className="h-3 w-full bg-gray-100 rounded animate-pulse" />
-                            <div className="h-3 w-4/5 bg-gray-100 rounded animate-pulse" />
+            <div className="px-6 py-5">
+                <div className="bg-white p-5 rounded-xl shadow-soft border border-gray-100">
+                    <div className="flex items-center gap-3 mb-5">
+                        <div className="h-11 w-11 rounded-full bg-gray-100 animate-pulse" />
+                        <div>
+                            <div className="h-3.5 w-28 bg-gray-100 rounded animate-pulse mb-2" />
+                            <div className="h-3 w-20 bg-gray-100 rounded animate-pulse" />
                         </div>
                     </div>
-                    <div className="hidden md:block bg-white p-5 rounded-xl shadow-soft border border-gray-100">
-                        <div className="flex justify-between items-center mb-5">
-                            <div className="h-3.5 w-20 bg-gray-100 rounded animate-pulse" />
-                            <div className="h-7 w-16 bg-gray-100 rounded-full animate-pulse" />
-                        </div>
-                        <div className="space-y-3">
-                            {[1, 2, 3].map((i) => (
-                                <div key={i} className="flex items-center gap-3 p-2 rounded-lg bg-gray-50">
-                                    <div className="h-2 w-2 rounded-full bg-gray-200 animate-pulse" />
-                                    <div className="h-3 w-full bg-gray-100 rounded animate-pulse" />
-                                </div>
-                            ))}
-                        </div>
+                    <div className="space-y-2">
+                        <div className="h-3 w-full bg-gray-100 rounded animate-pulse" />
+                        <div className="h-3 w-4/5 bg-gray-100 rounded animate-pulse" />
                     </div>
                 </div>
             </div>
@@ -324,12 +305,11 @@ function HeroMockUI() {
     }
 
     return (
-        <div className="p-4 pt-10 bg-gray-50 flex justify-center items-center min-h-[300px]">
+        <div className="px-6 py-5">
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.2 }}
-                className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl"
             >
                 {/* === Upcoming Session Card === */}
                 <div className="bg-white p-6 rounded-xl shadow-soft border border-gray-100 hover:shadow-floating transition-shadow duration-200">
@@ -389,35 +369,6 @@ function HeroMockUI() {
                     )}
                 </div>
 
-                {/* === Performance Chart (static visual) === */}
-                <div className="hidden md:flex flex-col bg-white p-6 rounded-xl shadow-soft border border-gray-100 hover:shadow-floating transition-shadow duration-200">
-                    <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-sm font-semibold text-gray-900">Performance</h3>
-                        <span className="text-xs text-gray-400 border border-gray-100 rounded-full px-3 py-1">
-                            Last 7 Days
-                        </span>
-                    </div>
-                    <div className="flex-1 flex items-end justify-between gap-1.5 pb-2">
-                        {[40, 70, 45, 90, 65, 85, 50].map((h, i) => (
-                            <motion.div
-                                key={i}
-                                initial={{ height: 0 }}
-                                animate={{ height: `${h}%` }}
-                                transition={{ delay: i * 0.05, duration: 0.3, ease: 'easeOut' }}
-                                className="w-full bg-blue-100 hover:bg-blue-200 rounded-t relative group cursor-pointer transition-colors duration-150"
-                            >
-                                <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                                    {h}%
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
-                    <div className="flex justify-between text-[11px] text-gray-300 mt-2 px-0.5">
-                        {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => (
-                            <span key={i}>{d}</span>
-                        ))}
-                    </div>
-                </div>
             </motion.div>
         </div>
     );
