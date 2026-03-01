@@ -1,1 +1,1 @@
-{"success":false,"msg":"User not found"}
+{"success":true,"count":0,"sessions":[]}
