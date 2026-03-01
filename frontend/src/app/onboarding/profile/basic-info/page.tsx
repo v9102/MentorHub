@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Mail, Phone, ArrowRight, Lightbulb, Loader2 } from "lucide-react";
+import { Mail, Phone, ArrowRight, Lightbulb, Loader2, ChevronDown, Check } from "lucide-react";
 
 import { MentorBasicInfo } from "@/shared/lib/types/mentor-onboarding-data";
 import { useMentorOnboarding } from "@/shared/lib/context/MentorOnboardingContext";
@@ -22,14 +22,14 @@ declare global {
 type BasicInfoFormValues = MentorBasicInfo & {
   email?: string;
   phone?: string;
-  preferredLanguage?: string;
+  preferredLanguages?: string[];
   aboutYou?: string;
 };
 
 export default function BasicInfoPage() {
   const { user } = useUser();
   const router = useRouter();
-  const { updateData } = useMentorOnboarding();
+  const { data: onboardingData, updateData } = useMentorOnboarding();
 
   const PHONE_VERIFICATION_ENABLED = false;
 
@@ -40,6 +40,20 @@ export default function BasicInfoPage() {
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
   const [otpError, setOtpError] = useState<string | null>(null);
+  const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false);
+  const languageDropdownRef = useRef<HTMLDivElement>(null);
+
+  const languageOptions = [
+    { value: "en", label: "English" },
+    { value: "hi", label: "Hindi" },
+    { value: "bn", label: "Bengali" },
+    { value: "ta", label: "Tamil" },
+    { value: "te", label: "Telugu" },
+    { value: "mr", label: "Marathi" },
+    { value: "gu", label: "Gujarati" },
+    { value: "kn", label: "Kannada" },
+    { value: "ml", label: "Malayalam" },
+  ];
 
   const {
     register,
@@ -57,23 +71,47 @@ export default function BasicInfoPage() {
       currentOrganisation: "",
       industry: "",
       currentRole: "",
-      workExperience: 0,
-      preferredLanguage: "en",
+      preferredLanguages: [],
       aboutYou: "",
     },
   });
 
   useEffect(() => {
+    // Load saved data from context first
+    if (onboardingData.basicInfo) {
+      const saved = onboardingData.basicInfo as any;
+      if (saved.firstName) setValue("firstName", saved.firstName);
+      if (saved.lastName) setValue("lastName", saved.lastName);
+      if (saved.profilePhoto) setValue("profilePhoto", saved.profilePhoto);
+      if (saved.gender) setValue("gender", saved.gender);
+      if (saved.currentOrganisation) setValue("currentOrganisation", saved.currentOrganisation);
+      if (saved.industry) setValue("industry", saved.industry);
+      if (saved.currentRole) setValue("currentRole", saved.currentRole);
+      if (saved.preferredLanguages) setValue("preferredLanguages", saved.preferredLanguages);
+      if (saved.aboutYou) setValue("aboutYou", saved.aboutYou);
+    }
+    // Then override with Clerk user data for name and photo
     if (user) {
-      setValue("firstName", user.firstName ?? "");
-      setValue("lastName", user.lastName ?? "");
-      setValue("profilePhoto", user.imageUrl ?? "");
+      setValue("firstName", user.firstName ?? onboardingData.basicInfo?.firstName ?? "");
+      setValue("lastName", user.lastName ?? onboardingData.basicInfo?.lastName ?? "");
+      setValue("profilePhoto", user.imageUrl ?? onboardingData.basicInfo?.profilePhoto ?? "");
       const primaryEmail = user.primaryEmailAddress?.emailAddress;
       if (primaryEmail) {
         setValue("email", primaryEmail);
       }
     }
-  }, [user, setValue]);
+  }, [user, setValue, onboardingData.basicInfo]);
+
+  // Close language dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (languageDropdownRef.current && !languageDropdownRef.current.contains(event.target as Node)) {
+        setLanguageDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && !window.recaptchaVerifier) {
@@ -147,7 +185,8 @@ export default function BasicInfoPage() {
       currentOrganisation,
       industry,
       currentRole,
-      workExperience,
+      preferredLanguages,
+      aboutYou,
     } = data;
 
     updateData({
@@ -159,8 +198,9 @@ export default function BasicInfoPage() {
         currentOrganisation,
         industry,
         currentRole,
-        workExperience,
-      },
+        preferredLanguages,
+        aboutYou,
+      } as any,
     });
 
     router.push("/onboarding/profile/expertise");
@@ -389,34 +429,80 @@ export default function BasicInfoPage() {
               </div>
 
               <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-700">
-                  Preferred Language
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1">
+                  Preferred Languages <span className="text-rose-500">*</span>
                 </label>
-                <select
-                  className="h-12 w-full rounded-lg border border-slate-200 bg-slate-50 px-4 text-slate-900 transition-all duration-200 ease-in-out hover:bg-white focus:border-primary focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/10"
-                  {...register("preferredLanguage")}
-                >
-                  <option value="en">English</option>
-                  <option value="hi">Hindi</option>
-                  <option value="bn">Bengali</option>
-                  <option value="ta">Tamil</option>
-                  <option value="te">Telugu</option>
-                </select>
+                <div ref={languageDropdownRef} className="relative">
+                  <input type="hidden" {...register("preferredLanguages", {
+                    validate: (value) => (value && value.length > 0) || "Select at least one language"
+                  })} />
+                  <button
+                    type="button"
+                    onClick={() => setLanguageDropdownOpen(!languageDropdownOpen)}
+                    className="h-12 w-full flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-4 text-slate-900 transition-all duration-200 ease-in-out hover:bg-white focus:border-primary focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/10"
+                  >
+                    <span className={`truncate ${(watch("preferredLanguages")?.length || 0) === 0 ? "text-slate-400" : "text-slate-900"}`}>
+                      {(watch("preferredLanguages")?.length || 0) === 0
+                        ? "Select languages"
+                        : languageOptions
+                            .filter((lang) => watch("preferredLanguages")?.includes(lang.value))
+                            .map((lang) => lang.label)
+                            .join(", ")}
+                    </span>
+                    <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform ${languageDropdownOpen ? "rotate-180" : ""}`} />
+                  </button>
+                  {languageDropdownOpen && (
+                    <div className="absolute z-50 mt-1 w-full rounded-lg border border-slate-200 bg-white shadow-lg py-1 max-h-48 overflow-auto">
+                      {languageOptions.map((lang) => {
+                        const isSelected = watch("preferredLanguages")?.includes(lang.value);
+                        return (
+                          <button
+                            key={lang.value}
+                            type="button"
+                            onClick={() => {
+                              const current = watch("preferredLanguages") || [];
+                              if (isSelected) {
+                                setValue("preferredLanguages", current.filter((v) => v !== lang.value), { shouldValidate: true });
+                              } else {
+                                setValue("preferredLanguages", [...current, lang.value], { shouldValidate: true });
+                              }
+                            }}
+                            className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm hover:bg-slate-50 transition-colors"
+                          >
+                            <div className={`h-4 w-4 rounded border flex items-center justify-center ${isSelected ? "bg-primary border-primary" : "border-slate-300"}`}>
+                              {isSelected && <Check className="h-3 w-3 text-white" />}
+                            </div>
+                            <span className="text-slate-700">{lang.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+                {errors.preferredLanguages && (
+                  <p className="text-xs font-medium text-rose-500">{errors.preferredLanguages.message}</p>
+                )}
               </div>
             </div>
 
             {/* About You */}
             <div className="flex flex-col gap-2 pt-6 border-t border-slate-100">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-700">
-                About you
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1">
+                About you <span className="text-rose-500">*</span>
               </label>
               <textarea
                 rows={5}
                 maxLength={500}
                 placeholder="Briefly describe your professional background and why you want to mentor students..."
                 className="w-full resize-none rounded-lg border border-slate-200 bg-slate-50 p-4 text-slate-900 transition-all duration-200 ease-in-out hover:bg-white focus:border-primary focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/10"
-                {...register("aboutYou")}
+                {...register("aboutYou", {
+                  required: "Please tell us about yourself",
+                  minLength: { value: 50, message: "Please write at least 50 characters" }
+                })}
               />
+              {errors.aboutYou && (
+                <p className="text-xs font-medium text-rose-500">{errors.aboutYou.message}</p>
+              )}
               <div className="flex items-center justify-between mt-1 text-xs text-slate-500">
                 <span className="flex items-center gap-1.5"><Lightbulb className="w-3.5 h-3.5 text-amber-500" /> A compelling bio increases booking requests.</span>
                 <span className="font-medium text-slate-400">

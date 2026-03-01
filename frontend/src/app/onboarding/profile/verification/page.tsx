@@ -1,27 +1,125 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, CloudUpload, ShieldCheck, CheckCircle, Info } from "lucide-react";
+import { ArrowLeft, ArrowRight, CloudUpload, ShieldCheck, CheckCircle, Info, AlertCircle } from "lucide-react";
 import { useMentorOnboarding } from "@/shared/lib/context/MentorOnboardingContext";
 
 const ID_TYPES = [
-    { value: "", label: "Select ID Type" },
-    { value: "aadhaar", label: "Aadhaar Card" },
-    { value: "pan", label: "PAN Card" },
-    { value: "passport", label: "Passport" },
-    { value: "driving_license", label: "Driving License" },
-    { value: "voter_id", label: "Voter ID" },
+    { value: "", label: "Select ID Type", pattern: null, length: null, hint: "" },
+    { value: "aadhaar", label: "Aadhaar Card", pattern: /^\d{12}$/, length: 12, hint: "12-digit number (e.g., 123456789012)" },
+    { value: "pan", label: "PAN Card", pattern: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, length: 10, hint: "Format: ABCDE1234F (5 letters, 4 digits, 1 letter)" },
+    { value: "passport", label: "Passport", pattern: /^[A-Z]{1}[0-9]{7}$/, length: 8, hint: "Format: A1234567 (1 letter, 7 digits)" },
+    { value: "driving_license", label: "Driving License", pattern: /^[A-Z]{2}[0-9]{2}[0-9]{11}$/, length: 15, hint: "Format: MH02 + 11 digits (e.g., MH0220190012345)" },
+    { value: "voter_id", label: "Voter ID (EPIC)", pattern: /^[A-Z]{3}[0-9]{7}$/, length: 10, hint: "Format: ABC1234567 (3 letters, 7 digits)" },
+    { value: "college_id", label: "College ID Card", pattern: /^[A-Za-z0-9]{6,20}$/, length: null, hint: "6-20 alphanumeric characters" },
+    { value: "itr", label: "ITR Acknowledgment", pattern: /^\d{15}$/, length: 15, hint: "15-digit acknowledgment number" },
+    { value: "salary_slip", label: "Salary Slip", pattern: /^[A-Za-z0-9]{4,20}$/, length: null, hint: "Employee ID (4-20 alphanumeric characters)" },
+    { value: "tdr", label: "TDR (Tax Deduction Receipt)", pattern: /^[A-Za-z0-9]{10,20}$/, length: null, hint: "10-20 alphanumeric characters" },
+    { value: "employment_letter", label: "Employment Verification Letter", pattern: /^[A-Za-z0-9]{4,20}$/, length: null, hint: "Reference/Employee ID (4-20 alphanumeric)" },
+    { value: "professional_cert", label: "Professional Certification", pattern: /^[A-Za-z0-9]{6,25}$/, length: null, hint: "Certificate number (6-25 alphanumeric)" },
 ];
 
 export default function VerificationPage() {
     const router = useRouter();
-    const { updateData } = useMentorOnboarding();
+    const { data: onboardingData, updateData } = useMentorOnboarding();
     const [dragging, setDragging] = useState(false);
     const [file, setFile] = useState<File | null>(null);
     const [idType, setIdType] = useState("");
     const [idNumber, setIdNumber] = useState("");
+    const [idError, setIdError] = useState<string | null>(null);
+    const [touched, setTouched] = useState(false);
+
+    // Load saved data from context
+    useEffect(() => {
+        if (onboardingData.verification) {
+            const saved = onboardingData.verification as any;
+            if (saved.idType) setIdType(saved.idType);
+            if (saved.idNumber) setIdNumber(saved.idNumber);
+            // Note: File cannot be restored from localStorage, user needs to re-upload
+        }
+    }, [onboardingData.verification]);
+
+    const selectedIdType = useMemo(() => ID_TYPES.find(t => t.value === idType), [idType]);
+
+    const validateIdNumber = (value: string, type: string): string | null => {
+        const idConfig = ID_TYPES.find(t => t.value === type);
+        if (!idConfig || !idConfig.pattern) return null;
+        
+        // Remove spaces for validation
+        const cleanValue = value.replace(/\s/g, "").toUpperCase();
+        
+        if (!cleanValue) {
+            return "ID number is required";
+        }
+        
+        if (idConfig.length && cleanValue.length !== idConfig.length) {
+            return `Must be exactly ${idConfig.length} characters`;
+        }
+        
+        if (!idConfig.pattern.test(cleanValue)) {
+            return `Invalid format. ${idConfig.hint}`;
+        }
+        
+        return null;
+    };
+
+    const handleIdNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let value = e.target.value.toUpperCase();
+        
+        // For Aadhaar, format with spaces every 4 digits
+        if (idType === "aadhaar") {
+            value = value.replace(/\D/g, "").slice(0, 12);
+            value = value.replace(/(\d{4})(?=\d)/g, "$1 ");
+        }
+        // For PAN, only allow alphanumeric and limit to 10
+        else if (idType === "pan") {
+            value = value.replace(/[^A-Z0-9]/g, "").slice(0, 10);
+        }
+        // For Passport
+        else if (idType === "passport") {
+            value = value.replace(/[^A-Z0-9]/g, "").slice(0, 8);
+        }
+        // For Driving License
+        else if (idType === "driving_license") {
+            value = value.replace(/[^A-Z0-9]/g, "").slice(0, 15);
+        }
+        // For Voter ID
+        else if (idType === "voter_id") {
+            value = value.replace(/[^A-Z0-9]/g, "").slice(0, 10);
+        }
+        // For ITR
+        else if (idType === "itr") {
+            value = value.replace(/\D/g, "").slice(0, 15);
+        }
+        
+        setIdNumber(value);
+        
+        if (touched) {
+            const error = validateIdNumber(value, idType);
+            setIdError(error);
+        }
+    };
+
+    const handleIdBlur = () => {
+        setTouched(true);
+        const error = validateIdNumber(idNumber, idType);
+        setIdError(error);
+    };
+
+    const handleIdTypeChange = (newType: string) => {
+        setIdType(newType);
+        setIdNumber("");
+        setIdError(null);
+        setTouched(false);
+    };
+
+    const isFormValid = useMemo(() => {
+        if (!idType || !idNumber || !file) return false;
+        const error = validateIdNumber(idNumber, idType);
+        return error === null;
+    }, [idType, idNumber, file]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selected = e.target.files?.[0];
@@ -100,11 +198,11 @@ export default function VerificationPage() {
                             {/* ID Type Dropdown */}
                             <div className="flex flex-col gap-2">
                                 <label className="text-xs font-bold uppercase tracking-wider text-slate-700">
-                                    ID Type <span className="text-rose-500">*</span>
+                                    Document Type <span className="text-rose-500">*</span>
                                 </label>
                                 <select
                                     value={idType}
-                                    onChange={(e) => setIdType(e.target.value)}
+                                    onChange={(e) => handleIdTypeChange(e.target.value)}
                                     className="h-12 w-full rounded-lg border border-slate-200 bg-slate-50 px-4 text-slate-900 transition-all duration-200 ease-in-out hover:bg-white focus:border-primary focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/10"
                                 >
                                     {ID_TYPES.map((type) => (
@@ -118,15 +216,30 @@ export default function VerificationPage() {
                             {/* ID Number Input */}
                             <div className="flex flex-col gap-2">
                                 <label className="text-xs font-bold uppercase tracking-wider text-slate-700">
-                                    ID Number <span className="text-rose-500">*</span>
+                                    ID/Reference Number <span className="text-rose-500">*</span>
                                 </label>
                                 <input
                                     type="text"
                                     value={idNumber}
-                                    onChange={(e) => setIdNumber(e.target.value)}
-                                    placeholder={idType === "aadhaar" ? "XXXX XXXX XXXX" : idType === "pan" ? "ABCDE1234F" : "Enter ID number"}
-                                    className="h-12 w-full rounded-lg border border-slate-200 bg-slate-50 px-4 text-slate-900 transition-all duration-200 ease-in-out hover:bg-white focus:border-primary focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/10"
+                                    onChange={handleIdNumberChange}
+                                    onBlur={handleIdBlur}
+                                    disabled={!idType}
+                                    placeholder={selectedIdType?.hint || "Select document type first"}
+                                    className={`h-12 w-full rounded-lg border bg-slate-50 px-4 text-slate-900 transition-all duration-200 ease-in-out hover:bg-white focus:bg-white focus:outline-none focus:ring-4 disabled:cursor-not-allowed disabled:opacity-50 ${
+                                        idError && touched
+                                            ? "border-rose-400 focus:border-rose-500 focus:ring-rose-500/10"
+                                            : "border-slate-200 focus:border-primary focus:ring-primary/10"
+                                    }`}
                                 />
+                                {selectedIdType?.hint && !idError && (
+                                    <p className="text-xs text-slate-500">{selectedIdType.hint}</p>
+                                )}
+                                {idError && touched && (
+                                    <p className="flex items-center gap-1 text-xs font-medium text-rose-500">
+                                        <AlertCircle className="h-3 w-3" />
+                                        {idError}
+                                    </p>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -181,9 +294,11 @@ export default function VerificationPage() {
                         </h4>
                         <ul className="space-y-3">
                             {[
+                                "Aadhaar Card, PAN Card, Passport, Driving License, Voter ID",
+                                "College ID Card or University enrollment proof",
+                                "ITR Acknowledgment or Tax Deduction Receipt (TDR)",
+                                "Salary Slip or Employment Verification Letter",
                                 "Professional certifications from recognized institutions",
-                                "Official government identification (Passport or Driver's License)",
-                                "Recent employment verification letter or LinkedIn profile snapshot",
                             ].map((doc) => (
                                 <li key={doc} className="flex items-start gap-3 text-sm text-slate-600">
                                     <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
@@ -255,7 +370,8 @@ export default function VerificationPage() {
                 <button
                     type="button"
                     onClick={handleContinue}
-                    className="flex items-center gap-2 rounded-xl bg-primary px-10 py-3 font-bold text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/90"
+                    disabled={!isFormValid}
+                    className="flex items-center gap-2 rounded-xl bg-primary px-10 py-3 font-bold text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                     Continue to Final Step
                     <ArrowRight className="h-4 w-4" />

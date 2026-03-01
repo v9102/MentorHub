@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSignIn, useSignUp, useUser } from "@clerk/nextjs";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -139,7 +139,7 @@ interface ExtendedFieldErrors extends FieldErrors {
 }
 
 // ============ MAIN COMPONENT ============
-export default function AuthFormsCard({ initialView }: AuthFormsCardProps) {
+function AuthFormsCardInner({ initialView }: AuthFormsCardProps) {
     const [view, setView] = useState<AuthView>(initialView);
     const router = useRouter();
     const { user, isLoaded: isUserLoaded, isSignedIn } = useUser();
@@ -861,5 +861,24 @@ export default function AuthFormsCard({ initialView }: AuthFormsCardProps) {
                 <Link href="/privacy" className="underline hover:text-slate-600 transition-colors">Privacy Policy</Link>.
             </p>
         </div>
+    );
+}
+
+// Loading fallback for Suspense
+function AuthFormsCardLoading() {
+    return (
+        <div className="w-full flex flex-col items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-[#1DA1F2]" />
+            <p className="text-sm text-slate-500 mt-4">Loading...</p>
+        </div>
+    );
+}
+
+// Wrapper component with Suspense boundary
+export default function AuthFormsCard({ initialView }: AuthFormsCardProps) {
+    return (
+        <Suspense fallback={<AuthFormsCardLoading />}>
+            <AuthFormsCardInner initialView={initialView} />
+        </Suspense>
     );
 }
