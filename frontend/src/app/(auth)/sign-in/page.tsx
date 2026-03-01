@@ -2,11 +2,14 @@
 
 import AuthLayout from "@/components/auth/AuthLayout";
 import AuthFormsCard from "@/components/auth/AuthFormsCard";
+import { Suspense } from "react";
 
 export default function SignInPage() {
   return (
     <AuthLayout>
-      <AuthFormsCard initialView="sign-in" />
+      <Suspense fallback={<div className="flex justify-center p-8">Loading...</div>}>
+        <AuthFormsCard initialView="sign-in" />
+      </Suspense>
     </AuthLayout>
   );
 }
