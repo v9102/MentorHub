@@ -1,7 +1,3 @@
-// ─── DashboardSidebar — 4 nav items only, in user-specified order ─────────────
-// Order: My Profile → Dashboard → Sessions → Availability
-// (Students, Company, Preview Profile removed per user requirements)
-
 "use client";
 
 import { useState } from "react";
