@@ -12,7 +12,7 @@ export async function PATCH(
         const { id } = await context.params;
         const mentorId = id;
 
-        const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:8080";
+        const backendUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || "https://mentomania-api.agreeablemushroom-bc2495ec.centralindia.azurecontainerapps.io";
 
         const response = await fetch(`${backendUrl}/api/admin/mentor/${mentorId}/verify`, {
             method: "PATCH",
