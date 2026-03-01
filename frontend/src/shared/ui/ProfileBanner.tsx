@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { Camera, Edit3, FileText, User as UserIcon, Share2, Heart, ShieldCheck, MapPin, Star } from "lucide-react";
 import Image from "next/image";

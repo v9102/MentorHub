@@ -35,6 +35,18 @@ export const transformMentorData = (mentor: any): MentorProfile => {
   const pricing = mp.pricing || {};
   const verification = mp.verification || {};
 
+  // Log the raw mentor data for debugging
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[transformMentorData] Raw mentor:', {
+      id: mentor._id,
+      name: mentor.name,
+      hasProfile: !!mentor.mentorProfile,
+      hasBasicInfo: !!basic,
+      currentRole: basic.currentRole,
+      exam: mp.examDetails?.[0]?.examName,
+    });
+  }
+
   return {
     id: mentor.clerkId || mentor.id || mentor._id,
     // Store MongoDB _id separately for backend API calls
@@ -67,12 +79,13 @@ export const transformMentorData = (mentor: any): MentorProfile => {
     subjects: expertise.subjects || [],
     specializations: expertise.specializations ? [expertise.specializations] : [],
 
-    // Metrics (Defaults for now as backend doesn't track these yet)
-    studentsHelped: mentor.studentsHelped || 0,
-    rating: mentor.rating || 0,
-    reviewsCount: mentor.reviewsCount || 0,
-    sessions: mentor.sessions || 0,
-    attendance: mentor.attendance || 100,
+    // Metrics - read from mentorProfile or top-level
+    studentsHelped: mentor.studentsHelped || mentor.mentorProfile?.studentsHelped || 0,
+    rating: mp.rating || mentor.rating || 0,
+    reviewsCount: mp.totalReviews || mentor.reviewsCount || 0,
+    // Calculate sessions from upcomingSessions that are booked
+    sessions: mentor.sessions || mp.upcomingSessions?.filter((s: any) => s.isBooked).length || 0,
+    attendance: mentor.attendance || 95, // Default to 95% instead of 100%
     responseTime: mentor.responseTime || "Within 24 hours",
 
     // Pricing & Availability
@@ -96,12 +109,19 @@ export const transformMentorData = (mentor: any): MentorProfile => {
 
     // Govt Specific Fields (Pass through if present)
     service: mentor.service,
-    posting: mentor.posting,
-    rank: mentor.rank,
-    attempts: mentor.attempts,
+    posting: mentor.posting || basic.currentRole,
+    rank: mentor.rank || mp.examDetails?.[0]?.rank,
+    attempts: mentor.attempts || mp.examDetails?.[0]?.attempts,
     exam: (() => {
+      // First check explicit exam field
       const explicitExam = mentor.exam;
       if (explicitExam) return explicitExam;
+
+      // Check examDetails array
+      if (mp.examDetails?.length > 0) {
+        const examName = mp.examDetails[0].examName;
+        if (examName) return examName;
+      }
 
       const subjects = expertise.subjects || [];
       const role = basic.currentRole || "";
@@ -111,8 +131,8 @@ export const transformMentorData = (mentor: any): MentorProfile => {
       const combinedText = `${role} ${org} ${specializations} ${subjects.join(" ")}`.toLowerCase();
 
       // Check for known exam keywords in order of priority
-      if (combinedText.match(/\b(upsc|ias|ips|ifs|irs|cse)\b/i)) return "UPSC";
-      if (combinedText.match(/\b(ssc|cgl|aso)\b/i)) return "SSC";
+      if (combinedText.match(/\b(upsc|ias|ips|ifs|irs|cse)\b/i)) return "UPSC CSE";
+      if (combinedText.match(/\b(ssc|cgl|aso)\b/i)) return "SSC CGL";
       if (combinedText.match(/\brbi\b/i)) return "RBI Grade B";
       if (combinedText.match(/\b(psc|uppsc|mppsc|bpsc)\b/i)) return "State PSC";
       if (combinedText.match(/\b(defence|cds|nda|afcat|navy|military|army)\b/i)) return "Defence";
@@ -124,12 +144,12 @@ export const transformMentorData = (mentor: any): MentorProfile => {
       if (combinedText.match(/\bclat|law\b/i)) return "CLAT";
       if (combinedText.match(/\bbank|po|ibps|sbi\b/i)) return "Banking";
 
-      // If no exam keyword is found, return the first subject, or a generic string
+      // If no exam keyword is found, don't show generic "General"
       if (subjects.length > 0) return subjects[0];
 
-      return "General";
+      return undefined; // Don't show exam field if we can't determine it
     })()?.replace(" CSE", "").replace(" CGL", ""),
-    optionalSubject: mentor.optionalSubject,
+    optionalSubject: mentor.optionalSubject || mp.examDetails?.[0]?.optionalSubject,
 
     // Verification status from backend (nested in mentorProfile)
     isVerified: verification?.isVerified ?? true,
@@ -155,22 +175,40 @@ export const transformMentorData = (mentor: any): MentorProfile => {
 export const fetchMentors = async (): Promise<MentorProfile[]> => {
   try {
     const baseUrl = getBaseUrl();
-    const response = await fetch(`${baseUrl}/api/mentors`, {
-      next: { revalidate: 300 } // Cache for 5 minutes on server
+    const url = `${baseUrl}/api/mentors`;
+    console.log('[fetchMentors] Fetching from:', url);
+    
+    const response = await fetch(url, {
+      next: { revalidate: 300 }, // Cache for 5 minutes on server
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
 
+    console.log('[fetchMentors] Response status:', response.status);
+
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error('[fetchMentors] Error response:', errorText);
       return [];
     }
 
     const data = await response.json();
+    console.log('[fetchMentors] Received data:', { 
+      isArray: Array.isArray(data),
+      hasMentors: !!data.mentors,
+      mentorCount: Array.isArray(data) ? data.length : (data.mentors?.length || 0)
+    });
+    
     const backendMentors = Array.isArray(data) ? data : (data.mentors || []);
+
+    if (backendMentors.length === 0) {
+      console.warn('[fetchMentors] No mentors returned from backend');
+    }
 
     return backendMentors.map(transformMentorData);
   } catch (error) {
-    if (process.env.NODE_ENV === 'development') {
-      console.error("Error fetching mentors:", error);
-    }
+    console.error('[fetchMentors] Error:', error);
     return [];
   }
 };

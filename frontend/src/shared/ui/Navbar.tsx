@@ -135,8 +135,8 @@ export default function Navbar() {
             {renderBecomeMentorLink()}
           </div>
 
-          {/* Desktop Auth */}
-          <div className="hidden md:flex items-center space-x-4">
+          {/* Desktop Auth - Fixed width to prevent layout shift */}
+          <div className="hidden md:flex items-center justify-end min-w-[240px]">
             <ClerkLoading>
               <div className="flex items-center space-x-4">
                 <div className="w-20 h-10 bg-gray-200 rounded-md animate-pulse"></div>
@@ -144,17 +144,21 @@ export default function Navbar() {
               </div>
             </ClerkLoading>
             <SignedOut>
-              <Link href={`/sign-in?redirect=${encodeURIComponent(pathname === "/" ? "/" : pathname)}`} className="px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100 cursor-pointer text-sm font-medium transition-colors">
-                Sign In
-              </Link>
+              <div className="flex items-center space-x-4">
+                <Link href={`/sign-in?redirect=${encodeURIComponent(pathname === "/" ? "/" : pathname)}`} className="px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100 cursor-pointer text-sm font-medium transition-colors whitespace-nowrap">
+                  Sign In
+                </Link>
 
-              <Link href={`/sign-up/student?redirect=${encodeURIComponent(pathname === "/" ? "/" : pathname)}`} className="px-5 py-2.5 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-all cursor-pointer font-medium shadow-sm hover:shadow text-sm">
-                Get Started
-              </Link>
+                <Link href={`/sign-up/student?redirect=${encodeURIComponent(pathname === "/" ? "/" : pathname)}`} className="px-5 py-2.5 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-all cursor-pointer font-medium shadow-sm hover:shadow text-sm whitespace-nowrap">
+                  Get Started
+                </Link>
+              </div>
             </SignedOut>
 
             <SignedIn>
-              <ProfileButton />
+              <div className="flex items-center justify-end">
+                <ProfileButton />
+              </div>
             </SignedIn>
           </div>
 

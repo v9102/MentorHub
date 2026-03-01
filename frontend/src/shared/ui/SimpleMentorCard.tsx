@@ -176,7 +176,7 @@ export default function SimpleMentorCard({
     <div className="block w-full relative group cursor-pointer">
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm relative overflow-visible transition-all duration-200 group-hover:shadow-md group-hover:border-blue-100">
         {/* Full-card invisible link */}
-        <Link href={`/mentors/${mentor.id}`} className="absolute inset-0 z-0 rounded-2xl">
+        <Link href={`/mentors/${mentor.mongoId || mentor.id}`} className="absolute inset-0 z-0 rounded-2xl">
           <span className="sr-only">View {mentor.name}&apos;s profile</span>
         </Link>
 
