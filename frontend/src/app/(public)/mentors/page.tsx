@@ -15,34 +15,13 @@ import { motion, AnimatePresence } from "framer-motion";
 const EXAM_OPTIONS = [
   { label: "All Exams", value: "" },
   { label: "UPSC CSE", value: "UPSC CSE" },
-  { label: "SSC CGL", value: "SSC CGL" },
-  { label: "State PSC", value: "State PSC" },
-  { label: "RBI Grade B", value: "RBI Grade B" },
-  { label: "Defence (NDA/CDS)", value: "Defence" },
-  { label: "Banking (IBPS/SBI)", value: "Banking" },
-  { label: "Railways (RRB)", value: "Railways" },
-  { label: "JEE Mains", value: "JEE Mains" },
+  { label: "Banking", value: "Banking" },
   { label: "NEET", value: "NEET" },
-  { label: "Teaching (CTET)", value: "Teaching" },
-];
-
-const SUBJECT_OPTIONS = [
-  { label: "All Subjects", value: "" },
-  { label: "General Studies", value: "General Studies" },
-  { label: "Mathematics", value: "Mathematics" },
-  { label: "Physics", value: "Physics" },
-  { label: "Chemistry", value: "Chemistry" },
-  { label: "History", value: "History" },
-  { label: "Geography", value: "Geography" },
-  { label: "Polity", value: "Polity" },
-  { label: "Economy", value: "Economy" },
-  { label: "Ethics", value: "Ethics" },
-  { label: "Essay", value: "Essay" },
-  { label: "Quantitative Aptitude", value: "Quantitative Aptitude" },
-  { label: "Reasoning", value: "Reasoning" },
-  { label: "English", value: "English" },
-  { label: "Current Affairs", value: "Current Affairs" },
-  { label: "CSAT", value: "CSAT" },
+  { label: "JEE", value: "JEE" },
+  { label: "CAT", value: "CAT" },
+  { label: "SSC CGL", value: "SSC CGL" },
+  { label: "CLAT", value: "CLAT" },
+  { label: "CA/CMA/CS", value: "CA/CMA/CS" },
 ];
 
 const LANGUAGE_OPTIONS = [
@@ -195,7 +174,6 @@ export default function MentorsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedExam, setSelectedExam] = useState("");
-  const [selectedSubject, setSelectedSubject] = useState("");
   const [selectedLanguage, setSelectedLanguage] = useState("");
   const [selectedRating, setSelectedRating] = useState("");
   const [selectedPrice, setSelectedPrice] = useState("");
@@ -204,6 +182,16 @@ export default function MentorsPage() {
   const [sortOpen, setSortOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
+
+  // Sync initial query parameter on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const examParam = params.get("exam");
+    if (examParam) {
+      // Decode any URL encoding
+      setSelectedExam(decodeURIComponent(examParam));
+    }
+  }, []);
 
   /* ── Debounce ── */
   useEffect(() => {
@@ -214,7 +202,6 @@ export default function MentorsPage() {
   /* ── Active filter count ── */
   const activeFilterCount = [
     selectedExam,
-    selectedSubject,
     selectedLanguage,
     selectedRating,
     selectedPrice,
@@ -224,7 +211,6 @@ export default function MentorsPage() {
 
   const clearAll = () => {
     setSelectedExam("");
-    setSelectedSubject("");
     setSelectedLanguage("");
     setSelectedRating("");
     setSelectedPrice("");
@@ -249,12 +235,6 @@ export default function MentorsPage() {
         return false;
 
       if (selectedExam && m.exam !== selectedExam) return false;
-
-      if (
-        selectedSubject &&
-        !(m.subjects || []).includes(selectedSubject)
-      )
-        return false;
 
       if (selectedRating && (m.rating || 0) < Number(selectedRating))
         return false;
@@ -290,7 +270,6 @@ export default function MentorsPage() {
     mentors,
     debouncedSearch,
     selectedExam,
-    selectedSubject,
     selectedRating,
     selectedPrice,
     selectedExperience,
@@ -313,7 +292,6 @@ export default function MentorsPage() {
     setCurrentPage(1);
   }, [
     selectedExam,
-    selectedSubject,
     selectedLanguage,
     selectedRating,
     selectedPrice,
@@ -390,12 +368,6 @@ export default function MentorsPage() {
             options={EXAM_OPTIONS}
             value={selectedExam}
             onChange={setSelectedExam}
-          />
-          <FilterDropdown
-            label="Subject"
-            options={SUBJECT_OPTIONS}
-            value={selectedSubject}
-            onChange={setSelectedSubject}
           />
           <FilterDropdown
             label="Language"

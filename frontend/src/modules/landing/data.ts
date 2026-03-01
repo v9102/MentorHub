@@ -1,14 +1,14 @@
-import { Calculator, Stethoscope, GraduationCap, BookOpen, Cog, DollarSign, Scale, Globe, Brain, FlaskConical, Search, Calendar, Rocket, BadgeCheck, Target, Coins, Users } from "lucide-react";
+import { Calculator, Stethoscope, BookOpen, DollarSign, Scale, Target, Briefcase, Search, Calendar, Rocket, BadgeCheck, Coins, Users } from "lucide-react";
 
 export const popularExams = [
     { id: "upsc", name: "UPSC CSE", icon: BookOpen, color: "text-orange-600", bg: "bg-orange-100", link: "/mentors?exam=UPSC+CSE" },
-    { id: "ssc", name: "SSC CGL", icon: Calculator, color: "text-blue-600", bg: "bg-blue-100", link: "/mentors?exam=SSC+CGL" },
-    { id: "banking", name: "Banking / SBI", icon: DollarSign, color: "text-green-600", bg: "bg-green-100", link: "/mentors?exam=Banking" },
-    { id: "statepsc", name: "State PSC", icon: Globe, color: "text-purple-600", bg: "bg-purple-100", link: "/mentors?exam=State+PSC" },
-    { id: "defence", name: "Defence", icon: Target, color: "text-teal-600", bg: "bg-teal-100", link: "/mentors?exam=Defence" },
-    { id: "railways", name: "Railways", icon: Rocket, color: "text-indigo-600", bg: "bg-indigo-100", link: "/mentors?exam=Railways" },
-    { id: "rbi", name: "RBI Grade B", icon: Coins, color: "text-yellow-600", bg: "bg-yellow-100", link: "/mentors?exam=RBI+Grade+B" },
-    { id: "gate", name: "GATE", icon: Cog, color: "text-red-600", bg: "bg-red-100", link: "/mentors?exam=GATE" },
+    { id: "banking", name: "Banking", icon: DollarSign, color: "text-green-600", bg: "bg-green-100", link: "/mentors?exam=Banking" },
+    { id: "neet", name: "NEET", icon: Stethoscope, color: "text-rose-600", bg: "bg-rose-100", link: "/mentors?exam=NEET" },
+    { id: "jee", name: "JEE", icon: Calculator, color: "text-indigo-600", bg: "bg-indigo-100", link: "/mentors?exam=JEE" },
+    { id: "cat", name: "CAT", icon: Target, color: "text-amber-600", bg: "bg-amber-100", link: "/mentors?exam=CAT" },
+    { id: "ssc", name: "SSC CGL", icon: Briefcase, color: "text-blue-600", bg: "bg-blue-100", link: "/mentors?exam=SSC+CGL" },
+    { id: "clat", name: "CLAT", icon: Scale, color: "text-purple-600", bg: "bg-purple-100", link: "/mentors?exam=CLAT" },
+    { id: "ca", name: "CA/CMA/CS", icon: Calculator, color: "text-emerald-600", bg: "bg-emerald-100", link: "/mentors?exam=CA%2FCMA%2FCS" },
 ];
 
 export const featuredMentors = [

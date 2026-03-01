@@ -150,7 +150,7 @@ export const transformMentorData = (mentor: any): MentorProfile => {
 };
 
 /**
- * Fetch all mentors from the API
+ * Fetch all mentors from the API (cached for 5 min — listing page only)
  */
 export const fetchMentors = async (): Promise<MentorProfile[]> => {
   try {
@@ -176,16 +176,18 @@ export const fetchMentors = async (): Promise<MentorProfile[]> => {
 };
 
 /**
- * Fetch a single mentor by ID directly from the backend
- * Uses the dedicated single-mentor endpoint for efficiency
+ * Fetch a single mentor by ID directly from the backend.
+ * Always fetches fresh data (no cache) so that booking availability
+ * reflects real-time slot status — important when bookings are created
+ * or deleted directly in the database.
  */
 export const fetchMentorById = async (id: string): Promise<MentorProfile | undefined> => {
   try {
     const baseUrl = getBaseUrl();
 
-    // Try to fetch single mentor from dedicated endpoint
+    // Fetch single mentor with NO cache so booking page is always up-to-date
     const response = await fetch(`${baseUrl}/api/mentors/${id}`, {
-      next: { revalidate: 300 } // Cache for 5 minutes on server
+      cache: 'no-store'
     });
 
     if (response.ok) {

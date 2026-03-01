@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useRef, useEffect, useCallback, useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useUser } from '@clerk/nextjs';
 import { Button } from '@/shared/ui/button';
-import { Star, Search, ChevronDown, Check } from 'lucide-react';
+import { Star, Search, ChevronDown } from 'lucide-react';
 import { popularExams } from '../data';
 import { useRouter } from 'next/navigation';
 import { useUpcomingSessions, type DashboardSession } from '@/shared/lib/hooks/useDashboard';
@@ -15,26 +15,9 @@ type Exam = (typeof popularExams)[number];
 function ExamCombobox() {
     const router = useRouter();
     const [open, setOpen] = useState(false);
-    const [query, setQuery] = useState('');
-    const [activeIndex, setActiveIndex] = useState(0);
     const containerRef = useRef<HTMLDivElement>(null);
-    const inputRef = useRef<HTMLInputElement>(null);
 
-    const filtered = query.trim()
-        ? popularExams.filter((e) =>
-            e.name.toLowerCase().includes(query.toLowerCase())
-        )
-        : popularExams;
-
-    const select = useCallback(
-        (exam: Exam) => {
-            setOpen(false);
-            setQuery('');
-            router.push(`/mentors?exam=${exam.id}`);
-        },
-        [router]
-    );
-
+    // Close on click outside
     useEffect(() => {
         function handleClick(e: MouseEvent) {
             if (!containerRef.current?.contains(e.target as Node)) {
@@ -45,112 +28,88 @@ function ExamCombobox() {
         return () => document.removeEventListener('mousedown', handleClick);
     }, []);
 
-    useEffect(() => {
-        setActiveIndex(0);
-    }, [query]);
-
-    function handleKeyDown(e: React.KeyboardEvent) {
-        if (!open) {
-            if (e.key === 'Enter' || e.key === 'ArrowDown') {
-                setOpen(true);
-            }
-            return;
-        }
-        switch (e.key) {
-            case 'ArrowDown':
-                e.preventDefault();
-                setActiveIndex((i) => Math.min(i + 1, filtered.length - 1));
-                break;
-            case 'ArrowUp':
-                e.preventDefault();
-                setActiveIndex((i) => Math.max(i - 1, 0));
-                break;
-            case 'Enter':
-                e.preventDefault();
-                if (filtered[activeIndex]) select(filtered[activeIndex]);
-                break;
-            case 'Escape':
-                setOpen(false);
-                break;
-        }
-    }
+    const handleSelect = (exam: Exam) => {
+        setOpen(false);
+        // Navigate with URI encoded param (which correctly turns CA/CMA/CS into encoded string)
+        router.push(`/mentors?exam=${encodeURIComponent(exam.name)}`);
+    };
 
     return (
-        <div ref={containerRef} className="relative w-full max-w-md">
-            {/* Input pill */}
-            <div
+        <div ref={containerRef} className="relative w-full max-w-md z-50">
+            {/* Beautiful Trigger Button */}
+            <button
+                type="button"
+                onClick={() => setOpen(!open)}
+                aria-expanded={open}
                 className={`
-                    flex items-center gap-3 h-14 px-5 rounded-full bg-white border
-                    transition-colors duration-200 cursor-text
-                    shadow-[inset_0_1px_3px_rgb(0_0_0/0.06)]
-                    ${open ? 'border-blue-400' : 'border-gray-200 hover:border-gray-300'}
+                    w-full flex items-center justify-between h-14 px-6 rounded-2xl bg-white border-2
+                    transition-all duration-300 shadow-sm
+                    ${open ? 'border-blue-500 shadow-[0_0_0_4px_rgba(59,130,246,0.1)]' : 'border-gray-100 hover:border-gray-200 hover:shadow-md'}
                 `}
-                onClick={() => {
-                    setOpen(true);
-                    inputRef.current?.focus();
-                }}
             >
-                <Search className="w-4 h-4 text-gray-400 shrink-0" />
-                <input
-                    ref={inputRef}
-                    type="text"
-                    value={query}
-                    onChange={(e) => {
-                        setQuery(e.target.value);
-                        setOpen(true);
-                    }}
-                    onFocus={() => setOpen(true)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Find mentors by exam — UPSC, SSC, Banking…"
-                    className="flex-1 bg-transparent text-sm text-gray-800 placeholder:text-gray-400 outline-none"
-                    aria-label="Search exams"
-                    aria-expanded={open}
-                    aria-haspopup="listbox"
-                    role="combobox"
-                />
-                <ChevronDown
-                    className={`w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''
-                        }`}
-                />
-            </div>
+                <div className="flex items-center gap-3 text-left">
+                    <div className={`p-2 rounded-xl transition-colors duration-300 ${open ? 'bg-blue-50 text-blue-500' : 'bg-gray-50 text-gray-500'}`}>
+                        <Search className="w-5 h-5" />
+                    </div>
+                    <div>
+                        <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-0.5">Find Mentors By</div>
+                        <div className="text-[15px] font-medium text-gray-900 leading-none">Select your exam...</div>
+                    </div>
+                </div>
+                <div className={`
+                    w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300
+                    ${open ? 'bg-blue-50 text-blue-500 rotate-180' : 'bg-gray-50 text-gray-400 group-hover:bg-gray-100'}
+                `}>
+                    <ChevronDown className="w-4 h-4" />
+                </div>
+            </button>
 
-            {/* Dropdown */}
+            {/* Beautiful Dropdown grid/list */}
             <AnimatePresence>
-                {open && filtered.length > 0 && (
-                    <motion.ul
-                        role="listbox"
-                        initial={{ opacity: 0, y: -6 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -6 }}
-                        transition={{ duration: 0.18, ease: 'easeOut' }}
+                {open && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.98 }}
+                        transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
                         className="
-                            absolute z-50 mt-2 w-full rounded-2xl bg-white border border-gray-100
-                            shadow-floating py-1.5 overflow-hidden
+                            absolute left-0 right-0 mt-3 p-3 bg-white border border-gray-100
+                            rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)]
+                            overflow-hidden
                         "
                     >
-                        {filtered.map((exam, i) => (
-                            <li
-                                key={exam.id}
-                                role="option"
-                                aria-selected={i === activeIndex}
-                                onMouseEnter={() => setActiveIndex(i)}
-                                onClick={() => select(exam)}
-                                className={`
-                                    flex items-center justify-between px-4 py-2.5 text-sm cursor-pointer
-                                    transition-colors duration-100
-                                    ${i === activeIndex
-                                        ? 'bg-blue-50 text-blue-700'
-                                        : 'text-gray-700 hover:bg-gray-50'
-                                    }
-                                `}
-                            >
-                                <span>{exam.name}</span>
-                                {i === activeIndex && (
-                                    <Check className="w-3.5 h-3.5 text-blue-500 shrink-0" />
-                                )}
-                            </li>
-                        ))}
-                    </motion.ul>
+                        <div className="grid grid-cols-2 gap-2">
+                            {popularExams.map((exam, i) => {
+                                const Icon = exam.icon;
+                                return (
+                                    <motion.button
+                                        key={exam.id}
+                                        initial={{ opacity: 0, scale: 0.9 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        transition={{ delay: i * 0.03 }}
+                                        onClick={() => handleSelect(exam)}
+                                        className="
+                                            group flex items-center gap-3 p-3 rounded-xl cursor-pointer text-left
+                                            transition-all duration-200 border border-transparent
+                                            hover:bg-gray-50 hover:border-gray-100 hover:shadow-sm
+                                        "
+                                    >
+                                        <div className={`
+                                            w-10 h-10 rounded-lg flex items-center justify-center shrink-0
+                                            ${exam.bg} ${exam.color} transition-transform duration-300 group-hover:scale-110
+                                        `}>
+                                            <Icon className="w-5 h-5" />
+                                        </div>
+                                        <div className="flex-1 truncate">
+                                            <div className="font-semibold text-sm text-gray-900 truncate">
+                                                {exam.name}
+                                            </div>
+                                        </div>
+                                    </motion.button>
+                                );
+                            })}
+                        </div>
+                    </motion.div>
                 )}
             </AnimatePresence>
         </div>
@@ -162,12 +121,14 @@ export default function HeroSection() {
     const { isSignedIn, isLoaded } = useUser();
 
     return (
-        <section className="relative overflow-hidden pt-36 pb-28 md:pt-48 md:pb-40 bg-white">
+        <section className="relative pt-36 pb-28 md:pt-48 md:pb-40 bg-white z-10">
 
             <div className="absolute inset-0 -z-10 bg-gradient-to-b from-white to-gray-50/60" />
 
-            <div className="absolute top-0 right-0 -z-10 h-[600px] w-[600px] rounded-full bg-blue-50/20 blur-[80px] opacity-30" />
-            <div className="absolute bottom-0 left-0 -z-10 h-[500px] w-[500px] rounded-full bg-slate-50/40 blur-[80px] opacity-30" />
+            <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
+                <div className="absolute top-0 right-0 h-[600px] w-[600px] rounded-full bg-blue-50/20 blur-[80px] opacity-30" />
+                <div className="absolute bottom-0 left-0 h-[500px] w-[500px] rounded-full bg-slate-50/40 blur-[80px] opacity-30" />
+            </div>
 
             <div className="max-w-6xl mx-auto px-6 relative z-10">
 

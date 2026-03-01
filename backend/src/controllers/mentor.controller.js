@@ -90,6 +90,42 @@ export const getMentorProfile = async (req, res) => {
       }
     }
 
+    // --- Reconcile isBooked flags with the live Booking collection ---
+    // When bookings are manually deleted from the DB, the upcomingSessions
+    // embedded array still has isBooked=true. This query cross-checks and fixes it.
+    const bookedSlots = mentorDoc.mentorProfile.upcomingSessions?.filter(s => s.isBooked) || [];
+    if (bookedSlots.length > 0) {
+      // Fetch all active bookings for this mentor in one query
+      const activeBookings = await Booking.find({
+        mentor: mentorDoc._id,
+        status: { $ne: "cancelled" }
+      }).select("sessionDate startTime").lean();
+
+      // Build a set of "date_startTime" keys for fast lookup
+      const activeKeys = new Set(
+        activeBookings.map(b => {
+          const d = new Date(b.sessionDate).toISOString().split("T")[0];
+          return `${d}_${b.startTime}`;
+        })
+      );
+
+      let needsSave = false;
+      mentorDoc.mentorProfile.upcomingSessions = mentorDoc.mentorProfile.upcomingSessions.map(slot => {
+        if (!slot.isBooked) return slot;
+        const slotKey = `${new Date(slot.date).toISOString().split("T")[0]}_${slot.startTime}`;
+        if (!activeKeys.has(slotKey)) {
+          // Booking was deleted — make the slot available again
+          needsSave = true;
+          return { ...slot.toObject?.() || slot, isBooked: false, bookedBy: null };
+        }
+        return slot;
+      });
+
+      if (needsSave) {
+        mentorDoc.save().catch(e => console.error("Reconcile save error:", e));
+      }
+    }
+
     const mentor = mentorDoc.toObject();
     mentor._id = mentorDoc._id;
     delete mentor.clerkId;
@@ -106,6 +142,7 @@ export const getMentorProfile = async (req, res) => {
     res.status(500).json({ success: false, msg: "Server error" });
   }
 };
+
 
 
 export const getOwnProfile = async (req, res) => {

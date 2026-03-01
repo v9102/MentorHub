@@ -29,7 +29,7 @@ export default function AuthFormsCard({ initialView }: AuthFormsCardProps) {
             setIsRedirecting(true);
             const role = user.publicMetadata?.role as string | undefined;
             if (role === "mentor" && redirectUrl === "/") {
-                router.push("/mentor/dashboard");
+                router.push("/mentor/profile");
             } else {
                 router.push(redirectUrl);
             }
@@ -80,7 +80,14 @@ export default function AuthFormsCard({ initialView }: AuthFormsCardProps) {
                 setIsSignInLoading(false);
             }
         } catch (err: any) {
-            setSignInError(err.errors?.[0]?.longMessage || "Failed to sign in.");
+            const errorCode = err.errors?.[0]?.code;
+            if (errorCode === "form_identifier_not_found") {
+                setSignUpEmail(signInEmail);
+                switchView("sign-up-student");
+                setSignUpError("No account found with this email. Please create one.");
+            } else {
+                setSignInError(err.errors?.[0]?.longMessage || "Failed to sign in.");
+            }
             setIsSignInLoading(false);
         }
     };
@@ -104,7 +111,14 @@ export default function AuthFormsCard({ initialView }: AuthFormsCardProps) {
             await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
             setVerifying(true);
         } catch (err: any) {
-            setSignUpError(err.errors?.[0]?.longMessage || "Failed to create account.");
+            const errorCode = err.errors?.[0]?.code;
+            if (errorCode === "form_identifier_exists") {
+                setSignInEmail(signUpEmail);
+                switchView("sign-in");
+                setSignInError("Account already exists with this email. Please sign in.");
+            } else {
+                setSignUpError(err.errors?.[0]?.longMessage || "Failed to create account.");
+            }
         } finally {
             setIsSignUpLoading(false);
         }

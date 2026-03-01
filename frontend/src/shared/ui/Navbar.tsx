@@ -74,7 +74,7 @@ export default function Navbar() {
     }
 
     return (
-      <Link href="/sign-up/mentor" className={classes} onClick={mobile ? closeMenu : undefined}>
+      <Link href={`/sign-up/mentor?redirect=${encodeURIComponent(pathname === "/" ? "/" : pathname)}`} className={classes} onClick={mobile ? closeMenu : undefined}>
         {content}
       </Link>
     )
@@ -148,7 +148,7 @@ export default function Navbar() {
                 Sign In
               </Link>
 
-              <Link href="/sign-up/student" className="px-5 py-2.5 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-all cursor-pointer font-medium shadow-sm hover:shadow text-sm">
+              <Link href={`/sign-up/student?redirect=${encodeURIComponent(pathname === "/" ? "/" : pathname)}`} className="px-5 py-2.5 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-all cursor-pointer font-medium shadow-sm hover:shadow text-sm">
                 Get Started
               </Link>
             </SignedOut>
@@ -205,7 +205,7 @@ export default function Navbar() {
                     <Link href={`/sign-in?redirect=${encodeURIComponent(pathname === "/" ? "/" : pathname)}`} className="w-full py-3 rounded-lg text-gray-700 bg-gray-100 font-semibold active:bg-gray-200 text-center" onClick={closeMenu}>
                       Sign In
                     </Link>
-                    <Link href="/sign-up/student" className="w-full py-3 rounded-lg bg-blue-600 text-white font-semibold shadow-md active:bg-blue-700 text-center" onClick={closeMenu}>
+                    <Link href={`/sign-up/student?redirect=${encodeURIComponent(pathname === "/" ? "/" : pathname)}`} className="w-full py-3 rounded-lg bg-blue-600 text-white font-semibold shadow-md active:bg-blue-700 text-center" onClick={closeMenu}>
                       Get Started
                     </Link>
                   </div>
