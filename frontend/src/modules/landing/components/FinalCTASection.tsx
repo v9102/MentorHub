@@ -45,7 +45,7 @@ export default function FinalCTASection() {
                                     <ArrowRight className="ml-2 h-5 w-5" />
                                 </Button>
                             </Link>
-                            <Link href="/onboarding/profile/basic-info">
+                            <Link href="/sign-up/mentor">
                                 <Button size="lg" variant="outline" className="bg-transparent h-14 px-8 text-lg border-white/30 text-white hover:bg-white/10 hover:border-white/50 hover:text-white transition-transform active:scale-[0.98] w-full sm:w-auto font-bold backdrop-blur-sm">
                                     Become a Mentor
                                 </Button>
