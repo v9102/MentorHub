@@ -7,16 +7,58 @@ import { useState } from "react";
 import { Skeleton } from "@/shared/ui/skeleton";
 
 type MentorCardData = {
+  /** MongoDB ObjectId serialised to string */
+  mongoId?: string;
+  /** Clerk user ID (used as primary navigation key) */
   id: string;
+
   name?: string;
-  profileImage?: string;
+  /** Top-level imageUrl from the User document */
   imageUrl?: string;
+  /** Alias passed from list pages (same value as imageUrl / profilePhoto) */
+  profileImage?: string;
+
   mentorProfile?: {
     basicInfo?: {
       profilePhoto?: string;
+      currentRole?: string;
+      currentOrganisation?: string;
+      workExperience?: number;
+    };
+    professionalInfo?: {
+      college?: string;
+      highestQualification?: string;
+    };
+    expertise?: {
+      /** Array of subject strings */
+      subjects?: string[];
+      /** Single string in the DB (not an array) */
+      specializations?: string;
+    };
+    pricing?: {
+      pricePerSession?: number;
+      sessionDuration?: number;
+      isFreeTrialEnabled?: boolean;
+    };
+    bio?: string;
+    rating?: number;
+    totalReviews?: number;
+    examDetails?: Array<{
+      examName?: string;
+      /** String in DB */
+      rank?: string;
+      /** String in DB */
+      attempts?: string;
+      college?: string;
+    }>;
+    verification?: {
+      isVerified?: boolean;
     };
   };
+
+  /* ── Flat fields set by transformMentorData ── */
   isVerified?: boolean;
+  /** mentorProfile.pricing.pricePerSession */
   pricing?: number;
   sessionDuration?: number;
   isFreeTrialEnabled?: boolean;
@@ -26,16 +68,19 @@ type MentorCardData = {
   reviewsCount?: number;
   college?: string;
   exam?: string;
-  rank?: number;
+  /** String from examDetails in DB */
+  rank?: string;
   yearsOfExperience?: number;
   sessions?: number;
   attendance?: number;
   responseTime?: string;
   subjects?: string[];
+  /** Array produced by the mapper from the DB string */
   specializations?: string[];
   service?: string;
   posting?: string;
-  attempts?: number;
+  /** String from examDetails in DB */
+  attempts?: string;
   optionalSubject?: string;
   offerings?: {
     id: string;
@@ -173,14 +218,10 @@ export default function SimpleMentorCard({
   }
 
   return (
-    <div className="block w-full relative group cursor-pointer">
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm relative overflow-visible transition-all duration-200 group-hover:shadow-md group-hover:border-blue-100">
-        {/* Full-card invisible link */}
-        <Link href={`/mentors/${mentor.mongoId || mentor.id}`} className="absolute inset-0 z-0 rounded-2xl">
-          <span className="sr-only">View {mentor.name}&apos;s profile</span>
-        </Link>
+    <div className="block w-full">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm relative overflow-visible">
 
-        <div className="p-6 relative z-10 pointer-events-none">
+        <div className="p-6">
 
           {/* ── Header: photo + blue verified badge + name + star rating ── */}
           <div className="flex items-start gap-5 mb-6">
@@ -260,8 +301,8 @@ export default function SimpleMentorCard({
           {/* ── Divider ── */}
           <div className="border-t border-gray-100 mb-5" />
 
-          {/* ── CTA Button (pointer-events re-enabled) ── */}
-          <div className="pointer-events-auto">
+          {/* ── CTA Button ── */}
+          <div>
             <Link
               href={`/book/${mentor.id}`}
               className="flex flex-col items-center justify-center w-full rounded-2xl py-3.5 px-5 bg-blue-50 hover:bg-blue-100 transition-colors duration-200 active:scale-[0.98] border border-blue-100"

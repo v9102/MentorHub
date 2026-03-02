@@ -116,7 +116,7 @@ export default function ExamPage({
                       college: mentor.college,
                       service: mentor.service,
                       posting: mentor.posting,
-                      rank: mentor.rank,
+                      rank: mentor.rank != null ? String(mentor.rank) : undefined,
                       offerings: mentor.offerings,
                     }}
                   />

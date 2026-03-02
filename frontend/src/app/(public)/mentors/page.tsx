@@ -534,7 +534,7 @@ export default function MentorsPage() {
                         specializations: mentor.specializations,
                         college: mentor.college,
                         exam: mentor.exam,
-                        rank: mentor.rank,
+                        rank: mentor.rank != null ? String(mentor.rank) : undefined,
                         service: mentor.service,
                         posting: mentor.posting,
                       }}
