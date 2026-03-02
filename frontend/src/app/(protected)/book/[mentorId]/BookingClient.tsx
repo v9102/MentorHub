@@ -123,25 +123,40 @@ export default function BookingClient({ mentor: initialMentor, mentorId }: Props
   const [currentMonth, setCurrentMonth] = useState(today.getMonth());
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
 
+  // Helper to check if a session is in the past
+  const isSessionPast = (date: string | Date, startTime: string) => {
+    try {
+      const dateStr = new Date(date).toISOString().split("T")[0]; // YYYY-MM-DD
+      const [year, month, day] = dateStr.split("-").map(Number);
+      const [hours, minutes] = startTime.split(":").map(Number);
+      const sessionDate = new Date(year, month - 1, day, hours, minutes);
+      return sessionDate <= today;
+    } catch {
+      return false;
+    }
+  };
+
   // Derive availability from mentor's upcomingSessions
   const sessions = mentor?.upcomingSessions || [];
 
-  // YYYY-MM-DD dates that have at least one unbooked session
+  // YYYY-MM-DD dates that have at least one unbooked future session
   const availableDates = new Set(
     sessions
-      .filter(s => !s.isBooked)
+      .filter(s => !s.isBooked && !isSessionPast(s.date, s.startTime))
       .map(s => new Date(s.date).toISOString().split("T")[0])
   );
 
-  // All dates (booked or not) — used for calendar dot indicators
+  // All future dates (booked or not) — used for calendar dot indicators
   const datesWithSessions = new Set(
-    sessions.map(s => new Date(s.date).toISOString().split("T")[0])
+    sessions
+      .filter(s => !isSessionPast(s.date, s.startTime))
+      .map(s => new Date(s.date).toISOString().split("T")[0])
   );
 
-  // Sorted slots for the currently selected date
+  // Sorted slots for the currently selected date (only future slots)
   const slotsForSelectedDate = selectedDate
     ? sessions
-      .filter(s => new Date(s.date).toISOString().split("T")[0] === selectedDate)
+      .filter(s => new Date(s.date).toISOString().split("T")[0] === selectedDate && !isSessionPast(s.date, s.startTime))
       .sort((a, b) => a.startTime.localeCompare(b.startTime))
     : [];
 

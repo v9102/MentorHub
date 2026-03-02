@@ -59,9 +59,10 @@ interface TimePickerProps {
     value: string;
     onChange: (value: string) => void;
     className?: string;
+    align?: 'left' | 'right';
 }
 
-const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, className = "" }) => {
+const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, className = "", align = 'left' }) => {
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -84,6 +85,11 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, className = ""
 
     const displayHour = hour.toString().padStart(2, '0');
 
+    // Calculate mobile left/right alignment based on the prop, keeping desktop centered relative to button
+    const alignClasses = align === 'right'
+        ? 'right-[-10px] sm:right-auto sm:left-1/2 sm:-translate-x-1/2'
+        : 'left-[-10px] sm:left-1/2 sm:-translate-x-1/2';
+
     return (
         <div className="relative" ref={containerRef}>
             <button
@@ -98,7 +104,7 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, className = ""
             </button>
 
             {isOpen && (
-                <div className="fixed sm:absolute inset-x-4 sm:inset-x-auto bottom-4 sm:bottom-auto sm:top-full sm:left-0 sm:mt-2 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 p-4 sm:w-[240px] animate-in fade-in zoom-in-95 duration-150">
+                <div className={`absolute top-full mt-2 bg-white border border-slate-200 rounded-2xl shadow-2xl z-[100] p-3 sm:p-4 w-[220px] sm:w-[240px] animate-in fade-in zoom-in-95 duration-150 ${alignClasses}`}>
                     <div className="flex justify-center mb-4 pb-4 border-b border-slate-100">
                         <div className="flex items-baseline gap-1 text-3xl font-black text-slate-800 tracking-tight">
                             {displayHour}:{minute}
@@ -108,7 +114,7 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, className = ""
                     <div className="flex gap-4 h-48">
                         <div className="flex-1 overflow-y-auto custom-scrollbar pr-1">
                             <div className="text-xs font-bold text-slate-400 uppercase mb-2 text-center">Hour</div>
-                            <div className="grid grid-cols-3 sm:grid-cols-1 gap-1">
+                            <div className="grid grid-cols-2 sm:grid-cols-1 gap-1">
                                 {Array.from({ length: 24 }, (_, i) => i).map((h) => (
                                     <button
                                         key={h}
@@ -124,11 +130,11 @@ const TimePicker: React.FC<TimePickerProps> = ({ value, onChange, className = ""
                             </div>
                         </div>
 
-                        <div className="w-px bg-slate-100 h-full hidden sm:block"></div>
+                        <div className="w-px bg-slate-100 h-full"></div>
 
                         <div className="flex-1">
                             <div className="text-xs font-bold text-slate-400 uppercase mb-2 text-center">Min</div>
-                            <div className="grid grid-cols-2 sm:flex sm:flex-col gap-1">
+                            <div className="grid grid-cols-1 gap-1">
                                 {['00', '15', '30', '45'].map((m) => (
                                     <button
                                         key={m}
@@ -517,15 +523,17 @@ export default function Availability() {
                                                                     const realIndex = weeklySlots.indexOf(slot);
                                                                     return (
                                                                         <div key={idx} className="flex flex-wrap sm:flex-nowrap items-center gap-2 sm:gap-3 animate-in fade-in slide-in-from-left-2">
-                                                                            <div className="flex items-center gap-1 sm:gap-2 bg-slate-50 border border-slate-200 rounded-lg sm:rounded-xl p-1.5 sm:p-2 pl-2 sm:pl-4 shadow-sm hover:border-indigo-300 transition-colors focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500/20 w-full sm:w-auto">
+                                                                            <div className="flex items-center gap-1 sm:gap-2 bg-slate-50 border border-slate-200 rounded-lg sm:rounded-xl p-1.5 sm:p-2 pl-2 sm:pl-4 shadow-sm hover:border-indigo-300 transition-colors focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500/20 w-full sm:w-auto mt-2 sm:mt-0">
                                                                                 <TimePicker
                                                                                     value={slot.startTime}
                                                                                     onChange={(val) => updateWeeklySlot(realIndex, 'startTime', val)}
+                                                                                    align="left"
                                                                                 />
                                                                                 <span className="text-slate-300 font-light text-base sm:text-lg">|</span>
                                                                                 <TimePicker
                                                                                     value={slot.endTime}
                                                                                     onChange={(val) => updateWeeklySlot(realIndex, 'endTime', val)}
+                                                                                    align="right"
                                                                                 />
                                                                             </div>
                                                                             <button
