@@ -7,7 +7,7 @@ import {
     User, Mail, ChevronDown, Camera, Pen, Check, Share2,
     Calendar, Clock, Trash2, Plus, ArrowUpRight, Bell,
     Shield, Smartphone, Briefcase, QrCode, Wallet,
-    MapPin, GraduationCap,
+    MapPin, GraduationCap, X
 } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import QRCode from "react-qr-code";
@@ -170,6 +170,7 @@ export default function EditProfile() {
     const [successAnimations, setSuccessAnimations] = useState<Record<string, boolean>>({});
     const [isPhoneDropdownOpen, setIsPhoneDropdownOpen] = useState(false);
     const [selectedCountry, setSelectedCountry] = useState({ code: "+91", label: "IN" });
+    const [showAvailabilityPopup, setShowAvailabilityPopup] = useState(false);
 
     const countries = [
         { code: "+966", label: "SA" }, { code: "+1", label: "US" },
@@ -181,20 +182,26 @@ export default function EditProfile() {
         fetchMentorProfile();
     }, []);
 
+    useEffect(() => {
+        if (!isLoadingProfile && mentor.availability.length === 0) {
+            setShowAvailabilityPopup(true);
+        }
+    }, [isLoadingProfile, mentor.availability.length]);
+
     const fetchMentorProfile = async () => {
         try {
             const res = await fetch("/api/dashboard/profile");
-            
+
             if (!res.ok) {
                 throw new Error(`HTTP error! status: ${res.status}`);
             }
-            
+
             const data = await res.json();
-            
+
             if (!data.success) {
                 throw new Error(data.message || "Failed to fetch profile data");
             }
-            
+
             if (data.mentor) {
                 const profile = data.mentor.mentorProfile || {};
                 const basic = profile.basicInfo || {};
@@ -203,13 +210,13 @@ export default function EditProfile() {
                 const ver = profile.verification || {};
                 const prc = profile.pricing || {};
                 const exams = profile.examDetails || [];
-                
+
                 // Validate and sanitize availability data
                 const availabilityData = profile.availability || [];
                 const validatedAvailability = availabilityData.map((day: any) => ({
                     _id: day._id || day.id,
                     day: day.day || "Unknown",
-                    slots: Array.isArray(day.slots) ? day.slots.filter((slot: any) => 
+                    slots: Array.isArray(day.slots) ? day.slots.filter((slot: any) =>
                         slot.startTime && slot.endTime && slot.sessionDuration
                     ) : []
                 })).filter((day: any) => day.slots.length > 0);
@@ -345,6 +352,27 @@ export default function EditProfile() {
         <div className="min-h-screen bg-gray-50 font-sans text-slate-900 pb-24">
             <UpcomingMeetingBanner />
 
+            {/* Empty Availability Action Popup */}
+            {showAvailabilityPopup && (
+                <div className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-[100] w-[calc(100%-3rem)] sm:w-80 bg-white rounded-2xl shadow-2xl border border-indigo-100 p-5 animate-in slide-in-from-bottom-8 fade-in duration-500">
+                    <button onClick={() => setShowAvailabilityPopup(false)} className="absolute top-3 right-3 p-1.5 text-slate-400 hover:bg-slate-50 hover:text-slate-600 rounded-lg transition-colors">
+                        <X className="w-4 h-4" />
+                    </button>
+                    <div className="flex items-start gap-4">
+                        <div className="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center shrink-0">
+                            <Calendar className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <h4 className="text-slate-900 font-bold text-sm mb-1">Next steps for you</h4>
+                            <p className="text-slate-500 text-xs mb-3 leading-relaxed">You haven't added any time slots yet. Set up your schedule to start receiving student bookings.</p>
+                            <Link href="/mentor/availability" className="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow-sm transition-colors">
+                                <Plus className="w-3.5 h-3.5" /> Add time slots
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* TOP HEADER */}
             <div className="relative max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6 lg:py-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between z-10">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
@@ -409,83 +437,83 @@ export default function EditProfile() {
                                     <div className="absolute w-16 h-full -left-12 top-0" />
                                     <div className="bg-white p-5 rounded-3xl shadow-xl border border-slate-100 w-[180px] flex flex-col items-center">
                                         <div className="w-[120px] h-[120px] bg-white rounded-xl flex items-center justify-center p-2">
-                                                {mounted && profileUrl && (
-                                                    <QRCode
-                                                        value={profileUrl}
-                                                        size={104}
-                                                        level="M"
-                                                        bgColor="#ffffff"
-                                                        fgColor="#1e293b"
-                                                    />
-                                                )}
-                                            </div>
-                                            <span className="mt-4 text-[10px] font-bold uppercase tracking-wider text-slate-400">Scan to View</span>
-                                            <div className="absolute -left-2 bottom-6 w-4 h-4 bg-white rotate-45 border-l border-b border-slate-100" />
+                                            {mounted && profileUrl && (
+                                                <QRCode
+                                                    value={profileUrl}
+                                                    size={104}
+                                                    level="M"
+                                                    bgColor="#ffffff"
+                                                    fgColor="#1e293b"
+                                                />
+                                            )}
                                         </div>
+                                        <span className="mt-4 text-[10px] font-bold uppercase tracking-wider text-slate-400">Scan to View</span>
+                                        <div className="absolute -left-2 bottom-6 w-4 h-4 bg-white rotate-45 border-l border-b border-slate-100" />
                                     </div>
                                 </div>
+                            </div>
 
-                                        {/* Details Section */}
-                                        <div className={`flex-1 w-full lg:pt-2 transition-all duration-300 ${isQRVisible ? "lg:pl-56" : ""}`}>
-                                            <div className="flex flex-col lg:flex-row justify-between items-center lg:items-start w-full gap-4 lg:gap-0">
-                                                <div className="flex-1 w-full">
-                                                    <SmoothWrapper>
-                                                        {activeSection === "personal" ? (
-                                                            <div key="edit-form" className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 w-full max-w-4xl">
-                                                                <InputGroup label="Full Name" value={mentor.name} onChange={(e) => updateField("name", e.target.value)} error={errors.name} success={successAnimations.name} icon={User} placeholder="John Doe" />
-                                                                <InputGroup label="Role Title" value={mentor.title} onChange={(e) => updateField("title", e.target.value)} icon={Briefcase} placeholder="Senior Developer" />
-                                                                <InputGroup label="Email Address" value={mentor.email} onChange={(e) => updateField("email", e.target.value)} error={errors.email} success={successAnimations.email} icon={Mail} placeholder="john@example.com" />
+                            {/* Details Section */}
+                            <div className={`flex-1 w-full lg:pt-2 transition-all duration-300 ${isQRVisible ? "lg:pl-56" : ""}`}>
+                                <div className="flex flex-col lg:flex-row justify-between items-center lg:items-start w-full gap-4 lg:gap-0">
+                                    <div className="flex-1 w-full">
+                                        <SmoothWrapper>
+                                            {activeSection === "personal" ? (
+                                                <div key="edit-form" className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 w-full max-w-4xl">
+                                                    <InputGroup label="Full Name" value={mentor.name} onChange={(e) => updateField("name", e.target.value)} error={errors.name} success={successAnimations.name} icon={User} placeholder="John Doe" />
+                                                    <InputGroup label="Role Title" value={mentor.title} onChange={(e) => updateField("title", e.target.value)} icon={Briefcase} placeholder="Senior Developer" />
+                                                    <InputGroup label="Email Address" value={mentor.email} onChange={(e) => updateField("email", e.target.value)} error={errors.email} success={successAnimations.email} icon={Mail} placeholder="john@example.com" />
 
-                                                                <div className="relative group">
-                                                                    <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-2 ml-1">Phone</label>
-                                                                    <div className="flex bg-white border border-slate-200 rounded-xl sm:rounded-2xl focus-within:ring-4 focus-within:ring-indigo-100 focus-within:border-indigo-500 transition-colors shadow-sm">
-                                                                        <button onClick={() => setIsPhoneDropdownOpen(!isPhoneDropdownOpen)}
-                                                                            className="px-3 sm:px-4 border-r border-slate-200 flex items-center gap-1.5 sm:gap-2 hover:bg-slate-50 rounded-l-xl sm:rounded-l-2xl transition-colors text-xs sm:text-sm font-bold text-slate-700">
-                                                                            {selectedCountry.code} <ChevronDown className="w-3 h-3 text-slate-400" />
-                                                                        </button>
-                                                                        <input type="tel" value={mentor.phone} onChange={(e) => updateField("phone", e.target.value)}
-                                                                            className="w-full bg-transparent px-3 sm:px-4 py-3 sm:py-3.5 text-sm sm:text-[15px] font-semibold outline-none placeholder:text-slate-400 rounded-r-xl sm:rounded-r-2xl" placeholder="123 456 789" />
-                                                                        <Smartphone className="absolute right-3 sm:right-4 top-[calc(50%+0.5rem)] -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-slate-400 pointer-events-none" />
-                                                                    </div>
-                                                                    {isPhoneDropdownOpen && (
-                                                                        <div className="absolute top-full left-0 mt-2 w-32 sm:w-36 bg-white border border-slate-100 shadow-xl rounded-xl sm:rounded-2xl overflow-hidden z-50 py-1">
-                                                                            {countries.map((c) => (
-                                                                                <button key={c.code} onClick={() => { setSelectedCountry(c); setIsPhoneDropdownOpen(false); }}
-                                                                                    className="w-full text-left px-3 sm:px-4 py-2.5 sm:py-2 hover:bg-slate-50 text-xs sm:text-sm font-semibold text-slate-700">
-                                                                                    {c.label} ({c.code})
-                                                                                </button>
-                                                                            ))}
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-
-                                                                <InputGroup label="Location" value={mentor.location} onChange={(e) => updateField("location", e.target.value)} icon={MapPin} placeholder="San Francisco, CA" />
-                                                                <InputGroup label="Experience" value={mentor.experience} onChange={(e) => updateField("experience", e.target.value)} icon={GraduationCap} placeholder="3rd Year" />
-
-                                                            </div>
-                                                        ) : (
-                                                            <div key="view-info" className="space-y-1 sm:space-y-2">
-                                                                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 tracking-tight">{mentor.name || "Your Name"}</h2>
-                                                                <p className="text-sm sm:text-base lg:text-lg font-medium text-slate-500 flex items-center justify-center lg:justify-start gap-2 pb-1">{mentor.title || "Add your role"}</p>
-                                                                <div className="flex flex-wrap justify-center lg:justify-start gap-x-4 sm:gap-x-6 gap-y-2 pt-1 text-xs sm:text-sm font-medium text-slate-500">
-                                                                    <span className="flex items-center gap-1.5 sm:gap-2 hover:text-indigo-600 transition-colors cursor-default break-all"><Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 text-slate-400" /><span className="truncate max-w-[150px] sm:max-w-none">{mentor.email || "No email"}</span></span>
-                                                                    <span className="flex items-center gap-1.5 sm:gap-2 hover:text-indigo-600 transition-colors cursor-default"><Smartphone className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 text-slate-400" />{selectedCountry.code} {mentor.phone || "No phone"}</span>
-                                                                    <span className="flex items-center gap-1.5 sm:gap-2 hover:text-indigo-600 transition-colors cursor-default"><MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 text-slate-400" />{mentor.location || "Add Location"}</span>
-                                                                    <span className="flex items-center gap-1.5 sm:gap-2 hover:text-indigo-600 transition-colors cursor-default"><GraduationCap className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 text-slate-400" />{mentor.experience || "Add Experience"}</span>
-                                                                    <span className="flex items-center gap-1.5 sm:gap-2 hover:text-indigo-600 transition-colors cursor-default"><User className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 text-slate-400" />{mentor.gender || "Add Gender"}</span>
-                                                                </div>
+                                                    <div className="relative group">
+                                                        <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-2 ml-1">Phone</label>
+                                                        <div className="flex bg-white border border-slate-200 rounded-xl sm:rounded-2xl focus-within:ring-4 focus-within:ring-indigo-100 focus-within:border-indigo-500 transition-colors shadow-sm">
+                                                            <button onClick={() => setIsPhoneDropdownOpen(!isPhoneDropdownOpen)}
+                                                                className="px-3 sm:px-4 border-r border-slate-200 flex items-center gap-1.5 sm:gap-2 hover:bg-slate-50 rounded-l-xl sm:rounded-l-2xl transition-colors text-xs sm:text-sm font-bold text-slate-700">
+                                                                {selectedCountry.code} <ChevronDown className="w-3 h-3 text-slate-400" />
+                                                            </button>
+                                                            <input type="tel" value={mentor.phone} onChange={(e) => updateField("phone", e.target.value)}
+                                                                className="w-full bg-transparent px-3 sm:px-4 py-3 sm:py-3.5 text-sm sm:text-[15px] font-semibold outline-none placeholder:text-slate-400 rounded-r-xl sm:rounded-r-2xl" placeholder="123 456 789" />
+                                                            <Smartphone className="absolute right-3 sm:right-4 top-[calc(50%+0.5rem)] -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-slate-400 pointer-events-none" />
+                                                        </div>
+                                                        {isPhoneDropdownOpen && (
+                                                            <div className="absolute top-full left-0 mt-2 w-32 sm:w-36 bg-white border border-slate-100 shadow-xl rounded-xl sm:rounded-2xl overflow-hidden z-50 py-1">
+                                                                {countries.map((c) => (
+                                                                    <button key={c.code} onClick={() => { setSelectedCountry(c); setIsPhoneDropdownOpen(false); }}
+                                                                        className="w-full text-left px-3 sm:px-4 py-2.5 sm:py-2 hover:bg-slate-50 text-xs sm:text-sm font-semibold text-slate-700">
+                                                                        {c.label} ({c.code})
+                                                                    </button>
+                                                                ))}
                                                             </div>
                                                         )}
-                                                    </SmoothWrapper>
-                                                </div>
+                                                    </div>
 
-                                                <button onClick={() => toggleSection("personal")}
-                                                    className={`p-2.5 sm:p-3 lg:p-3.5 rounded-full transition-colors shadow-sm border lg:ml-6 ${activeSection === "personal" ? "bg-slate-900 text-white border-slate-900" : "bg-white text-slate-500 border-slate-200 hover:border-indigo-300 hover:text-indigo-600 hover:shadow-md"}`}>
-                                                    {activeSection === "personal" ? <Check className="w-4 h-4 sm:w-5 sm:h-5" /> : <Pen className="w-4 h-4 sm:w-5 sm:h-5" />}
-                                                </button>
-                                            </div>
-                                        </div>
+                                                    <InputGroup label="Location" value={mentor.location} onChange={(e) => updateField("location", e.target.value)} icon={MapPin} placeholder="San Francisco, CA" />
+                                                    <InputGroup label="Experience" value={mentor.experience} onChange={(e) => updateField("experience", e.target.value)} icon={GraduationCap} placeholder="3rd Year" />
+
+                                                </div>
+                                            ) : (
+                                                <div key="view-info" className="space-y-1 sm:space-y-2">
+                                                    <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 tracking-tight">{mentor.name || "Your Name"}</h2>
+                                                    <p className="text-sm sm:text-base lg:text-lg font-medium text-slate-500 flex items-center justify-center lg:justify-start gap-2 pb-1">{mentor.title || "Add your role"}</p>
+                                                    <div className="flex flex-wrap justify-center lg:justify-start gap-x-4 sm:gap-x-6 gap-y-2 pt-1 text-xs sm:text-sm font-medium text-slate-500">
+                                                        <span className="flex items-center gap-1.5 sm:gap-2 hover:text-indigo-600 transition-colors cursor-default break-all"><Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 text-slate-400" /><span className="truncate max-w-[150px] sm:max-w-none">{mentor.email || "No email"}</span></span>
+                                                        <span className="flex items-center gap-1.5 sm:gap-2 hover:text-indigo-600 transition-colors cursor-default"><Smartphone className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 text-slate-400" />{selectedCountry.code} {mentor.phone || "No phone"}</span>
+                                                        <span className="flex items-center gap-1.5 sm:gap-2 hover:text-indigo-600 transition-colors cursor-default"><MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 text-slate-400" />{mentor.location || "Add Location"}</span>
+                                                        <span className="flex items-center gap-1.5 sm:gap-2 hover:text-indigo-600 transition-colors cursor-default"><GraduationCap className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 text-slate-400" />{mentor.experience || "Add Experience"}</span>
+                                                        <span className="flex items-center gap-1.5 sm:gap-2 hover:text-indigo-600 transition-colors cursor-default"><User className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 text-slate-400" />{mentor.gender || "Add Gender"}</span>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </SmoothWrapper>
+                                    </div>
+
+                                    <button onClick={() => toggleSection("personal")}
+                                        className={`p-2.5 sm:p-3 lg:p-3.5 rounded-full transition-colors shadow-sm border lg:ml-6 ${activeSection === "personal" ? "bg-slate-900 text-white border-slate-900" : "bg-white text-slate-500 border-slate-200 hover:border-indigo-300 hover:text-indigo-600 hover:shadow-md"}`}>
+                                        {activeSection === "personal" ? <Check className="w-4 h-4 sm:w-5 sm:h-5" /> : <Pen className="w-4 h-4 sm:w-5 sm:h-5" />}
+                                    </button>
+                                </div>
                             </div>
+                        </div>
 
                         {/* Bio Section */}
                         <div className="pt-4 border-t border-slate-100">
@@ -546,7 +574,16 @@ export default function EditProfile() {
                                     </div>
                                 ))}
                                 {mentor.availability.length === 0 && (
-                                    <div className="text-center py-10 sm:py-12 border-2 border-dashed border-slate-100 rounded-2xl sm:rounded-3xl text-slate-400 text-xs sm:text-sm font-medium italic">No availability slots added yet.</div>
+                                    <div className="flex flex-col items-center justify-center text-center py-10 sm:py-12 border-2 border-dashed border-slate-200 bg-slate-50 rounded-2xl sm:rounded-3xl">
+                                        <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mb-4">
+                                            <Calendar className="w-6 h-6" />
+                                        </div>
+                                        <h4 className="text-slate-900 font-bold text-base sm:text-lg mb-1">Next steps for you</h4>
+                                        <p className="text-slate-500 text-sm mb-5 max-w-xs">Set up your schedule so students can start booking sessions with you.</p>
+                                        <Link href="/mentor/availability" className="inline-flex items-center gap-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl shadow-sm hover:shadow-md transition-all active:scale-95">
+                                            <Plus className="w-4 h-4" /> Add time slots
+                                        </Link>
+                                    </div>
                                 )}
                             </div>
                         </SmoothWrapper>
@@ -577,49 +614,49 @@ export default function EditProfile() {
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
                                         <h5 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
                                             <Smartphone className="w-4 h-4 text-blue-500" />
                                             Payment Details
                                         </h5>
-                                        <InputGroup 
-                                            label="UPI ID (Virtual Payment Address)" 
-                                            value={mentor.upiId} 
-                                            onChange={(e) => updateField("upiId", e.target.value)} 
-                                            error={errors.upiId} 
-                                            success={successAnimations.upiId} 
-                                            icon={Smartphone} 
+                                        <InputGroup
+                                            label="UPI ID (Virtual Payment Address)"
+                                            value={mentor.upiId}
+                                            onChange={(e) => updateField("upiId", e.target.value)}
+                                            error={errors.upiId}
+                                            success={successAnimations.upiId}
+                                            icon={Smartphone}
                                             placeholder="yourname@paytm"
                                         />
                                     </div>
-                                    
+
                                     <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
                                         <h5 className="font-semibold text-gray-600 mb-1 flex items-center gap-2">
                                             <Shield className="w-4 h-4 text-gray-500" />
                                             Bank Details
                                         </h5>
                                         <p className="text-sm text-gray-500 mb-4">Optional - for additional verification</p>
-                                        
+
                                         <div className="space-y-4">
-                                            <InputGroup 
-                                                label="Account Number" 
-                                                value={mentor.accountNumber} 
-                                                onChange={(e) => updateField("accountNumber", e.target.value)} 
-                                                placeholder="1234567890" 
+                                            <InputGroup
+                                                label="Account Number"
+                                                value={mentor.accountNumber}
+                                                onChange={(e) => updateField("accountNumber", e.target.value)}
+                                                placeholder="1234567890"
                                             />
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                <InputGroup 
-                                                    label="Bank Name" 
-                                                    value={mentor.bankName} 
-                                                    onChange={(e) => updateField("bankName", e.target.value)} 
-                                                    placeholder="State Bank of India" 
+                                                <InputGroup
+                                                    label="Bank Name"
+                                                    value={mentor.bankName}
+                                                    onChange={(e) => updateField("bankName", e.target.value)}
+                                                    placeholder="State Bank of India"
                                                 />
-                                                <InputGroup 
-                                                    label="IFSC Code" 
-                                                    value={mentor.ifsc} 
-                                                    onChange={(e) => updateField("ifsc", e.target.value)} 
-                                                    placeholder="SBIN0001234" 
+                                                <InputGroup
+                                                    label="IFSC Code"
+                                                    value={mentor.ifsc}
+                                                    onChange={(e) => updateField("ifsc", e.target.value)}
+                                                    placeholder="SBIN0001234"
                                                 />
                                             </div>
                                         </div>
@@ -642,7 +679,7 @@ export default function EditProfile() {
                                             {mentor.bankName ? `Linked: ${mentor.bankName}` : "Secure Payment Gateway"}
                                         </div>
                                     </div>
-                                    
+
                                     {/* QR code */}
                                     <div className="relative shrink-0 hidden sm:block">
                                         <div className="bg-white p-3 rounded-xl shadow-md">
