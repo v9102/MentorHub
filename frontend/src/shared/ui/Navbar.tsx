@@ -106,27 +106,38 @@ export default function Navbar() {
           </Link>
 
           <div className="flex items-center gap-3">
-            <SignedIn>
-              <ProfileButton />
-            </SignedIn>
-            <SignedOut>
-              <Link
-                href={`/sign-up/student?redirect=${encodeURIComponent(pathname === "/" ? "/" : pathname)}`}
-                style={{
-                  backgroundColor: '#2E5FFF',
-                  color: 'white',
-                  fontFamily: 'var(--font-dm-sans, sans-serif)',
-                  fontWeight: 600,
-                  fontSize: '13px',
-                  padding: '8px 18px',
+            {/* Fixed-width auth slot — prevents CLS when Clerk resolves */}
+            <div style={{ minWidth: '92px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+              <ClerkLoading>
+                <div style={{
+                  width: '92px', height: '34px',
                   borderRadius: '100px',
-                  whiteSpace: 'nowrap',
-                  display: 'inline-block',
-                }}
-              >
-                Get Started
-              </Link>
-            </SignedOut>
+                  background: '#E2E8F0',
+                  animation: 'pulse 1.5s ease infinite',
+                }} />
+              </ClerkLoading>
+              <SignedIn>
+                <ProfileButton />
+              </SignedIn>
+              <SignedOut>
+                <Link
+                  href={`/sign-up/student?redirect=${encodeURIComponent(pathname === "/" ? "/" : pathname)}`}
+                  style={{
+                    backgroundColor: '#2E5FFF',
+                    color: 'white',
+                    fontFamily: 'var(--font-dm-sans, sans-serif)',
+                    fontWeight: 600,
+                    fontSize: '13px',
+                    padding: '8px 18px',
+                    borderRadius: '100px',
+                    whiteSpace: 'nowrap',
+                    display: 'inline-block',
+                  }}
+                >
+                  Get Started
+                </Link>
+              </SignedOut>
+            </div>
             <button
               onClick={() => setIsMobileMenuOpen(true)}
               aria-label="Open menu"
@@ -141,9 +152,11 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* ── Desktop bar: transparent until scroll ── */}
+        {/* ── Desktop bar: full-width backdrop + inner max-w content ── */}
+        {/* Backdrop fills the entire nav width (edge-to-edge) */}
         <div
-          className="hidden md:flex max-w-7xl mx-auto px-4 items-center justify-between h-16"
+          aria-hidden="true"
+          className="hidden md:block absolute inset-0 pointer-events-none"
           style={{
             background: isScrolled ? 'rgba(255, 255, 255, 0.92)' : 'transparent',
             backdropFilter: isScrolled ? 'blur(16px)' : 'none',
@@ -151,7 +164,9 @@ export default function Navbar() {
             borderBottom: isScrolled ? '1px solid rgba(0, 0, 0, 0.06)' : '1px solid transparent',
             transition: 'background 0.25s ease, border-color 0.25s ease',
           }}
-        >
+        />
+        {/* Content row — max-width centred, sits above the backdrop */}
+        <div className="hidden md:flex relative max-w-7xl mx-auto px-6 items-center justify-between h-16">
           <Link href="/">
             <Image
               src="/mentomanialogo.png"
