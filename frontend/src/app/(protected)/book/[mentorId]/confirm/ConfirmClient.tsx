@@ -57,10 +57,10 @@ export default function ConfirmClient({ mentor, sessionDate, sessionTime, price 
           date: date,
           startTime: time || sessionTime,
           studentDetails: {
-            email: user?.primaryEmailAddress?.emailAddress || "",
-            firstName: user?.firstName || "",
+            email: user?.primaryEmailAddress?.emailAddress || user?.emailAddresses?.[0]?.emailAddress || `${user?.id}@placeholder.mentomania.com`,
+            firstName: user?.firstName || "Student",
             lastName: user?.lastName || "",
-            name: user?.fullName || "Student",
+            name: user?.fullName || "Student User",
             imageUrl: user?.imageUrl || "",
           }
         }),
