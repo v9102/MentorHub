@@ -72,43 +72,45 @@ function init() {
   document.querySelector('#camBtn').addEventListener('click', toggleCam);
   document.querySelector('#blurBtn').addEventListener('click', toggleBlur);
 
-  // Custom Modal Logic
+  // Custom Modal Logic (Optional, for legacy compatibility)
   const dialog = document.querySelector('#room-dialog');
-  roomDialog = {
-    open: () => dialog.classList.add('active'),
-    close: () => dialog.classList.remove('active')
-  };
-
-  dialog.querySelectorAll('[data-mdc-dialog-action]').forEach(btn => {
-    btn.addEventListener('click', () => roomDialog.close());
-  });
+  if (dialog) {
+    roomDialog = {
+      open: () => dialog.classList.add('active'),
+      close: () => dialog.classList.remove('active')
+    };
+    dialog.querySelectorAll('[data-mdc-dialog-action]').forEach(btn => {
+      btn.addEventListener('click', () => roomDialog.close());
+    });
+  }
 
   const shareDlg = document.querySelector('#share-dialog');
-  const shareDialogObj = {
-    open: () => shareDlg.classList.add('active'),
-    close: () => shareDlg.classList.remove('active')
-  };
-  shareDlg.querySelectorAll('[data-mdc-dialog-action]').forEach(btn => {
-    btn.addEventListener('click', () => shareDialogObj.close());
-  });
-
-  const shareBtn = document.querySelector('#shareBtn');
-  if (shareBtn) {
-    shareBtn.addEventListener('click', () => {
-      const inviteLink = `${window.location.origin}/${roomId}`;
-      const linkInput = document.querySelector('#share-link');
-      if (linkInput) {
-        linkInput.value = inviteLink;
-        linkInput.select();
-        navigator.clipboard.writeText(inviteLink).then(() => {
-          console.log('Invite link copied to clipboard');
-        }).catch(err => {
-          console.error('Failed to copy text: ', err);
-        });
-      }
-      shareDialogObj.open();
-      shareDialogObj.open();
+  if (shareDlg) {
+    const shareDialogObj = {
+      open: () => shareDlg.classList.add('active'),
+      close: () => shareDlg.classList.remove('active')
+    };
+    shareDlg.querySelectorAll('[data-mdc-dialog-action]').forEach(btn => {
+      btn.addEventListener('click', () => shareDialogObj.close());
     });
+
+    const shareBtn = document.querySelector('#shareBtn');
+    if (shareBtn) {
+      shareBtn.addEventListener('click', () => {
+        const inviteLink = `${window.location.origin}/${roomId}`;
+        const linkInput = document.querySelector('#share-link');
+        if (linkInput) {
+          linkInput.value = inviteLink;
+          linkInput.select();
+          navigator.clipboard.writeText(inviteLink).then(() => {
+            console.log('Invite link copied to clipboard');
+          }).catch(err => {
+            console.error('Failed to copy text: ', err);
+          });
+        }
+        shareDialogObj.open();
+      });
+    }
   }
 
   // Chat Panel Modals

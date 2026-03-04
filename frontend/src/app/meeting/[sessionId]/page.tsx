@@ -24,7 +24,8 @@ export default function MeetingPage() {
         const authorize = async () => {
             try {
                 const token = await getToken();
-                const res = await fetch(`http://localhost:5000/api/meeting/${sessionId}/authorize`, {
+                const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
+                const res = await fetch(`${backendUrl}/api/meeting/${sessionId}/authorize`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
@@ -53,7 +54,8 @@ export default function MeetingPage() {
             const interval = setInterval(async () => {
                 try {
                     const token = await getToken();
-                    const res = await fetch(`http://localhost:5000/api/meeting/${sessionId}/authorize`, {
+                    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
+                    const res = await fetch(`${backendUrl}/api/meeting/${sessionId}/authorize`, {
                         headers: { Authorization: `Bearer ${token}` }
                     });
                     const data = await res.json();
@@ -78,7 +80,8 @@ export default function MeetingPage() {
             if (event.data?.type === "MEETING_STARTED" && role === "mentor") {
                 try {
                     const token = await getToken();
-                    await fetch(`http://localhost:5000/api/meeting/${sessionId}/start`, {
+                    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
+                    await fetch(`${backendUrl}/api/meeting/${sessionId}/start`, {
                         method: "POST",
                         headers: {
                             Authorization: `Bearer ${token}`
