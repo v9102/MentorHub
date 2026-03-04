@@ -82,17 +82,23 @@ export const createBooking = async (req, res) => {
     if (!student) {
       const studentDetails = req.body.studentDetails;
       if (studentDetails && studentClerkId) {
-        student = await User.create({
-          clerkId: studentClerkId,
-          email: studentDetails.email,
-          firstName: studentDetails.firstName,
-          lastName: studentDetails.lastName,
-          name: studentDetails.name,
-          imageUrl: studentDetails.imageUrl,
-          role: "student"
-        });
+        try {
+          student = await User.create({
+            clerkId: studentClerkId,
+            email: studentDetails.email,
+            firstName: studentDetails.firstName,
+            lastName: studentDetails.lastName,
+            name: studentDetails.name,
+            imageUrl: studentDetails.imageUrl,
+            role: "student"
+          });
+          console.log("[Booking API] Auto-created missing student:", student.email);
+        } catch (err) {
+          console.error("[Booking API] Failed to auto-create missing student:", err);
+          return res.status(500).json({ success: false, msg: "Failed to auto-create student record: " + err.message });
+        }
       } else {
-        return res.status(404).json({ success: false, msg: "Student account not found in database" });
+        return res.status(404).json({ success: false, msg: "Student account not found in database and no details provided to create one." });
       }
     }
 
