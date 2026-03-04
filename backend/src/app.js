@@ -7,6 +7,8 @@ import mentorAuth from "./routes/mentorAuth.routes.js";
 import webhookRoutes from "./routes/webhook.routes.js";
 import bookingRoutes from "./routes/booking.route.js";
 import adminRoutes from "./routes/admin.routes.js";
+import meetingRoutes from "./routes/meeting.route.js";
+import { initCronJobs } from "./services/cron.js";
 const app = express();
 
 app.use(cors({
@@ -32,6 +34,7 @@ app.use("/api/pay-now", bookingRoutes);
 app.use("/api/mentor", mentorRoutes);
 app.use("/api/mentorAuth", mentorAuth);
 app.use("/api/admin", adminRoutes);
+app.use("/api/meeting", meetingRoutes);
 
 app.get("/", (req, res) => {
   res.send("Server running");
@@ -53,5 +56,7 @@ app.use((err, req, res, next) => {
 });
 
 console.log("APP LOADED");
+
+initCronJobs();
 
 export default app;

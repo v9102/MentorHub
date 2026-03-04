@@ -5,12 +5,13 @@ import { useAuth } from "@clerk/nextjs";
 
 // Types for dashboard data
 export interface DashboardSession {
+  _id?: string;
   bookingId: string;
   date: string;
   startTime: string;
   endTime: string;
   duration: number;
-  status: "pending" | "confirmed" | "completed" | "cancelled";
+  status: "scheduled" | "meeting_ready" | "meeting_started" | "meeting_finished" | "pending" | "confirmed" | "completed" | "cancelled" | "In progress" | "Upcoming" | "Ready";
   mentor: {
     id: string;
     name: string;
@@ -75,7 +76,7 @@ export interface DashboardProfile {
 class FetchError extends Error {
   status: number;
   info?: { success: boolean; msg: string };
-  
+
   constructor(message: string, status: number, info?: { success: boolean; msg: string }) {
     super(message);
     this.name = 'FetchError';
@@ -94,7 +95,7 @@ const createAuthFetcher = (getToken: () => Promise<string | null>) => {
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
     });
-    
+
     if (!res.ok) {
       // Try to parse error response for more context
       let errorInfo: { success: boolean; msg: string } | undefined;
@@ -103,14 +104,14 @@ const createAuthFetcher = (getToken: () => Promise<string | null>) => {
       } catch {
         // Ignore JSON parse errors
       }
-      
+
       // Handle specific error cases gracefully
       if (res.status === 404 && errorInfo?.msg === "User not found") {
         // User exists in Clerk but not in backend database yet
         // Return empty data instead of throwing
         return { success: true, sessions: [], count: 0 };
       }
-      
+
       const error = new FetchError(
         errorInfo?.msg || "An error occurred while fetching the data.",
         res.status,
@@ -118,7 +119,7 @@ const createAuthFetcher = (getToken: () => Promise<string | null>) => {
       );
       throw error;
     }
-    
+
     return res.json();
   };
 };
@@ -201,7 +202,7 @@ export function useMentorProfile() {
 
   const updateProfile = async (profileData: Partial<DashboardProfile["mentorProfile"]>) => {
     const token = await getToken();
-    
+
     const res = await fetch("/api/dashboard/profile", {
       method: "PUT",
       headers: {
@@ -238,16 +239,16 @@ export function useDashboardStats() {
   const { sessions: historySession, isLoading: historyLoading } = useSessionHistory();
 
   const allSessions = [...upcomingSessions, ...historySession];
-  
+
   // Calculate stats
   const completedSessions = allSessions.filter(s => s.status === "completed").length;
   const totalEarnings = allSessions
     .filter(s => s.status === "completed")
     .reduce((sum, s) => sum + (s.price || 0), 0);
-  
+
   // Get unique students
   const uniqueStudents = new Set(allSessions.map(s => s.student.id)).size;
-  
+
   // Upcoming sessions count
   const upcomingCount = upcomingSessions.filter(
     s => s.status !== "cancelled" && s.status !== "completed"

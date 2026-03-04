@@ -1,0 +1,8 @@
+.next/types/validator.ts(188,39): error TS2307: Cannot find module '../../src/app/(public)/about/page.js' or its corresponding type declarations.
+.next/types/validator.ts(206,39): error TS2307: Cannot find module '../../src/app/(public)/careers/page.js' or its corresponding type declarations.
+.next/types/validator.ts(215,39): error TS2307: Cannot find module '../../src/app/(public)/community/page.js' or its corresponding type declarations.
+.next/types/validator.ts(224,39): error TS2307: Cannot find module '../../src/app/(public)/contact/page.js' or its corresponding type declarations.
+.next/types/validator.ts(251,39): error TS2307: Cannot find module '../../src/app/(public)/faq/page.js' or its corresponding type declarations.
+.next/types/validator.ts(260,39): error TS2307: Cannot find module '../../src/app/(public)/how-it-works/page.js' or its corresponding type declarations.
+.next/types/validator.ts(296,39): error TS2307: Cannot find module '../../src/app/(public)/partners/page.js' or its corresponding type declarations.
+.next/types/validator.ts(305,39): error TS2307: Cannot find module '../../src/app/(public)/pricing/page.js' or its corresponding type declarations.

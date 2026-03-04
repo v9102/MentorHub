@@ -1,0 +1,311 @@
+/* Google Meet Theme */
+
+:root {
+    --bg-main: #202124;
+    --bg-panel: #ffffff;
+    --bg-control: #3c4043;
+    --bg-control-hover: #4d5156;
+    --color-danger: #ea4335;
+    --color-danger-hover: #d32f2f;
+    --color-blue: #8ab4f8;
+    --color-blue-solid: #1a73e8;
+    --text-main: #ffffff;
+    --text-dark: #202124;
+    --text-muted: #9aa0a6;
+    --radius-full: 9999px;
+    --radius-lg: 16px;
+    --radius-md: 8px;
+    --font-family: 'Google Sans', Roboto, Arial, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-family);
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Typography */
+h1, h2, h3 {
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Overlay / Green Room */
+.full-screen-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--bg-main);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+.full-screen-overlay.active {
+    display: flex;
+}
+.room-title {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+}
+.green-room-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+}
+.video-preview-container {
+    width: 640px;
+    height: 360px;
+    background: #000;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.join-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+.preview-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+/* Main App Container */
+.app-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.main-split {
+    flex: 1;
+    display: flex;
+    padding: 1rem;
+    gap: 1rem;
+    overflow: hidden;
+}
+
+/* Video Grid */
+.video-grid {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.video-container {
+    position: relative;
+    border-radius: var(--radius-md);
+    background: #3c4043;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 300px;
+    min-height: 200px;
+    flex: 1 1 40%;
+    max-width: 100%;
+    max-height: 100%;
+}
+.video-container video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.video-controls {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+.video-container:hover .video-controls {
+    opacity: 1;
+}
+.control-btn {
+    background: rgba(0,0,0,0.6);
+    border: none;
+    color: white;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+}
+.control-btn.muted {
+    background: var(--color-danger);
+}
+
+/* Chat Panel */
+.chat-panel {
+    width: 360px;
+    background: var(--bg-panel);
+    border-radius: var(--radius-lg);
+    display: none;
+    flex-direction: column;
+    color: var(--text-dark);
+}
+.chat-panel.active {
+    display: flex;
+}
+.chat-header {
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.chat-header h3 {
+    font-size: 1.1rem;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 0 1.5rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.chat-notice {
+    font-size: 0.8rem;
+    color: #5f6368;
+    background: #f1f3f4;
+    padding: 0.8rem;
+    border-radius: var(--radius-md);
+    text-align: center;
+}
+.chat-bubble {
+    display: flex;
+    flex-direction: column;
+}
+.chat-sender-name {
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-bottom: 0.2rem;
+    color: #202124;
+}
+.chat-bubble.local .chat-sender-name {
+    color: var(--color-blue-solid);
+}
+.chat-content {
+    font-size: 0.95rem;
+    word-wrap: break-word;
+}
+
+.chat-input-area {
+    padding: 1rem 1.5rem;
+    display: flex;
+    gap: 0.5rem;
+}
+.chat-input-area input {
+    flex: 1;
+    border: none;
+    background: #f1f3f4;
+    padding: 0.8rem 1rem;
+    border-radius: var(--radius-full);
+    outline: none;
+    font-family: inherit;
+}
+
+/* Bottom Controls Bar */
+.controls-bar {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+}
+.controls-left, .controls-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+.controls-right {
+    justify-content: flex-end;
+}
+.controls-center {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.room-id-display {
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+/* Buttons */
+.btn {
+    border: none; outline: none; cursor: pointer;
+    font-family: var(--font-family);
+    font-weight: 500;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+}
+.btn-primary {
+    background: var(--color-blue-solid);
+    color: white;
+    padding: 0.8rem 2rem;
+    border-radius: var(--radius-full);
+    font-size: 1rem;
+}
+.btn-primary:hover {
+    background: #1765cc;
+}
+
+.btn-icon {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+}
+.btn-icon .material-icons {
+    font-size: 20px;
+}
+.btn-dark {
+    width: 50px; height: 50px;
+    background: var(--bg-control);
+    color: white;
+}
+.btn-dark:hover {
+    background: var(--bg-control-hover);
+}
+.btn-danger {
+    width: 60px; height: 40px;
+    border-radius: var(--radius-full);
+    background: var(--color-danger);
+    color: white;
+}
+.btn-danger:hover {
+    background: var(--color-danger-hover);
+}
+.btn-transparent {
+    background: transparent;
+    color: #5f6368;
+}
+.btn-transparent:hover {
+    background: #f1f3f4;
+}
+.text-blue {
+    color: var(--color-blue-solid);
+}
+.btn.muted {
+    background: var(--color-danger);
+    color: white;
+}

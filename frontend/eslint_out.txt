@@ -1,0 +1,260 @@
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\public\rtc\app.js
+  626:20  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+  662:23  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\app\(protected)\book\[mentorId]\BookingClient.tsx
+   23:18  warning  'AnimatePresence' is defined but never used  @typescript-eslint/no-unused-vars
+  200:19  error    Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+  223:19  error    Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\app\(protected)\book\[mentorId]\confirm\ConfirmClient.tsx
+  20:11  warning  'user' is assigned a value but never used       @typescript-eslint/no-unused-vars
+  29:9   warning  'parseTime' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\app\(protected)\mentor\availability\page.tsx
+  215:77  error    Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  216:53  error    Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  341:17  error    'count' is never reassigned. Use 'const' instead  prefer-const
+  394:18  warning  'error' is defined but never used                 @typescript-eslint/no-unused-vars
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\app\(protected)\mentor\dashboard\page.tsx
+   21:5   warning  'Loader2' is defined but never used                   @typescript-eslint/no-unused-vars
+   63:11  warning  'chartVisibleRef' is assigned a value but never used  @typescript-eslint/no-unused-vars
+   67:47  warning  'historyLoading' is assigned a value but never used   @typescript-eslint/no-unused-vars
+   69:33  warning  'profileLoading' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  148:29  error    Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
+  164:11  warning  'isLoading' is assigned a value but never used        @typescript-eslint/no-unused-vars
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\app\(protected)\mentor\profile\page.tsx
+    8:22  warning  'Trash2' is defined but never used                                                                                     @typescript-eslint/no-unused-vars
+   89:24  error    Unexpected any. Specify a different type                                                                               @typescript-eslint/no-explicit-any
+  183:8   warning  React Hook useEffect has a missing dependency: 'fetchMentorProfile'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  216:74  error    Unexpected any. Specify a different type                                                                               @typescript-eslint/no-explicit-any
+  219:79  error    Unexpected any. Specify a different type                                                                               @typescript-eslint/no-explicit-any
+  222:34  error    Unexpected any. Specify a different type                                                                               @typescript-eslint/no-explicit-any
+  270:11  warning  'handleBannerImageChange' is assigned a value but never used                                                           @typescript-eslint/no-unused-vars
+  277:11  warning  'handleGenderSelect' is assigned a value but never used                                                                @typescript-eslint/no-unused-vars
+  282:11  warning  'handleColorSelect' is assigned a value but never used                                                                 @typescript-eslint/no-unused-vars
+  367:97  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                        react/no-unescaped-entities
+  558:67  error    Unexpected any. Specify a different type                                                                               @typescript-eslint/no-explicit-any
+  565:86  error    Unexpected any. Specify a different type                                                                               @typescript-eslint/no-explicit-any
+  719:57  error    Unexpected any. Specify a different type                                                                               @typescript-eslint/no-explicit-any
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\app\(protected)\mentor\sessions\page.tsx
+   6:49  warning  'Loader2' is defined but never used                 @typescript-eslint/no-unused-vars
+  12:55  warning  'DashboardSession' is defined but never used        @typescript-eslint/no-unused-vars
+  73:76  warning  'upcomingCount' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  76:11  warning  'isLoading' is assigned a value but never used      @typescript-eslint/no-unused-vars
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\app\(protected)\profile\page.tsx
+  12:5  warning  'Clock' is defined but never used     @typescript-eslint/no-unused-vars
+  14:5  warning  'BookOpen' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\app\(protected)\session\[sessionId]\page.tsx
+   37:6   warning  React Hook useEffect has a missing dependency: 'fetchSession'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+   78:60  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                  react/no-unescaped-entities
+   78:81  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                  react/no-unescaped-entities
+  219:64  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                  react/no-unescaped-entities
+  221:22  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                  react/no-unescaped-entities
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\app\(public)\exam\[examId]\page.tsx
+  112:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  113:54  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\app\(public)\mentors\[mentorId]\page.tsx
+  26:33  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  26:44  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\app\(public)\mentors\page.tsx
+  486:68  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  527:53  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  528:56  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\app\admin\applications\review\page.tsx
+   6:5  warning  'ArrowLeft' is defined but never used  @typescript-eslint/no-unused-vars
+  12:5  warning  'MapPin' is defined but never used     @typescript-eslint/no-unused-vars
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\app\api\admin\mentor-applications\route.ts
+  4:27  warning  'req' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\app\api\dashboard\history\route.ts
+  10:27  warning  'request' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\app\api\dashboard\profile\route.ts
+  10:27  warning  'request' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\app\api\dashboard\sessions\route.ts
+  10:27  warning  'request' is defined but never used      @typescript-eslint/no-unused-vars
+  41:7   error    A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+  42:14  warning  'e' is defined but never used            @typescript-eslint/no-unused-vars
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\app\api\mentor\onboarding\route.ts
+   6:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  90:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\app\api\sessions\join\route.ts
+  16:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\app\api\sessions\list\route.ts
+  17:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  21:55  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  31:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  31:35  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\app\api\webhooks\clerk\route.ts
+  29:16  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  88:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\app\meeting\[sessionId]\page.tsx
+  20:13  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\app\meeting\[sessionId]\page.tsx:20:13
+  18 |         if (!isLoaded) return;
+  19 |         if (!isSignedIn) {
+> 20 |             setStatus("unauthorized");
+     |             ^^^^^^^^^ Avoid calling setState() directly within an effect
+  21 |             return;
+  22 |         }
+  23 |  react-hooks/set-state-in-effect
+  69:26  warning  'e' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             @typescript-eslint/no-unused-vars
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\app\not-found.tsx
+  30:33  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  30:54  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  30:85  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\app\onboarding\profile\basic-info\page.tsx
+    8:16  warning  'Phone' is defined but never used         @typescript-eslint/no-unused-vars
+   12:10  warning  'Input' is defined but never used         @typescript-eslint/no-unused-vars
+   82:49  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  147:19  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  203:12  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\app\onboarding\profile\expertise\page.tsx
+  65:49  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-explicit-any
+  84:24  warning  Compilation Skipped: Use of incompatible library
+
+This API returns functions which cannot be memoized without leading to stale UI. To prevent this, by default React Compiler will skip memoizing this component/hook. However, you may see issues if values from this API are passed to other components/hooks that are memoized.
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\app\onboarding\profile\expertise\page.tsx:84:24
+  82 |   }, [onboardingData.expertise, setValue]);
+  83 |
+> 84 |   const selectedExam = watch("examExpertise");
+     |                        ^^^^^ React Hook Form's `useForm()` API returns a `watch()` function which cannot be memoized safely.
+  85 |
+  86 |   const onSubmit: SubmitHandler<ExpertiseFormValues> = (data) => {
+  87 |     updateData({ expertise: data as any });  react-hooks/incompatible-library
+  87:37  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-explicit-any
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\app\onboarding\profile\review\page.tsx
+  121:19  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  128:39  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  129:39  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  344:25  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  344:42  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\app\onboarding\profile\verification\page.tsx
+   37:58  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @typescript-eslint/no-explicit-any
+   38:31  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\app\onboarding\profile\verification\page.tsx:38:31
+  36 |         if (onboardingData.verification) {
+  37 |             const saved = onboardingData.verification as any;
+> 38 |             if (saved.idType) setIdType(saved.idType);
+     |                               ^^^^^^^^^ Avoid calling setState() directly within an effect
+  39 |             if (saved.idNumber) setIdNumber(saved.idNumber);
+  40 |             // Note: File cannot be restored from localStorage, user needs to re-upload
+  41 |         }  react-hooks/set-state-in-effect
+  332:37  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 @next/next/no-img-element
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\components\dashboard-ui\DashboardSidebar.tsx
+  53:11  warning  'toggleSidebar' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\modules\landing\components\FAQSection.tsx
+   5:16  warning  'Minus' is defined but never used                                @typescript-eslint/no-unused-vars
+  81:58  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  81:80  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\modules\landing\components\FeaturedMentorsSection.tsx
+  57:32  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\modules\landing\components\TestimonialsSection.tsx
+  4:30  warning  'Quote' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\modules\mentor\components\profile\ReviewsSection.tsx
+  27:71  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  27:85  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\modules\mentor\components\profile\ServicesSection.tsx
+  3:34  warning  'MessageSquare' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\shared\lib\api\mentors.ts
+  87:66  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\shared\lib\context\MentorOnboardingContext.tsx
+  45:11  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\shared\lib\context\MentorOnboardingContext.tsx:45:11
+  43 |           localStorage.removeItem("mentorOnboarding");
+  44 |           const stored = localStorage.getItem(`mentorOnboarding_${currentUserId}`);
+> 45 |           setData(stored ? JSON.parse(stored) : {});
+     |           ^^^^^^^ Avoid calling setState() directly within an effect
+  46 |         } catch {
+  47 |           setData({});
+  48 |         }  react-hooks/set-state-in-effect
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\shared\lib\db.ts
+  16:40  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  19:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\shared\lib\hooks\useDashboard.ts
+  72:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\shared\lib\hooks\useMentors.ts
+  3:41  warning  'transformMentorData' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\shared\ui\Navbar.tsx
+  7:10  warning  'Menu' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\shared\ui\PremiumAreaChart.tsx
+  17:70  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\shared\ui\PremiumBarChart.tsx
+  16:70  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\shared\ui\PremiumDonutChart.tsx
+  19:45  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  32:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  34:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\shared\ui\PremiumLineChart.tsx
+  16:70  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\shared\ui\app-sidebar.tsx
+  4:26  warning  'Inbox' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\rajra\Desktop\unstop\mentorhub2\frontend\src\shared\ui\avatar-stack.tsx
+  17:13  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+Ô£û 110 problems (67 errors, 43 warnings)
+  1 error and 0 warnings potentially fixable with the `--fix` option.
+

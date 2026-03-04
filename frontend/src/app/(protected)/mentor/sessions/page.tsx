@@ -101,24 +101,37 @@ export default function SessionsPage() {
             const now = new Date();
             const sessionDateTime = new Date(s.date);
             const [hours, minutes] = s.startTime.split(":").map(Number);
-            sessionDateTime.setHours(hours, minutes);
+            sessionDateTime.setHours(hours, minutes, 0, 0);
 
-            let status: "In progress" | "Upcoming" = "Upcoming";
-            if (s.status === "confirmed" && sessionDateTime <= now) {
+            const timeDiffMs = sessionDateTime.getTime() - now.getTime();
+            const minutesToStart = timeDiffMs / (1000 * 60);
+
+            let status: "In progress" | "Upcoming" | "Ready" = "Upcoming";
+            let canStartMeeting = false;
+
+            if (s.status === "meeting_started" || s.status === "In progress") {
                 status = "In progress";
+                canStartMeeting = true;
+            } else if (s.status === "completed") {
+                status = "Upcoming"; // Or Completed, but type restricts to "In progress" | "Upcoming"
+            } else if (minutesToStart <= 10 && minutesToStart > -s.duration) {
+                // Within 10 mins before start, and hasn't ended yet
+                status = "Ready";
+                canStartMeeting = true;
             }
 
             return {
-                id: s.bookingId || `session-${index}`,
+                id: s.bookingId || s._id || `session-${index}`,
                 student: s.student.name,
                 studentImage: s.student.imageUrl,
                 time: timeLabel,
                 date: sessionDate,
-                topic: `Session with ${s.mentor.name}`,
+                topic: `Session with ${s.mentor?.name || "Mentor"}`,
                 duration: `${s.duration} min`,
                 status,
+                canStartMeeting,
                 progress: status === "In progress" ? 84 : 0,
-                meetingLink: s.meetingLink,
+                meetingLink: s.meetingLink || `/meeting/${s.bookingId || s._id}`,
             };
         });
     }, [upcomingSessions]);
@@ -136,7 +149,7 @@ export default function SessionsPage() {
         // Add hours from completed sessions this week
         const weekStart = new Date();
         weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-        
+
         [...historyData, ...upcomingSessions].forEach((s) => {
             const sessionDate = new Date(s.date);
             if (sessionDate >= weekStart) {
@@ -219,9 +232,14 @@ export default function SessionsPage() {
                                                 </span>
                                             </div>
                                         </div>
-                                        <button onClick={() => show(`j-${s.id}`, `Joining call with ${s.student}…`)}
-                                            className="relative w-full sm:w-auto px-5 sm:px-6 py-3 bg-slate-900 hover:bg-blue-600 active:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2">
-                                            <Video className="w-4 h-4" /> Join Call
+                                        <button onClick={() => {
+                                            if (!s.canStartMeeting) return;
+                                            show(`j-${s.id}`, `Joining call with ${s.student}…`);
+                                            window.location.href = s.meetingLink;
+                                        }}
+                                            disabled={!s.canStartMeeting}
+                                            className={`relative w-full sm:w-auto px-5 sm:px-6 py-3 text-white text-sm font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 ${s.canStartMeeting ? 'bg-slate-900 hover:bg-blue-600 active:bg-blue-700 active:scale-[0.98]' : 'bg-slate-400 cursor-not-allowed opacity-70'}`}>
+                                            <Video className="w-4 h-4" /> {s.canStartMeeting ? "Start Meeting" : "Not yet time"}
                                             {notif?.id === `j-${s.id}` && (
                                                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-0 mb-2 w-max bg-slate-900 text-white text-xs px-3 py-2 rounded-lg shadow-xl z-50 animate-slideUp">
                                                     {notif.message}<div className="absolute -bottom-1 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-5 w-2 h-2 bg-slate-900 rotate-45" />
@@ -298,7 +316,7 @@ export default function SessionsPage() {
                     <h3 className="text-base sm:text-lg font-bold text-slate-900">All Upcoming Sessions</h3>
                     <span className="text-xs font-bold text-slate-500 uppercase bg-slate-100 px-3 py-1 rounded-full w-fit">{sessions.length} Total</span>
                 </div>
-                
+
                 {/* Desktop table view */}
                 <div className="hidden md:block overflow-x-auto">
                     <table className="w-full text-left">

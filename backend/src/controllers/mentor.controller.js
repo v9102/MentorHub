@@ -472,30 +472,46 @@ export const saveAvailability = async (req, res) => {
 
     const newSessions = generateUpcomingSessionsFromAvailability(availability);
 
-    // Keep already-booked sessions
+    // Keep already-booked sessions intact
     const bookedSessions = mentor.mentorProfile.upcomingSessions.filter(s => s.isBooked);
 
-    // Build a set of keys for existing unbooked sessions so we don't duplicate
-    const existingUnbooked = mentor.mentorProfile.upcomingSessions.filter(s => !s.isBooked);
-    const existingKeys = new Set(
-      existingUnbooked.map(s => {
+    // Build keys for the newly generated sessions
+    const newSessionKeys = new Set(
+      newSessions.map(s => {
         const d = new Date(s.date);
         return `${d.toISOString().split("T")[0]}_${s.startTime}`;
       })
     );
 
-    // Only add sessions that don't already exist (avoids duplicates on re-save)
-    const dedupedNew = newSessions.filter(s => {
-      const key = `${new Date(s.date).toISOString().split("T")[0]}_${s.startTime}`;
-      return !existingKeys.has(key);
+    // Find exiting unbooked sessions that STILL overlap with the new availability
+    // This preserves existing sessions (and their potential _ids/DB state) if the slot wasn't removed
+    const existingUnbooked = mentor.mentorProfile.upcomingSessions.filter(s => !s.isBooked);
+    const validExistingUnbooked = existingUnbooked.filter(s => {
+      const d = new Date(s.date);
+      const key = `${d.toISOString().split("T")[0]}_${s.startTime}`;
+      return newSessionKeys.has(key);
     });
 
+    const validExistingKeys = new Set(
+      validExistingUnbooked.map(s => {
+        const d = new Date(s.date);
+        return `${d.toISOString().split("T")[0]}_${s.startTime}`;
+      })
+    );
+
+    // Only add COMPLETELY NEW generated sessions that weren't already in validExistingUnbooked
+    const dedupedNew = newSessions.filter(s => {
+      const d = new Date(s.date);
+      const key = `${d.toISOString().split("T")[0]}_${s.startTime}`;
+      return !validExistingKeys.has(key);
+    });
+
+    // Final merge: Booked slots + Still valid unbooked + Brand new unbooked slots
     mentor.mentorProfile.upcomingSessions = [
       ...bookedSessions,
-      ...existingUnbooked,
+      ...validExistingUnbooked,
       ...dedupedNew
     ];
-
 
     await mentor.save();
 

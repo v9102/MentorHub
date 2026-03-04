@@ -58,26 +58,8 @@ export default function SessionDetailsPage({ params }: { params: Promise<{ sessi
 
   const handleJoinSession = async () => {
     if (!sessionId) return;
-
     setJoining(true);
-    try {
-      const response = await fetch("/api/sessions/join", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ sessionId }),
-      });
-
-      const data = await response.json();
-
-      if (data.success && data.roomId) {
-        router.push(`/call/${data.roomId}`);
-      }
-    } catch (error) {
-      console.error("Error joining session:", error);
-      setJoining(false);
-    }
+    router.push(`/meeting/${sessionId}`);
   };
 
   if (loading) {

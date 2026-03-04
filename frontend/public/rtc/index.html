@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Meeting Room</title>
+
+    <!-- Google Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+    <!-- Firebase SDKs -->
+    <script defer src="/__/firebase/7.13.1/firebase-app.js"></script>
+    <script defer src="/__/firebase/7.13.1/firebase-firestore.js"></script>
+    <script defer src="/__/firebase/init.js"></script>
+
+    <!-- Main Styles -->
+    <link rel="stylesheet" type="text/css" href="main.css">
+</head>
+
+<body>
+    <!-- Pre-join Screen (Green Room) -->
+    <div id="green-room" class="full-screen-overlay active">
+        <h1 class="room-title">Ready to join?</h1>
+        <div class="green-room-content">
+            <div class="video-preview-container" id="video-preview">
+                <!-- Local video preview attached via JS before joining -->
+            </div>
+            <div class="join-controls">
+                <button class="btn btn-primary" id="greenRoomJoinBtn">Join Now</button>
+                <div class="preview-actions">
+                    <button class="btn btn-icon btn-dark" id="previewMicBtn"><i class="material-icons">mic</i></button>
+                    <button class="btn btn-icon btn-dark" id="previewCamBtn"><i class="material-icons">videocam</i></button>
+                    <button class="btn btn-icon btn-dark" id="previewBlurBtn"><i class="material-icons">blur_on</i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Meeting Interface -->
+    <main class="app-container" id="main-meeting" style="display: none;">
+        
+        <div class="main-split">
+            <!-- Video Grid -->
+            <section class="video-grid" id="videos">
+                <!-- Videos will be dynamically added here -->
+            </section>
+
+            <!-- Chat Panel -->
+            <aside class="chat-panel" id="chat-panel">
+                <div class="chat-header">
+                    <h3>In-call messages</h3>
+                    <button class="btn btn-icon btn-small btn-transparent" id="closeChatBtn">
+                        <i class="material-icons">close</i>
+                    </button>
+                </div>
+                <div class="chat-messages" id="chat-messages">
+                    <p class="chat-notice">Messages can only be seen by people in the call and are deleted when the call ends.</p>
+                </div>
+                <form class="chat-input-area" id="chat-form">
+                    <input type="text" id="chat-input" placeholder="Send a message to everyone" autocomplete="off" required>
+                    <button type="submit" class="btn btn-icon btn-small btn-transparent text-blue" id="sendChatBtn">
+                        <i class="material-icons">send</i>
+                    </button>
+                </form>
+            </aside>
+        </div>
+
+        <!-- Bottom Controls Bar (Classic Google Meet) -->
+        <section class="controls-bar" id="buttons">
+            <div class="controls-left">
+                <span id="currentRoom" class="room-id-display"></span>
+            </div>
+            
+            <div class="controls-center call-controls">
+                <button class="btn btn-icon btn-dark" id="micBtn" title="Toggle Microphone">
+                    <i class="material-icons">mic</i>
+                </button>
+                <button class="btn btn-icon btn-dark" id="camBtn" title="Toggle Camera">
+                    <i class="material-icons">videocam</i>
+                </button>
+                <button class="btn btn-icon btn-dark" id="blurBtn" title="Toggle Background Blur">
+                    <i class="material-icons">blur_on</i>
+                </button>
+                
+                <button class="btn btn-danger" id="hangupBtn" title="Leave Call">
+                    <i class="material-icons">call_end</i>
+                </button>
+            </div>
+
+            <div class="controls-right">
+                <button class="btn btn-icon btn-dark" id="toggleChatBtn" title="Chat with everyone">
+                    <i class="material-icons">chat</i>
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Hidden Lobby actions for legacy compatibility -->
+    <div id="lobbyControls" style="display: none;">
+        <button id="createBtn">Create Room</button>
+        <button id="joinBtn">Join Room</button>
+    </div>
+
+    <!-- MediaPipe Selfie Segmentation -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js"></script>
+
+    <!-- App Logic -->
+    <script src="app.js?v=7"></script>
+</body>
+</html>
