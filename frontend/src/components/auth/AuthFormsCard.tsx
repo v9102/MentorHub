@@ -290,7 +290,7 @@ function AuthFormsCardInner({ initialView }: AuthFormsCardProps) {
         });
     };
 
-    // ---- Sign Up Handler ----
+    // Sign Up Handler 
     const handleSignUpSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
@@ -349,7 +349,7 @@ function AuthFormsCardInner({ initialView }: AuthFormsCardProps) {
         }
     };
 
-    // ---- Verify Handler ----
+    // Verify Handler 
     const handleVerify = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!isSignUpLoaded || isSignUpLoading) return;
@@ -362,7 +362,6 @@ function AuthFormsCardInner({ initialView }: AuthFormsCardProps) {
             if (result.status === "complete") {
                 await setSignUpActive({ session: result.createdSessionId });
                 router.replace(view === "sign-up-mentor" ? "/onboarding/profile/basic-info" : "/");
-                // Don't reset loading — component unmounts on redirect
             } else {
                 setVerifyError("Verification incomplete. Please try again.");
                 setIsSignUpLoading(false);
@@ -384,7 +383,7 @@ function AuthFormsCardInner({ initialView }: AuthFormsCardProps) {
         });
     };
 
-    // ---- Shared UI Components ----
+    // Shared UI Components
     const GoogleIcon = () => (
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
             <path d="M22.56 12.25C22.56 11.47 22.49 10.72 22.36 10H12V14.26H17.92C17.66 15.63 16.88 16.81 15.71 17.59V20.34H19.28C21.36 18.42 22.56 15.6 22.56 12.25Z" fill="#4285F4" />
@@ -400,14 +399,12 @@ function AuthFormsCardInner({ initialView }: AuthFormsCardProps) {
     return (
         <div className="w-full space-y-3">
 
-            {/* ===== SIGN IN ACCORDION CARD ===== */}
             <div
                 className={`rounded-2xl border overflow-hidden ${isSignIn
                     ? "border-[#1DA1F2]/30 shadow-[0_0_0_3px_rgba(29,161,242,0.08)] bg-white"
                     : "border-slate-200 bg-white/70"
                     }`}
             >
-                {/* Card Header */}
                 <button
                     type="button"
                     onClick={() => switchView("sign-in")}
@@ -428,7 +425,6 @@ function AuthFormsCardInner({ initialView }: AuthFormsCardProps) {
                     </div>
                 </button>
 
-                {/* Expanded Sign In Content */}
                 {isSignIn && (
                     <div className="overflow-hidden">
                             <div className="px-6 pb-6 space-y-4">
