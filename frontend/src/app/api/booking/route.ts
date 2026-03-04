@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     const token = await getToken();
 
     const body = await request.json();
-    const { mentorId, date, startTime } = body;
+    const { mentorId, date, startTime, studentDetails } = body;
 
     if (!mentorId || !date || !startTime) {
       return NextResponse.json(
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     // Forward request to backend (endpoint is /api/pay-now)
     const backendUrl = `${BACKEND_URL}/api/pay-now`;
     console.log("[Booking API] Forwarding to:", backendUrl);
-    
+
     const backendResponse = await fetch(backendUrl, {
       method: "POST",
       headers: {
@@ -41,13 +41,14 @@ export async function POST(request: NextRequest) {
         mentorId,
         date,
         startTime,
+        studentDetails
       }),
     });
 
     const responseText = await backendResponse.text();
     console.log("[Booking API] Backend response status:", backendResponse.status);
     console.log("[Booking API] Backend response:", responseText.substring(0, 200));
-    
+
     // Try to parse as JSON
     let data;
     try {

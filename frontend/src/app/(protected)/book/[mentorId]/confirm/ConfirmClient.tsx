@@ -56,6 +56,13 @@ export default function ConfirmClient({ mentor, sessionDate, sessionTime, price 
           mentorId: mentor.mongoId || mentor.id,
           date: date,
           startTime: time || sessionTime,
+          studentDetails: {
+            email: user?.primaryEmailAddress?.emailAddress || "",
+            firstName: user?.firstName || "",
+            lastName: user?.lastName || "",
+            name: user?.fullName || "Student",
+            imageUrl: user?.imageUrl || "",
+          }
         }),
       });
 

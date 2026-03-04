@@ -76,9 +76,24 @@ export const createBooking = async (req, res) => {
     // Look up the student making the booking
     const authObj = typeof req.auth === "function" ? req.auth() : req.auth;
     const studentClerkId = authObj?.userId;
-    const student = await User.findOne({ clerkId: studentClerkId });
+    let student = await User.findOne({ clerkId: studentClerkId });
+
+    // Auto-create student if they don't exist in DB yet (e.g. local dev without webhook)
     if (!student) {
-      return res.status(404).json({ success: false, msg: "Student account not found" });
+      const studentDetails = req.body.studentDetails;
+      if (studentDetails && studentClerkId) {
+        student = await User.create({
+          clerkId: studentClerkId,
+          email: studentDetails.email,
+          firstName: studentDetails.firstName,
+          lastName: studentDetails.lastName,
+          name: studentDetails.name,
+          imageUrl: studentDetails.imageUrl,
+          role: "student"
+        });
+      } else {
+        return res.status(404).json({ success: false, msg: "Student account not found in database" });
+      }
     }
 
     const booking = await Booking.create({
