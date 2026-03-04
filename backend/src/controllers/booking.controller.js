@@ -78,21 +78,36 @@ export const createBooking = async (req, res) => {
     const studentClerkId = authObj?.userId;
     let student = await User.findOne({ clerkId: studentClerkId });
 
-    // Auto-create student if they don't exist in DB yet (e.g. local dev without webhook)
+    // Auto-create or Auto-link student if they don't exist in DB yet
     if (!student) {
       const studentDetails = req.body.studentDetails;
       if (studentDetails && studentClerkId) {
         try {
-          student = await User.create({
-            clerkId: studentClerkId,
-            email: studentDetails.email,
-            firstName: studentDetails.firstName,
-            lastName: studentDetails.lastName,
-            name: studentDetails.name,
-            imageUrl: studentDetails.imageUrl,
-            role: "student"
-          });
-          console.log("[Booking API] Auto-created missing student:", student.email);
+          // First, check if a user with this email already exists (e.g. old clerkId)
+          student = await User.findOne({ email: studentDetails.email });
+
+          if (student) {
+            // Update the existing user with the new clerkId
+            student.clerkId = studentClerkId;
+            student.name = studentDetails.name || student.name;
+            student.firstName = studentDetails.firstName || student.firstName;
+            student.lastName = studentDetails.lastName || student.lastName;
+            student.imageUrl = studentDetails.imageUrl || student.imageUrl;
+            await student.save();
+            console.log("[Booking API] Auto-linked existing student email to new clerkId:", student.email);
+          } else {
+            // Completely new user
+            student = await User.create({
+              clerkId: studentClerkId,
+              email: studentDetails.email,
+              firstName: studentDetails.firstName,
+              lastName: studentDetails.lastName,
+              name: studentDetails.name,
+              imageUrl: studentDetails.imageUrl,
+              role: "student"
+            });
+            console.log("[Booking API] Auto-created missing student:", student.email);
+          }
         } catch (err) {
           console.error("[Booking API] Failed to auto-create missing student:", err);
           return res.status(500).json({ success: false, msg: "Failed to auto-create student record: " + err.message });
