@@ -112,7 +112,7 @@ export default function ExpertisePage() {
             className="h-full rounded-full bg-primary"
             initial={{ width: 0 }}
             animate={{ width: "50%" }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
+            transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
           />
         </div>
         <div className="mt-3 flex items-center gap-2 text-slate-500">

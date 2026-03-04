@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useUser, useClerk } from "@clerk/nextjs";
-import { LogOut, User as UserIcon, Loader2 } from "lucide-react";
+import { LogOut, User as UserIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/shared/lib/utils";
 
@@ -32,11 +32,7 @@ export function ProfileButton({ className, showName = false }: ProfileButtonProp
     }, []);
 
     if (!isLoaded) {
-        return (
-            <div className={cn("w-10 h-10 rounded-full bg-slate-200 animate-pulse flex items-center justify-center", className)}>
-                <Loader2 className="w-5 h-5 text-slate-400 animate-spin" />
-            </div>
-        );
+        return null;
     }
 
     if (!user) {
@@ -71,7 +67,7 @@ export function ProfileButton({ className, showName = false }: ProfileButtonProp
                 aria-label="Toggle profile menu"
                 aria-expanded={isOpen}
             >
-                <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center bg-slate-200 shrink-0">
+                <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-slate-200 shrink-0">
                     {imageUrl ? (
                         <Image
                             src={imageUrl}
@@ -82,7 +78,7 @@ export function ProfileButton({ className, showName = false }: ProfileButtonProp
                             unoptimized
                         />
                     ) : (
-                        <span className="text-sm font-semibold text-slate-600">
+                        <span className="text-xs font-semibold text-slate-600">
                             {initials}
                         </span>
                     )}
@@ -98,10 +94,10 @@ export function ProfileButton({ className, showName = false }: ProfileButtonProp
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        initial={{ opacity: 0, y: -4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -4 }}
+                        transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
                         className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-100 overflow-hidden z-50 transform origin-top-right"
                     >
                         {/* User Info Header */}

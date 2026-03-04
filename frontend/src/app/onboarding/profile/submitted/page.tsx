@@ -9,9 +9,9 @@ export default function SubmittedPage() {
         <div className="flex min-h-[calc(100vh-65px)] flex-col items-center justify-center px-4 py-12 md:py-20">
             {/* Main Card */}
             <motion.div
-                initial={{ opacity: 0, y: 24 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.45, ease: "easeOut" }}
+                transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
                 className="w-full max-w-2xl rounded-2xl border border-slate-100 bg-white p-8 text-center shadow-xl shadow-primary/5 md:p-12"
             >
                 {/* Success Icon */}

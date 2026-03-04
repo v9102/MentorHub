@@ -206,7 +206,7 @@ export default function ReviewPage() {
             className="h-full rounded-full bg-primary"
             initial={{ width: 0 }}
             animate={{ width: "100%" }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
+            transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
           />
         </div>
         <p className="mt-4 text-sm text-slate-600">

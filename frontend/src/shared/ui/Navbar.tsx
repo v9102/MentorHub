@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { SignedIn, SignedOut, ClerkLoading, useUser } from "@clerk/nextjs";
+import { SignedIn, SignedOut, useUser } from "@clerk/nextjs";
 import { ProfileButton } from "@/shared/ui/ProfileButton";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
@@ -23,7 +23,7 @@ export default function Navbar() {
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll(); // Check initial state
-    
+
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -101,43 +101,33 @@ export default function Navbar() {
               width={200}
               height={40}
               className="w-auto object-contain"
-              style={{ height: '40px' }}
+              style={{ height: '56px' }}
             />
           </Link>
 
           <div className="flex items-center gap-3">
-            {/* Fixed-width auth slot — prevents CLS when Clerk resolves */}
-            <div style={{ minWidth: '92px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-              <ClerkLoading>
-                <div style={{
-                  width: '92px', height: '34px',
+            {/* Auth section — only shows when signed in */}
+            <SignedIn>
+              <ProfileButton />
+            </SignedIn>
+            <SignedOut>
+              <Link
+                href={`/sign-up/student?redirect=${encodeURIComponent(pathname === "/" ? "/" : pathname)}`}
+                style={{
+                  backgroundColor: '#2E5FFF',
+                  color: 'white',
+                  fontFamily: 'var(--font-dm-sans, sans-serif)',
+                  fontWeight: 600,
+                  fontSize: '13px',
+                  padding: '8px 18px',
                   borderRadius: '100px',
-                  background: '#E2E8F0',
-                  animation: 'pulse 1.5s ease infinite',
-                }} />
-              </ClerkLoading>
-              <SignedIn>
-                <ProfileButton />
-              </SignedIn>
-              <SignedOut>
-                <Link
-                  href={`/sign-up/student?redirect=${encodeURIComponent(pathname === "/" ? "/" : pathname)}`}
-                  style={{
-                    backgroundColor: '#2E5FFF',
-                    color: 'white',
-                    fontFamily: 'var(--font-dm-sans, sans-serif)',
-                    fontWeight: 600,
-                    fontSize: '13px',
-                    padding: '8px 18px',
-                    borderRadius: '100px',
-                    whiteSpace: 'nowrap',
-                    display: 'inline-block',
-                  }}
-                >
-                  Get Started
-                </Link>
-              </SignedOut>
-            </div>
+                  whiteSpace: 'nowrap',
+                  display: 'inline-block',
+                }}
+              >
+                Get Started
+              </Link>
+            </SignedOut>
             <button
               onClick={() => setIsMobileMenuOpen(true)}
               aria-label="Open menu"
@@ -174,7 +164,7 @@ export default function Navbar() {
               width={200}
               height={44}
               className="w-auto object-contain"
-              style={{ height: '44px' }}
+              style={{ height: '56px' }}
               priority
             />
           </Link>
@@ -193,13 +183,10 @@ export default function Navbar() {
             {renderBecomeMentorLink()}
           </div>
 
-          <div className="flex items-center justify-end min-w-[240px]">
-            <ClerkLoading>
-              <div className="flex items-center space-x-4">
-                <div className="w-20 h-10 bg-gray-200 rounded-md animate-pulse" />
-                <div className="w-28 h-10 bg-gray-200 rounded-md animate-pulse" />
-              </div>
-            </ClerkLoading>
+          <div className="flex items-center justify-end">
+            <SignedIn>
+              <ProfileButton />
+            </SignedIn>
             <SignedOut>
               <div className="flex items-center space-x-4">
                 <Link
@@ -216,11 +203,6 @@ export default function Navbar() {
                 </Link>
               </div>
             </SignedOut>
-            <SignedIn>
-              <div className="flex items-center justify-end">
-                <ProfileButton />
-              </div>
-            </SignedIn>
           </div>
         </div>
       </nav>
@@ -234,7 +216,7 @@ export default function Navbar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.28, ease: 'easeInOut' }}
+              transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
               className="fixed inset-0 bg-black/50 z-[60] md:hidden"
               onClick={closeMenu}
             />
@@ -244,7 +226,7 @@ export default function Navbar() {
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
-              transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
+              transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
               className="fixed inset-y-0 right-0 z-[70] md:hidden bg-white flex flex-col"
               style={{ width: '80vw' }}
             >

@@ -157,7 +157,7 @@ export default function VerificationPage() {
                         className="h-full rounded-full bg-primary"
                         initial={{ width: 0 }}
                         animate={{ width: "75%" }}
-                        transition={{ duration: 0.6, ease: "easeOut" }}
+                        transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
                     />
                 </div>
             </motion.div>

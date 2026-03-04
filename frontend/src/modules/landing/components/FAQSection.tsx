@@ -43,9 +43,10 @@ export default function FAQSection() {
                         FAQ
                     </span>
                     <motion.h2
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 12 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
+                        transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
                         className="mt-8 text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 leading-[1.1] mb-6"
                     >
                         Frequently Asked Questions
@@ -63,9 +64,10 @@ export default function FAQSection() {
 
                 {/* Still have questions CTA */}
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 12 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
+                    transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
                     className="bg-gray-50/80 backdrop-blur-sm rounded-3xl p-10 md:p-12 text-center border border-gray-100 shadow-sm"
                 >
                     <div className="flex justify-center -space-x-2 mb-4">
@@ -91,9 +93,9 @@ function FAQItem({ question, answer, index }: { question: string, answer: string
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
+            transition={{ delay: index * 0.08, duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
             viewport={{ once: true }}
             className={cn(
                 "border rounded-2xl bg-white overflow-hidden transition-all duration-300",
@@ -121,7 +123,7 @@ function FAQItem({ question, answer, index }: { question: string, answer: string
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: "auto", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
                     >
                         <div className="px-6 pb-6 text-gray-600 leading-relaxed">
                             {answer}

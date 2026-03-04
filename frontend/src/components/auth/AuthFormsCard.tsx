@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback, Suspense } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { useSignIn, useSignUp, useUser } from "@clerk/nextjs";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -86,11 +85,6 @@ const parseAuthError = (err: unknown, context: "sign-in" | "sign-up"): AuthError
     };
 };
 
-// ============ SPINNER COMPONENT ============
-const Spinner = ({ className = "" }: { className?: string }) => (
-    <Loader2 className={`w-4 h-4 animate-spin ${className}`} />
-);
-
 // ============ ERROR MESSAGE COMPONENT ============
 interface InlineErrorProps {
     message: string;
@@ -101,12 +95,7 @@ interface InlineErrorProps {
 }
 
 const InlineError = ({ message, showSignUpLink, showSignInLink, onSwitchToSignUp, onSwitchToSignIn }: InlineErrorProps) => (
-    <motion.p
-        initial={{ opacity: 0, y: -4 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -4 }}
-        className="text-red-500 text-xs mt-1.5 flex items-center gap-1 flex-wrap"
-    >
+    <p className="text-red-500 text-xs mt-1.5 flex items-center gap-1 flex-wrap">
         <span>{message}</span>
         {showSignUpLink && onSwitchToSignUp && (
             <button
@@ -126,11 +115,8 @@ const InlineError = ({ message, showSignUpLink, showSignInLink, onSwitchToSignUp
                 Login instead
             </button>
         )}
-    </motion.p>
+    </p>
 );
-
-// ============ CONSTANTS ============
-const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 // ============ EXTENDED FIELD ERRORS TYPE ============
 interface ExtendedFieldErrors extends FieldErrors {
@@ -152,7 +138,7 @@ function AuthFormsCardInner({ initialView }: AuthFormsCardProps) {
     useEffect(() => {
         if (isSignedIn && isUserLoaded && user && !isRedirecting) {
             setIsRedirecting(true);
-            router.push(redirectUrl);
+            router.replace(redirectUrl);
         }
     }, [isSignedIn, isUserLoaded, user, redirectUrl, isRedirecting, router]);
 
@@ -375,14 +361,15 @@ function AuthFormsCardInner({ initialView }: AuthFormsCardProps) {
             const result = await signUp.attemptEmailAddressVerification({ code });
             if (result.status === "complete") {
                 await setSignUpActive({ session: result.createdSessionId });
-                router.push(view === "sign-up-mentor" ? "/onboarding/profile/basic-info" : "/");
+                router.replace(view === "sign-up-mentor" ? "/onboarding/profile/basic-info" : "/");
+                // Don't reset loading — component unmounts on redirect
             } else {
                 setVerifyError("Verification incomplete. Please try again.");
+                setIsSignUpLoading(false);
             }
         } catch (err: unknown) {
             const error = err as { errors?: Array<{ longMessage?: string }> };
             setVerifyError(error.errors?.[0]?.longMessage || "Invalid verification code.");
-        } finally {
             setIsSignUpLoading(false);
         }
     };
@@ -414,9 +401,8 @@ function AuthFormsCardInner({ initialView }: AuthFormsCardProps) {
         <div className="w-full space-y-3">
 
             {/* ===== SIGN IN ACCORDION CARD ===== */}
-            <motion.div
-                transition={{ duration: 0.55, ease: EASE }}
-                className={`rounded-2xl border overflow-hidden transition-colors duration-300 ${isSignIn
+            <div
+                className={`rounded-2xl border overflow-hidden ${isSignIn
                     ? "border-[#1DA1F2]/30 shadow-[0_0_0_3px_rgba(29,161,242,0.08)] bg-white"
                     : "border-slate-200 bg-white/70"
                     }`}
@@ -437,25 +423,14 @@ function AuthFormsCardInner({ initialView }: AuthFormsCardProps) {
                             )}
                         </div>
                     </div>
-                    <motion.div
-                        animate={{ rotate: isSignIn ? 90 : 0, opacity: isSignIn ? 0 : 1 }}
-                        transition={{ duration: 0.3 }}
-                    >
-                        <ChevronRight className={`w-4 h-4 transition-colors duration-200 ${isSignIn ? "text-transparent" : "text-slate-400 group-hover:text-slate-600"}`} />
-                    </motion.div>
+                    <div style={{ opacity: isSignIn ? 0 : 1 }}>
+                        <ChevronRight className={`w-4 h-4 ${isSignIn ? "text-transparent" : "text-slate-400 group-hover:text-slate-600"}`} />
+                    </div>
                 </button>
 
                 {/* Expanded Sign In Content */}
-                <AnimatePresence initial={false}>
-                    {isSignIn && (
-                        <motion.div
-                            key="signin-body"
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.55, ease: EASE }}
-                            className="overflow-hidden"
-                        >
+                {isSignIn && (
+                    <div className="overflow-hidden">
                             <div className="px-6 pb-6 space-y-4">
                                 {/* Google Button */}
                                 <button
@@ -476,18 +451,11 @@ function AuthFormsCardInner({ initialView }: AuthFormsCardProps) {
 
                                 <form onSubmit={handleSignInSubmit} className="space-y-3">
                                     {/* General Error */}
-                                    <AnimatePresence>
-                                        {signInErrors.general && (
-                                            <motion.div
-                                                initial={{ opacity: 0, y: -6 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                exit={{ opacity: 0, y: -6 }}
-                                                className="bg-red-50 text-red-500 px-3 py-2.5 rounded-lg text-xs font-medium border border-red-100"
-                                            >
-                                                {signInErrors.general}
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
+                                    {signInErrors.general && (
+                                        <div className="bg-red-50 text-red-500 px-3 py-2.5 rounded-lg text-xs font-medium border border-red-100">
+                                            {signInErrors.general}
+                                        </div>
+                                    )}
 
                                     {/* Email Field */}
                                     <div>
@@ -503,15 +471,13 @@ function AuthFormsCardInner({ initialView }: AuthFormsCardProps) {
                                                 autoComplete="email"
                                             />
                                         </div>
-                                        <AnimatePresence>
-                                            {signInErrors.email && (
-                                                <InlineError 
-                                                    message={signInErrors.email}
-                                                    showSignUpLink={signInErrors._showSignUpLink}
-                                                    onSwitchToSignUp={switchToSignUp}
-                                                />
-                                            )}
-                                        </AnimatePresence>
+                                        {signInErrors.email && (
+                                            <InlineError 
+                                                message={signInErrors.email}
+                                                showSignUpLink={signInErrors._showSignUpLink}
+                                                onSwitchToSignUp={switchToSignUp}
+                                            />
+                                        )}
                                     </div>
 
                                     {/* Password Field */}
@@ -536,11 +502,9 @@ function AuthFormsCardInner({ initialView }: AuthFormsCardProps) {
                                                 {showSignInPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                             </button>
                                         </div>
-                                        <AnimatePresence>
-                                            {signInErrors.password && (
-                                                <InlineError message={signInErrors.password} />
-                                            )}
-                                        </AnimatePresence>
+                                        {signInErrors.password && (
+                                            <InlineError message={signInErrors.password} />
+                                        )}
                                     </div>
 
                                     <div className="flex justify-end">
@@ -548,36 +512,23 @@ function AuthFormsCardInner({ initialView }: AuthFormsCardProps) {
                                     </div>
 
                                     {/* Submit Button */}
-                                    <motion.button
-                                        whileHover={!isSignInLoading ? { scale: 1.01 } : {}}
-                                        whileTap={!isSignInLoading ? { scale: 0.98 } : {}}
+                                    <button
                                         type="submit"
                                         disabled={isSignInLoading}
-                                        className="w-full h-[46px] bg-[#1DA1F2] hover:bg-[#1a90d9] text-white font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
+                                        className="w-full h-[46px] bg-[#1DA1F2] hover:bg-[#1a90d9] text-white font-semibold rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
                                     >
-                                        {isSignInLoading ? (
-                                            <>
-                                                <Spinner />
-                                                <span>Signing in...</span>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <span>Sign In</span>
-                                                <ArrowRight className="w-4 h-4" />
-                                            </>
-                                        )}
-                                    </motion.button>
+                                        <span>{isSignInLoading ? "Signing in..." : "Sign In"}</span>
+                                        {!isSignInLoading && <ArrowRight className="w-4 h-4" />}
+                                    </button>
                                 </form>
                             </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </motion.div>
+                    </div>
+                )}
+            </div>
 
             {/* ===== SIGN UP ACCORDION CARD ===== */}
-            <motion.div
-                transition={{ duration: 0.55, ease: EASE }}
-                className={`rounded-2xl border overflow-hidden transition-colors duration-300 ${!isSignIn
+            <div
+                className={`rounded-2xl border overflow-hidden ${!isSignIn
                     ? "border-[#1DA1F2]/30 shadow-[0_0_0_3px_rgba(29,161,242,0.08)] bg-white"
                     : "border-slate-200 bg-white/70"
                     }`}
@@ -598,25 +549,14 @@ function AuthFormsCardInner({ initialView }: AuthFormsCardProps) {
                             )}
                         </div>
                     </div>
-                    <motion.div
-                        animate={{ rotate: !isSignIn ? 90 : 0, opacity: !isSignIn ? 0 : 1 }}
-                        transition={{ duration: 0.3 }}
-                    >
-                        <ChevronRight className={`w-4 h-4 transition-colors duration-200 ${!isSignIn ? "text-transparent" : "text-slate-400 group-hover:text-slate-600"}`} />
-                    </motion.div>
+                    <div style={{ opacity: !isSignIn ? 0 : 1 }}>
+                        <ChevronRight className={`w-4 h-4 ${!isSignIn ? "text-transparent" : "text-slate-400 group-hover:text-slate-600"}`} />
+                    </div>
                 </button>
 
                 {/* Expanded Sign Up Content */}
-                <AnimatePresence initial={false}>
-                    {!isSignIn && (
-                        <motion.div
-                            key="signup-body"
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.55, ease: EASE }}
-                            className="overflow-hidden"
-                        >
+                {!isSignIn && (
+                    <div className="overflow-hidden">
                             <div className="px-6 pb-6 space-y-4">
 
                                 {/* OTP Verification view */}
@@ -630,18 +570,11 @@ function AuthFormsCardInner({ initialView }: AuthFormsCardProps) {
                                             </p>
                                         </div>
                                         
-                                        <AnimatePresence>
-                                            {verifyError && (
-                                                <motion.div 
-                                                    initial={{ opacity: 0 }} 
-                                                    animate={{ opacity: 1 }}
-                                                    exit={{ opacity: 0 }}
-                                                    className="bg-red-50 text-red-500 px-3 py-2.5 rounded-lg text-xs font-medium border border-red-100"
-                                                >
-                                                    {verifyError}
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
+                                        {verifyError && (
+                                            <div className="bg-red-50 text-red-500 px-3 py-2.5 rounded-lg text-xs font-medium border border-red-100">
+                                                {verifyError}
+                                            </div>
+                                        )}
                                         
                                         <input
                                             type="text"
@@ -657,22 +590,13 @@ function AuthFormsCardInner({ initialView }: AuthFormsCardProps) {
                                             autoComplete="one-time-code"
                                         />
                                         
-                                        <motion.button
-                                            whileHover={!isSignUpLoading ? { scale: 1.01 } : {}}
-                                            whileTap={!isSignUpLoading ? { scale: 0.98 } : {}}
+                                        <button
                                             type="submit" 
                                             disabled={isSignUpLoading || code.length < 6}
-                                            className="w-full h-[46px] bg-[#1DA1F2] hover:bg-[#1a90d9] text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                                            className="w-full h-[46px] bg-[#1DA1F2] hover:bg-[#1a90d9] text-white font-semibold rounded-xl flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                                         >
-                                            {isSignUpLoading ? (
-                                                <>
-                                                    <Spinner />
-                                                    <span>Verifying...</span>
-                                                </>
-                                            ) : (
-                                                <span>Verify Email</span>
-                                            )}
-                                        </motion.button>
+                                            <span>{isSignUpLoading ? "Verifying..." : "Verify Email"}</span>
+                                        </button>
                                     </form>
                                 ) : (
                                     <>
@@ -710,18 +634,11 @@ function AuthFormsCardInner({ initialView }: AuthFormsCardProps) {
 
                                         <form onSubmit={handleSignUpSubmit} className="space-y-3">
                                             {/* General Error */}
-                                            <AnimatePresence>
-                                                {signUpErrors.general && (
-                                                    <motion.div 
-                                                        initial={{ opacity: 0, y: -6 }} 
-                                                        animate={{ opacity: 1, y: 0 }}
-                                                        exit={{ opacity: 0, y: -6 }}
-                                                        className="bg-red-50 text-red-500 px-3 py-2.5 rounded-lg text-xs font-medium border border-red-100"
-                                                    >
-                                                        {signUpErrors.general}
-                                                    </motion.div>
-                                                )}
-                                            </AnimatePresence>
+                                            {signUpErrors.general && (
+                                                <div className="bg-red-50 text-red-500 px-3 py-2.5 rounded-lg text-xs font-medium border border-red-100">
+                                                    {signUpErrors.general}
+                                                </div>
+                                            )}
 
                                             {/* Name Fields */}
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -738,11 +655,9 @@ function AuthFormsCardInner({ initialView }: AuthFormsCardProps) {
                                                             autoComplete="given-name"
                                                         />
                                                     </div>
-                                                    <AnimatePresence>
-                                                        {signUpErrors.firstName && (
-                                                            <InlineError message={signUpErrors.firstName} />
-                                                        )}
-                                                    </AnimatePresence>
+                                                    {signUpErrors.firstName && (
+                                                        <InlineError message={signUpErrors.firstName} />
+                                                    )}
                                                 </div>
                                                 <div>
                                                     <div className="relative flex items-center">
@@ -757,11 +672,9 @@ function AuthFormsCardInner({ initialView }: AuthFormsCardProps) {
                                                             autoComplete="family-name"
                                                         />
                                                     </div>
-                                                    <AnimatePresence>
-                                                        {signUpErrors.lastName && (
-                                                            <InlineError message={signUpErrors.lastName} />
-                                                        )}
-                                                    </AnimatePresence>
+                                                    {signUpErrors.lastName && (
+                                                        <InlineError message={signUpErrors.lastName} />
+                                                    )}
                                                 </div>
                                             </div>
 
@@ -779,15 +692,13 @@ function AuthFormsCardInner({ initialView }: AuthFormsCardProps) {
                                                         autoComplete="email"
                                                     />
                                                 </div>
-                                                <AnimatePresence>
-                                                    {signUpErrors.email && (
-                                                        <InlineError 
-                                                            message={signUpErrors.email}
-                                                            showSignInLink={signUpErrors._showSignInLink}
-                                                            onSwitchToSignIn={switchToSignIn}
-                                                        />
-                                                    )}
-                                                </AnimatePresence>
+                                                {signUpErrors.email && (
+                                                    <InlineError 
+                                                        message={signUpErrors.email}
+                                                        showSignInLink={signUpErrors._showSignInLink}
+                                                        onSwitchToSignIn={switchToSignIn}
+                                                    />
+                                                )}
                                             </div>
 
                                             {/* Password Field */}
@@ -812,44 +723,27 @@ function AuthFormsCardInner({ initialView }: AuthFormsCardProps) {
                                                         {showSignUpPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                                     </button>
                                                 </div>
-                                                <AnimatePresence>
-                                                    {signUpErrors.password && (
-                                                        <InlineError message={signUpErrors.password} />
-                                                    )}
-                                                </AnimatePresence>
+                                                {signUpErrors.password && (
+                                                    <InlineError message={signUpErrors.password} />
+                                                )}
                                             </div>
 
-                                            {/* Clerk bot-protection anchor */}
-                                            <div id="clerk-captcha" />
-
                                             {/* Submit Button */}
-                                            <motion.button
-                                                whileHover={!isSignUpLoading ? { scale: 1.01 } : {}}
-                                                whileTap={!isSignUpLoading ? { scale: 0.98 } : {}}
+                                            <button
                                                 type="submit" 
                                                 disabled={isSignUpLoading}
-                                                className="w-full h-[46px] bg-[#1DA1F2] hover:bg-[#1a90d9] text-white font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
+                                                className="w-full h-[46px] bg-[#1DA1F2] hover:bg-[#1a90d9] text-white font-semibold rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
                                             >
-                                                {isSignUpLoading ? (
-                                                    <>
-                                                        <Spinner />
-                                                        <span>Creating account...</span>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <span>Create Account</span>
-                                                        <ArrowRight className="w-4 h-4" />
-                                                    </>
-                                                )}
-                                            </motion.button>
+                                                <span>{isSignUpLoading ? "Creating account..." : "Create Account"}</span>
+                                                {!isSignUpLoading && <ArrowRight className="w-4 h-4" />}
+                                            </button>
                                         </form>
                                     </>
                                 )}
                             </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </motion.div>
+                    </div>
+                )}
+            </div>
 
             {/* Footer */}
             <p className="text-center text-[12px] text-slate-400 leading-relaxed font-medium pt-1">

@@ -15,7 +15,7 @@ interface Testimonial {
     };
     mentee: {
         name: string;
-        role: string; 
+        role: string;
         image: string;
     };
     review: string;

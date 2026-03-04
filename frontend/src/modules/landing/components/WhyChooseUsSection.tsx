@@ -1,7 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { GraduationCap, Scan, Headphones, Waypoints } from 'lucide-react';
 import Image from 'next/image';
 
@@ -41,30 +40,12 @@ const features: Feature[] = [
 ];
 
 export default function WhyChooseUsSection() {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const { scrollYProgress } = useScroll({
-        target: containerRef,
-        offset: ["start end", "end end"]
-    });
-
-    const smoothProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
-
-    const imageY = useTransform(smoothProgress, [0.1, 0.6], [100, 0]);
-    const imageOpacity = useTransform(smoothProgress, [0.1, 0.4], [0, 1]);
-    const imageScale = useTransform(smoothProgress, [0.1, 0.6], [0.95, 1]);
-
-    const leftX = useTransform(smoothProgress, [0.2, 0.5], [-50, 0]);
-    const leftOpacity = useTransform(smoothProgress, [0.2, 0.4], [0, 1]);
-
-    const rightX = useTransform(smoothProgress, [0.2, 0.5], [50, 0]);
-    const rightOpacity = useTransform(smoothProgress, [0.2, 0.4], [0, 1]);
-
     // Split features for layout
     const leftFeatures = [features[0], features[2]];
     const rightFeatures = [features[1], features[3]];
 
     return (
-        <section id="about" ref={containerRef} className="relative bg-white py-24 md:py-32 overflow-hidden">
+        <section id="about" className="relative bg-white py-24 md:py-32 overflow-hidden">
             {/* Background elements */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
                 <div className="absolute top-[20%] left-[-10%] w-[40%] h-[40%] bg-blue-50/60 rounded-full blur-[100px] mix-blend-multiply" />
@@ -88,7 +69,10 @@ export default function WhyChooseUsSection() {
 
                     {/* LEFT COLUMN */}
                     <motion.div
-                        style={{ x: leftX, opacity: leftOpacity }}
+                        initial={{ opacity: 0, y: 12 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
                         className="space-y-16 order-2 lg:order-1"
                     >
                         {leftFeatures.map((feature, idx) => (
@@ -99,7 +83,10 @@ export default function WhyChooseUsSection() {
                     {/* CENTER COLUMN (IMAGE) */}
                     <div className="relative order-1 lg:order-2 flex justify-center py-8">
                         <motion.div
-                            style={{ y: imageY, opacity: imageOpacity, scale: imageScale }}
+                            initial={{ opacity: 0 }}
+                            whileInView={{ opacity: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
                             className="relative z-10 w-full max-w-[400px] lg:max-w-full"
                         >
                             <div
@@ -146,7 +133,10 @@ export default function WhyChooseUsSection() {
 
                     {/* RIGHT COLUMN */}
                     <motion.div
-                        style={{ x: rightX, opacity: rightOpacity }}
+                        initial={{ opacity: 0, y: 12 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.3, delay: 0.08, ease: [0.4, 0, 0.2, 1] }}
                         className="space-y-16 order-3 lg:mt-24"
                     >
                         {rightFeatures.map((feature, idx) => (

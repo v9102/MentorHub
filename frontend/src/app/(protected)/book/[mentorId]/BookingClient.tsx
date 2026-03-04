@@ -271,9 +271,9 @@ export default function BookingClient({ mentor: initialMentor, mentorId }: Props
       </Link>
 
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
         className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start"
       >
 
@@ -381,10 +381,9 @@ export default function BookingClient({ mentor: initialMentor, mentorId }: Props
           {/* Step 1: Calendar & Time */}
           {step === 1 && (
             <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.2 }}
               className="flex flex-col h-full"
             >
               <div className="mb-6">
@@ -548,10 +547,9 @@ export default function BookingClient({ mentor: initialMentor, mentorId }: Props
           {/* Step 2: Fill Information (Verification & Payment) */}
           {step === 2 && (
             <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.2 }}
               className="flex flex-col h-full"
             >
               <div className="mb-6">
@@ -631,11 +629,7 @@ export default function BookingClient({ mentor: initialMentor, mentorId }: Props
 
                 {/* OTP Input - Only show if OTP sent and not verified (and OTP is enabled) */}
                 {ENABLE_OTP_VERIFICATION && isOtpSent && !isPhoneVerified && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    className="space-y-2"
-                  >
+                  <div className="space-y-2">
                     <label className="block text-xs font-medium text-gray-700">Enter OTP</label>
                     <div className="flex gap-2">
                       <input
@@ -653,7 +647,7 @@ export default function BookingClient({ mentor: initialMentor, mentorId }: Props
                         {isVerifyingOtp ? <Loader2 className="w-4 h-4 animate-spin" /> : "Verify"}
                       </button>
                     </div>
-                  </motion.div>
+                  </div>
                 )}
 
                 {/* Apply Coupon */}
