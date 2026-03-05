@@ -139,7 +139,8 @@ export function useUpcomingSessions() {
     createAuthFetcher(getToken),
     {
       revalidateOnFocus: false,
-      refreshInterval: 60000, // Refresh every minute
+      revalidateOnMount: true,  // Always fetch fresh on every page visit
+      refreshInterval: 60000,   // Refresh every minute while page is open
     }
   );
 

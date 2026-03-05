@@ -252,10 +252,22 @@ function HeroMockUI() {
     const { user } = useUser();
     const { sessions, isLoading } = useUpcomingSessions();
 
-    // Soonest upcoming confirmed/pending session
-    const session = sessions.find(
-        (s: DashboardSession) => s.status === 'confirmed' || s.status === 'pending'
-    );
+    // Soonest upcoming confirmed/pending session that hasn't passed yet
+    const now = new Date();
+    const session = sessions.find((s: DashboardSession) => {
+        const isRelevantStatus =
+            s.status === 'confirmed' || s.status === 'pending' ||
+            s.status === 'meeting_started' || s.status === 'meeting_ready';
+        if (!isRelevantStatus) return false;
+
+        // Build full datetime from date string + startTime
+        const [y, mo, d] = s.date.split('-').map(Number);
+        const [sh, sm] = (s.startTime || '00:00').split(':').map(Number);
+        const sessionStart = new Date(y, mo - 1, d, sh, sm, 0, 0);
+
+        // Allow up to 15 min grace (matches backend + banner logic)
+        return sessionStart.getTime() > now.getTime() - 15 * 60 * 1000;
+    });
 
     const isMentor = user?.publicMetadata?.role === 'mentor';
     const otherPerson = isMentor ? session?.student : session?.mentor;
