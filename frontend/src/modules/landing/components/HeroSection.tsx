@@ -361,9 +361,19 @@ function HeroMockUI() {
                             </div>
                             <Button
                                 className="w-full bg-blue-500 hover:bg-blue-600 text-white text-sm transition-colors duration-200"
-                                onClick={() => window.location.href = `/session/${session.bookingId}`}
+                                onClick={() => {
+                                    const meetingActive =
+                                        session.status === 'meeting_started' ||
+                                        session.status === 'meeting_ready' ||
+                                        session.status === 'In progress';
+                                    window.location.href = meetingActive
+                                        ? `/meeting/${session.bookingId}`
+                                        : `/session/${session.bookingId}`;
+                                }}
                             >
-                                Join Meeting Room
+                                {(session.status === 'meeting_started' || session.status === 'meeting_ready')
+                                    ? 'Join Meeting Room'
+                                    : 'View Session'}
                             </Button>
                         </>
                     ) : (
