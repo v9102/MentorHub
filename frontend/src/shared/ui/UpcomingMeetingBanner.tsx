@@ -54,8 +54,10 @@ export default function UpcomingMeetingBanner() {
     const hoursUntilMeeting = msUntilMeeting / (1000 * 60 * 60);
     const minutesUntilMeeting = msUntilMeeting / (1000 * 60);
 
-    // Hide banner if more than 24h away or more than 30 min past
-    if (hoursUntilMeeting > 24 || msUntilMeeting < -30 * 60 * 1000) return null;
+    // Hide banner if:
+    // - more than 24h away (too far in the future), OR
+    // - more than 15 min in the past (session is over; matches backend 15-min grace)
+    if (hoursUntilMeeting > 24 || msUntilMeeting < -15 * 60 * 1000) return null;
 
     const isMentor = user?.publicMetadata?.role === "mentor";
     const isStudent = !isMentor;

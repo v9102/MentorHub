@@ -302,8 +302,14 @@ export const upcomingSessions = async (req, res) => {
     const userId = user._id;
     const role = user.role;
     const now = new Date();
+
+    // Build a cutoff: sessions whose date is today or future,
+    // then post-filter in JS to exclude ones where time has already passed.
+    // sessionDate is stored as midnight UTC so $gte today's date at midnight UTC.
+    const todayMidnightUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+
     let filter = {
-      sessionDate: { $gte: now },
+      sessionDate: { $gte: todayMidnightUTC },
       status: { $ne: "cancelled" },
       $or: [
         { mentor: userId },
@@ -315,11 +321,23 @@ export const upcomingSessions = async (req, res) => {
     console.log("[DEBUG] User role:", role, "userId:", userId);
     console.log("[DEBUG] Executing filter:", JSON.stringify(filter));
 
-    const sessions = await Booking.find(filter)
+    const rawSessions = await Booking.find(filter)
       .populate("mentor", "name imageUrl")
       .populate("student", "name imageUrl")
       .sort({ sessionDate: 1, startTime: 1 })
       .lean();
+
+    // Post-filter: exclude sessions where date+startTime is fully in the past
+    const nowMs = now.getTime();
+    const sessions = rawSessions.filter(s => {
+      // Parse the session date from UTC midnight
+      const d = new Date(s.sessionDate);
+      const [sh, sm] = (s.startTime || "00:00").split(":").map(Number);
+      // Build the actual start datetime in local time (server timezone)
+      const sessionStart = new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), sh, sm, 0, 0);
+      // Keep sessions that haven't ended yet — allow 15 min grace window
+      return sessionStart.getTime() > nowMs - 15 * 60 * 1000;
+    });
     const formattedSessions = sessions.map(s => ({
       bookingId: s._id,
       date:
