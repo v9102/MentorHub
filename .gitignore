@@ -52,3 +52,6 @@ pnpm-debug.log*
 .vscode/
 .idea/
 .agent
+
+gcp_key.json
+deploy_out.txt
