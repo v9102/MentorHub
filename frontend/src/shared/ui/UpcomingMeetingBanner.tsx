@@ -1,18 +1,22 @@
 "use client";
 
 import { useUpcomingSessions } from "@/shared/lib/hooks/useDashboard";
-import { Calendar, Clock, Video, ArrowRight } from "lucide-react";
+import { Calendar, Clock, Video, ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useUser } from "@clerk/nextjs";
-import { useState, useEffect } from "react";
+import { useUser, useAuth } from "@clerk/nextjs";
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 
 export default function UpcomingMeetingBanner() {
     const { isSignedIn, user } = useUser();
+    const { getToken } = useAuth();
+    const router = useRouter();
     const { sessions, isLoading } = useUpcomingSessions();
     const [isScrolled, setIsScrolled] = useState(false);
+    const [meetingStatus, setMeetingStatus] = useState<string | null>(null);
+    const [isJoining, setIsJoining] = useState(false);
 
     useEffect(() => {
-        // Create a sentinel element at 500px from top to match MobileStickyCTA
         const sentinel = document.createElement('div');
         sentinel.style.position = 'absolute';
         sentinel.style.top = '500px';
@@ -22,62 +26,48 @@ export default function UpcomingMeetingBanner() {
         document.body.prepend(sentinel);
 
         const observer = new IntersectionObserver(
-            ([entry]) => {
-                setIsScrolled(!entry.isIntersecting);
-            },
+            ([entry]) => setIsScrolled(!entry.isIntersecting),
             { threshold: [1] }
         );
-
         observer.observe(sentinel);
 
-        return () => {
-            observer.disconnect();
-            sentinel.remove();
-        };
+        return () => { observer.disconnect(); sentinel.remove(); };
     }, []);
 
-    // Hide if not signed in or still loading (prevents flash)
+    // Hide if not signed in or still loading
     if (!isSignedIn || isLoading) return null;
 
-    // Pick the soonest upcoming confirmed session
-    // The backend already returns sessions sorted by sessionDate asc,
-    // so the first confirmed/pending entry is the next meeting.
     const upcomingSession = sessions.find(
-        (s) => s.status === "confirmed" || s.status === "pending"
+        (s) => s.status === "confirmed" || s.status === "pending" ||
+            s.status === "meeting_started" || s.status === "meeting_ready" ||
+            s.status === "In progress"
     );
 
-    // No upcoming meeting → section is invisible
     if (!upcomingSession) return null;
 
-    // Helper: Parse the exact meeting Date from backend "YYYY-MM-DD" and "HH:MM"
     const [year, month, day] = upcomingSession.date.split("-").map(Number);
     const [startHour, startMin] = upcomingSession.startTime.split(":").map(Number);
     const meetingStartDateTime = new Date(year, month - 1, day, startHour, startMin);
     const now = new Date();
 
-    // Only show the banner if the meeting is strictly within 24 hours from right now
     const msUntilMeeting = meetingStartDateTime.getTime() - now.getTime();
     const hoursUntilMeeting = msUntilMeeting / (1000 * 60 * 60);
+    const minutesUntilMeeting = msUntilMeeting / (1000 * 60);
 
-    // If the meeting is more than 24 hours away or in the past, hide the banner
-    if (hoursUntilMeeting > 24 || hoursUntilMeeting < 0) {
-        return null;
-    }
+    // Hide banner if more than 24h away or more than 30 min past
+    if (hoursUntilMeeting > 24 || msUntilMeeting < -30 * 60 * 1000) return null;
 
     const isMentor = user?.publicMetadata?.role === "mentor";
+    const isStudent = !isMentor;
+    const sessionId = upcomingSession.bookingId || (upcomingSession as any)._id;
     const otherPersonName = isMentor
         ? upcomingSession.student?.name
         : upcomingSession.mentor?.name;
 
-    // Format the session date (already parsed above as sessionDate)
     const formattedDate = meetingStartDateTime.toLocaleDateString("en-US", {
-        weekday: "short",
-        month: "short",
-        day: "numeric",
-        year: "numeric",
+        weekday: "short", month: "short", day: "numeric", year: "numeric",
     });
 
-    // Format start/end times (HH:mm stored in DB)
     const fmtTime = (t: string) => {
         const [h, m] = t.split(":").map(Number);
         const ampm = h >= 12 ? "PM" : "AM";
@@ -85,7 +75,43 @@ export default function UpcomingMeetingBanner() {
         return `${hour}:${m.toString().padStart(2, "0")} ${ampm}`;
     };
 
-    const linkTarget = `/session/${upcomingSession.bookingId}`;
+    // Determine student meeting status (either from session or polled)
+    const currentStatus = meetingStatus ?? upcomingSession.status;
+    const meetingHasStarted =
+        currentStatus === "meeting_started" || currentStatus === "In progress";
+
+    // Student can join only if within 10 min of start AND mentor has started
+    const withinJoinWindow = minutesUntilMeeting <= 10;
+
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const pollMeetingStatus = useCallback(async () => {
+        if (!isStudent || !sessionId) return;
+        try {
+            const token = await getToken();
+            const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
+            const res = await fetch(`${backendUrl}/api/meeting/${sessionId}/authorize`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (data.success) setMeetingStatus(data.status);
+        } catch { /* silent */ }
+    }, [isStudent, sessionId, getToken]);
+
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useEffect(() => {
+        if (!isStudent || !withinJoinWindow) return;
+        // Poll every 8 seconds while within window and not yet started
+        if (meetingHasStarted) return;
+        const interval = setInterval(pollMeetingStatus, 8000);
+        pollMeetingStatus(); // immediate first check
+        return () => clearInterval(interval);
+    }, [isStudent, withinJoinWindow, meetingHasStarted, pollMeetingStatus]);
+
+    const handleStudentJoin = async () => {
+        if (!meetingHasStarted) return;
+        setIsJoining(true);
+        router.push(`/meeting/${sessionId}`);
+    };
 
     return (
         <div
@@ -100,7 +126,6 @@ export default function UpcomingMeetingBanner() {
             style={{ transform: 'translateZ(0)' }}
         >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-                {/* Subtle shine effect */}
                 <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/0 pointer-events-none" />
 
                 <div className="py-3 flex flex-col sm:flex-row items-center justify-between gap-4 relative z-10">
@@ -111,10 +136,8 @@ export default function UpcomingMeetingBanner() {
                         </div>
                         <div>
                             <p className="font-semibold text-sm sm:text-base leading-tight">
-                                Upcoming session with{" "}
-                                <span className="font-bold">
-                                    {otherPersonName || "your mentor"}
-                                </span>
+                                {isMentor ? "Upcoming session with " : "Your session with "}
+                                <span className="font-bold">{otherPersonName || (isMentor ? "your student" : "your mentor")}</span>
                             </p>
                             <div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm text-blue-100 mt-0.5">
                                 <span className="flex items-center gap-1">
@@ -123,23 +146,60 @@ export default function UpcomingMeetingBanner() {
                                 </span>
                                 <span className="flex items-center gap-1">
                                     <Clock className="w-3.5 h-3.5" />
-                                    {fmtTime(upcomingSession.startTime)} —{" "}
-                                    {fmtTime(upcomingSession.endTime)}
+                                    {fmtTime(upcomingSession.startTime)} — {fmtTime(upcomingSession.endTime)}
                                 </span>
+                                {/* Status badge for student */}
+                                {isStudent && withinJoinWindow && (
+                                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${meetingHasStarted ? 'bg-green-400/30 text-green-100' : 'bg-yellow-400/20 text-yellow-100'}`}>
+                                        {meetingHasStarted ? "● Live" : "● Waiting for mentor"}
+                                    </span>
+                                )}
                             </div>
                         </div>
                     </div>
 
-                    {/* Right: CTA */}
-                    <Link
-                        href={linkTarget}
-                        className="shrink-0 w-full sm:w-auto text-center inline-flex justify-center items-center gap-2 px-4 py-2 bg-white text-blue-700 hover:bg-blue-50 text-sm font-semibold rounded-lg transition-colors shadow-sm"
-                    >
-                        Go to Session
-                        <ArrowRight className="w-4 h-4" />
-                    </Link>
+                    {/* Right: CTA — Role-based */}
+                    {isMentor ? (
+                        <Link
+                            href={`/mentor/sessions`}
+                            className="shrink-0 w-full sm:w-auto text-center inline-flex justify-center items-center gap-2 px-4 py-2 bg-white text-blue-700 hover:bg-blue-50 text-sm font-semibold rounded-lg transition-colors shadow-sm"
+                        >
+                            Go to Sessions
+                            <ArrowRight className="w-4 h-4" />
+                        </Link>
+                    ) : (
+                        /* Student: Join Meeting button */
+                        withinJoinWindow ? (
+                            <button
+                                onClick={handleStudentJoin}
+                                disabled={!meetingHasStarted || isJoining}
+                                className={`shrink-0 w-full sm:w-auto text-center inline-flex justify-center items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-colors shadow-sm
+                                    ${meetingHasStarted && !isJoining
+                                        ? "bg-white text-blue-700 hover:bg-blue-50 cursor-pointer"
+                                        : "bg-white/30 text-white/70 cursor-not-allowed"
+                                    }`}
+                            >
+                                {isJoining
+                                    ? <><Loader2 className="w-4 h-4 animate-spin" /> Joining...</>
+                                    : meetingHasStarted
+                                        ? <><Video className="w-4 h-4" /> Join Meeting</>
+                                        : <><Loader2 className="w-4 h-4 animate-spin" /> Waiting for mentor...</>
+                                }
+                            </button>
+                        ) : (
+                            /* More than 10 min away — show countdown info only */
+                            <Link
+                                href={`/session/${sessionId}`}
+                                className="shrink-0 w-full sm:w-auto text-center inline-flex justify-center items-center gap-2 px-4 py-2 bg-white/20 text-white text-sm font-semibold rounded-lg transition-colors"
+                            >
+                                View Details
+                                <ArrowRight className="w-4 h-4" />
+                            </Link>
+                        )
+                    )}
                 </div>
             </div>
         </div>
     );
 }
+
