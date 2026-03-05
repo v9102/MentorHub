@@ -6,40 +6,66 @@ on:
       - main
     paths:
       - 'backend/**'
+  workflow_dispatch: # Allows manual trigger from GitHub UI
 
 env:
   PROJECT_ID: mentomania
-  REGION: us-central1
+  REGION: asia-south1
   SERVICE_NAME: mentorhub-backend
-  WORKLOAD_IDENTITY_PROVIDER: projects/547639074222/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider
-  SERVICE_ACCOUNT: github-actions-cr@mentomania.iam.gserviceaccount.com
+  REPOSITORY: backend-repo
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
+    # Required for Workload Identity Federation
     permissions:
       contents: read
-      id-token: write # Required for Workload Identity Federation
+      id-token: write
+
+    defaults:
+      run:
+        working-directory: ./backend
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Google Auth
-        id: auth
+      - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ env.SERVICE_ACCOUNT }}
+          project_id: ${{ env.PROJECT_ID }}
+          workload_identity_provider: 'projects/547639074222/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
+          service_account: 'github-actions@mentomania.iam.gserviceaccount.com'
 
       - name: Setup Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Deploy to Cloud Run
+      - name: Configure Docker authentication
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+      - name: Build and Push Docker Image
         run: |
-          cd backend
-          gcloud run deploy ${{ env.SERVICE_NAME }} \
-            --source . \
-            --region ${{ env.REGION }} \
-            --allow-unauthenticated \
-            --project ${{ env.PROJECT_ID }}
+          IMAGE_NAME="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE_NAME }}:${{ github.sha }}"
+          docker build -t $IMAGE_NAME .
+          docker push $IMAGE_NAME
+
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ env.SERVICE_NAME }}
+          region: ${{ env.REGION }}
+          image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+          flags: '--allow-unauthenticated'
+          env_vars: |
+            NODE_ENV=production
+            MONGO_URI=${{ secrets.MONGO_URI }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            CLERK_WEBHOOK_SECRET=${{ secrets.CLERK_WEBHOOK_SECRET }}
+            CLERK_SECRET_KEY=${{ secrets.CLERK_SECRET_KEY }}
+            CLERK_PUBLISHABLE_KEY=${{ secrets.CLERK_PUBLISHABLE_KEY }}
+            PORT=${{ secrets.PORT }}
+
+      - name: Show Cloud Run URL
+        run: echo "✅ Deployed to ${{ steps.deploy.outputs.url }}"

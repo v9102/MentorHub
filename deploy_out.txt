@@ -1,0 +1,7 @@
+Building using Dockerfile and deploying container to Cloud Run service [mentorhub-backend] in project [mentomania] region [us-central1]
+Building and deploying new service...
+Validating configuration.......................done
+Uploading sources......................................done
+failed
+Deployment failed
+ERROR: (gcloud.run.deploy) INVALID_ARGUMENT: Invalid build request. could not resolve source: googleapi: Error 403: 547639074222-compute@developer.gserviceaccount.com does not have storage.objects.get access to the Google Cloud Storage object. Permission 'storage.objects.get' denied on resource (or it may not exist)., forbidden
