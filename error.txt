@@ -1,0 +1,6 @@
+ERROR: (gcloud.iam.service-accounts.keys.create) FAILED_PRECONDITION: Key creation is not allowed on this service account.
+- '@type': type.googleapis.com/google.rpc.PreconditionFailure
+  violations:
+  - description: Key creation is not allowed on this service account.
+    subject: projects/mentomania/serviceAccounts/github-actions-cr@mentomania.iam.gserviceaccount.com?configvalue=github-actions-cr%40mentomania.iam.gserviceaccount.com
+    type: constraints/iam.disableServiceAccountKeyCreation
