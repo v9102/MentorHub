@@ -11,8 +11,22 @@ import meetingRoutes from "./routes/meeting.route.js";
 import { initCronJobs } from "./services/cron.js";
 const app = express();
 
+const ALLOWED_ORIGINS = [
+  "http://localhost:3000",
+  "https://mentomania.com",
+  "https://www.mentomania.com",
+  ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
+];
+
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: (origin, callback) => {
+    // Allow requests with no origin (curl, Postman, server-to-server)
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS: origin ${origin} not allowed`));
+    }
+  },
   credentials: true
 }));
 
