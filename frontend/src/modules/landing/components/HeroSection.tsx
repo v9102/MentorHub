@@ -122,7 +122,7 @@ export default function HeroSection() {
 
             <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
 
-                <div className="grid grid-cols-1 md:grid-cols-[55fr_45fr] gap-8 lg:gap-20 items-start lg:items-center mt-4 sm:mt-6">
+                <div className="grid grid-cols-1 md:grid-cols-[48fr_52fr] gap-8 lg:gap-16 items-start lg:items-center mt-4 sm:mt-6">
 
                     <div className="text-left">
 
@@ -165,7 +165,7 @@ export default function HeroSection() {
                             {/* Exam services */}
                             <span className="flex items-center gap-1 text-slate-500 font-medium">
                                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shrink-0" />
-                                IAS · IPS · SBI
+                                Exams · Careers · Skills
                             </span>
                         </motion.div>
 
@@ -203,7 +203,7 @@ export default function HeroSection() {
                             initial={{ opacity: 0, y: 8 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.25, delay: 0.06, ease: 'easeOut' }}
-                            className="text-[30px] md:text-[36px] lg:text-[44px] xl:text-[52px] font-extrabold leading-[1.1] tracking-tight text-[#0A1628] mb-6"
+                            className="text-[30px] md:text-[36px] lg:text-[42px] xl:text-[48px] font-extrabold leading-[1.15] tracking-tight text-[#0A1628] mb-6 max-w-[28rem] lg:max-w-[32rem]"
                         >
                             1-on-1 mentorship that turns{' '}
                             <span className="text-blue-500">
@@ -238,16 +238,17 @@ export default function HeroSection() {
                         initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3, delay: 0.22, ease: 'easeOut' }}
-                        className="hidden md:block relative max-w-[580px] w-full mx-auto"
+                        className="hidden md:block relative w-full min-w-0"
                     >
-                        <div className="relative w-full h-[340px] md:h-[380px] lg:h-[460px] xl:h-[520px] rounded-2xl lg:rounded-3xl overflow-hidden shadow-floating border border-gray-100">
+                        <div className="relative w-full rounded-2xl lg:rounded-3xl overflow-hidden shadow-floating border border-gray-100">
                             <Image
                                 src="/mentorLanding.png"
                                 alt="Live 1-on-1 mentorship session"
-                                fill
+                                width={1300}
+                                height={600}
                                 priority
                                 sizes="(max-width: 1023px) 50vw, (max-width: 1280px) 40vw, 580px"
-                                className="object-cover object-top"
+                                className="w-full h-auto rounded-2xl lg:rounded-3xl"
                             />
 
                             <div className="absolute top-5 left-5 bg-white/95 rounded-full px-3.5 py-1.5 shadow-soft flex items-center gap-2 border border-gray-100">

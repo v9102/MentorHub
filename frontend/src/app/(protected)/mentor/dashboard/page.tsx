@@ -109,6 +109,8 @@ export default function Dashboard() {
         return last6Months;
     }, [historyData]);
 
+    const isMentor = user?.publicMetadata?.role === "mentor";
+
     // Transform upcoming sessions for display
     const upcomingSessions = useMemo(() => {
         return upcomingSessionsData.slice(0, 3).map((session, index) => {
@@ -126,14 +128,15 @@ export default function Dashboard() {
                 timeLabel = `${sessionDate.toLocaleDateString("en-US", { weekday: "short" })}, ${session.startTime}`;
             }
 
+            const otherPerson = isMentor ? session.student : session.mentor;
             return {
                 id: session.bookingId || index + 1,
-                student: session.student.name,
+                otherPersonName: otherPerson?.name || (isMentor ? "Student" : "Mentor"),
                 time: timeLabel,
                 topic: `${session.duration} min session`,
             };
         });
-    }, [upcomingSessionsData]);
+    }, [upcomingSessionsData, isMentor]);
 
     // Calculate wallet balance (mock for now - would need payment integration)
     const walletBalance = "0.00";
@@ -351,7 +354,7 @@ export default function Dashboard() {
                                             <div className="w-px h-full bg-slate-100 my-1 group-last:hidden" />
                                         </div>
                                         <div className="flex-1 pb-2 min-w-0">
-                                            <p className="text-sm sm:text-base font-bold text-slate-900 truncate">{session.student}</p>
+                                            <p className="text-sm sm:text-base font-bold text-slate-900 truncate">{session.otherPersonName}</p>
                                             <p className="text-xs sm:text-sm font-medium text-blue-600 mt-0.5 truncate">{session.topic}</p>
                                             <div className="flex items-center gap-1.5 text-[11px] sm:text-xs font-medium text-slate-500 mt-2 bg-slate-50 w-fit px-2 py-1 rounded-md">
                                                 <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5" />

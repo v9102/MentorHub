@@ -129,6 +129,7 @@ export default function EditProfile() {
     const [isLoadingProfile, setIsLoadingProfile] = useState(true);
 
     const { sessions: rawUpcomingSessions } = useUpcomingSessions();
+    const isMentor = user?.publicMetadata?.role === "mentor";
 
     const upcomingSessions = useMemo(() => {
         return rawUpcomingSessions.slice(0, 3).map((session, index) => {
@@ -146,17 +147,19 @@ export default function EditProfile() {
                 timeLabel = `${sessionDate.toLocaleDateString("en-US", { weekday: "short" })}, ${session.startTime}`;
             }
 
+            const otherPerson = isMentor ? session.student : session.mentor;
+            const otherPersonName = otherPerson?.name || (isMentor ? "Student" : "Mentor");
             return {
                 id: session.bookingId || index + 1,
-                student: session.student.name,
+                otherPersonName,
                 time: timeLabel,
                 topic: `${session.duration} min session`,
                 duration: `${session.duration} min`,
                 status: session.status === "confirmed" ? "Confirmed" : "Pending",
-                avatar: session.student.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(session.student.name)}&background=e0e7ff&color=4f46e5`,
+                avatar: otherPerson?.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(otherPersonName)}&background=e0e7ff&color=4f46e5`,
             };
         });
-    }, [rawUpcomingSessions]);
+    }, [rawUpcomingSessions, isMentor]);
 
     const [activeSection, setActiveSection] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
@@ -307,9 +310,57 @@ export default function EditProfile() {
         setTimeout(() => setNotification(null), 3000);
     };
 
-    const toggleSection = (section: string) => {
+    const saveProfile = async () => {
+        try {
+            const subjectsArr = mentor.subjects
+                ? mentor.subjects.split(",").map((s) => s.trim()).filter(Boolean)
+                : [];
+            const body = {
+                basicInfo: {
+                    currentRole: mentor.title,
+                    currentOrganisation: mentor.currentOrganisation,
+                    industry: mentor.industry,
+                    workExperience: mentor.workExperience ? Number(mentor.workExperience) : 0,
+                    gender: mentor.gender,
+                    profilePhoto: profileImageUrl?.startsWith("http") ? profileImageUrl : undefined,
+                },
+                professionalInfo: {
+                    college: mentor.college,
+                    highestQualification: mentor.highestQualification,
+                    branch: mentor.branch,
+                    passingYear: mentor.passingYear ? Number(mentor.passingYear) : undefined,
+                },
+                expertise: {
+                    subjects: subjectsArr,
+                    specializations: mentor.specializations || "",
+                },
+                examDetails: (() => {
+                    const ed = mentor.examDetails?.[0];
+                    if (!ed || (!ed.examName && !ed.rank && !ed.college)) return undefined;
+                    return [{ examName: ed.examName || "General", ...ed }];
+                })(),
+                pricing: mentor.pricePerSession
+                    ? { pricePerSession: Number(mentor.pricePerSession), sessionDuration: 30, isFreeTrialEnabled: false }
+                    : undefined,
+                bio: mentor.about,
+            };
+            const res = await fetch("/api/dashboard/profile", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.msg || "Failed to save");
+            showNotification("save", "Profile saved successfully!");
+        } catch (err) {
+            showNotification("save", err instanceof Error ? err.message : "Failed to save profile");
+        }
+    };
+
+    const toggleSection = async (section: string) => {
         if (activeSection === section) {
             if (section === "slots") showNotification("slots", "Availability saved!");
+            else if (["personal", "bio", "payment"].includes(section)) await saveProfile();
             setActiveSection(null);
         } else {
             setActiveSection(section);
@@ -489,6 +540,24 @@ export default function EditProfile() {
 
                                                     <InputGroup label="Location" value={mentor.location} onChange={(e) => updateField("location", e.target.value)} icon={MapPin} placeholder="San Francisco, CA" />
                                                     <InputGroup label="Experience" value={mentor.experience} onChange={(e) => updateField("experience", e.target.value)} icon={GraduationCap} placeholder="3rd Year" />
+                                                    <InputGroup label="Years of Experience" value={mentor.workExperience} onChange={(e) => updateField("workExperience", e.target.value)} icon={Briefcase} placeholder="5" />
+                                                    <InputGroup label="Current Organisation" value={mentor.currentOrganisation} onChange={(e) => updateField("currentOrganisation", e.target.value)} icon={Briefcase} placeholder="e.g. SBI, AIIMS" />
+                                                    <InputGroup label="College / Institution" value={mentor.college} onChange={(e) => updateField("college", e.target.value)} icon={GraduationCap} placeholder="e.g. IIT Bombay, AIIMS Delhi" />
+                                                    <InputGroup label="Highest Qualification" value={mentor.highestQualification} onChange={(e) => updateField("highestQualification", e.target.value)} icon={GraduationCap} placeholder="e.g. MBBS, MBA" />
+                                                    <InputGroup label="Price per Session (₹)" value={mentor.pricePerSession} onChange={(e) => updateField("pricePerSession", e.target.value)} icon={Wallet} placeholder="500" />
+                                                    <div className="sm:col-span-2">
+                                                        <label className="block text-[11px] uppercase tracking-wider font-bold text-slate-500 mb-2 ml-1">Subjects (comma-separated)</label>
+                                                        <input value={mentor.subjects} onChange={(e) => updateField("subjects", e.target.value)} placeholder="e.g. Physics, Maths, Chemistry"
+                                                            className="block w-full pl-4 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 text-sm focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none" />
+                                                    </div>
+                                                    <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                        <InputGroup label="Exam (e.g. UPSC CSE, JEE)" value={mentor.examDetails?.[0]?.examName ?? ""} onChange={(e) => setMentor((p) => ({
+                                                            ...p, examDetails: [{ ...(p.examDetails?.[0] || {}), examName: e.target.value }]
+                                                        }))} placeholder="UPSC CSE, JEE, NEET" />
+                                                        <InputGroup label="Rank / AIR" value={mentor.examDetails?.[0]?.rank ?? ""} onChange={(e) => setMentor((p) => ({
+                                                            ...p, examDetails: [{ ...(p.examDetails?.[0] || {}), rank: e.target.value }]
+                                                        }))} placeholder="e.g. 12" />
+                                                    </div>
 
                                                 </div>
                                             ) : (
@@ -720,9 +789,9 @@ export default function EditProfile() {
                             <div key={session.id}
                                 className="flex flex-col gap-4 p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-slate-50/50 border border-slate-100 hover:bg-white hover:shadow-lg hover:border-indigo-100 transition-all group cursor-pointer">
                                 <div className="flex items-center gap-3 sm:gap-5">
-                                    <Image src={session.avatar} alt={session.student} width={56} height={56} className="w-11 h-11 sm:w-14 sm:h-14 rounded-full ring-2 sm:ring-4 ring-white shadow-sm" unoptimized />
+                                    <Image src={session.avatar} alt={session.otherPersonName} width={56} height={56} className="w-11 h-11 sm:w-14 sm:h-14 rounded-full ring-2 sm:ring-4 ring-white shadow-sm" unoptimized />
                                     <div className="flex-1 min-w-0">
-                                        <h4 className="font-bold text-slate-900 text-base sm:text-lg group-hover:text-indigo-600 transition-colors truncate">{session.student}</h4>
+                                        <h4 className="font-bold text-slate-900 text-base sm:text-lg group-hover:text-indigo-600 transition-colors truncate">{session.otherPersonName}</h4>
                                         <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5 truncate">{session.topic}</p>
                                     </div>
                                     <span className={`px-2.5 sm:px-4 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wide border shrink-0 ${session.status === "Confirmed" ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-amber-50 text-amber-600 border-amber-100"}`}>

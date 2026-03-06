@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useUser } from "@clerk/nextjs";
 import {
     Calendar as CalendarIcon, Clock, MapPin, Video,
     ChevronRight, ChevronLeft, RotateCcw, User, Loader2,
@@ -68,6 +69,8 @@ function MiniCalendar({ selected, onChange, sessionDates }: { selected: Date; on
 export default function SessionsPage() {
     const [selected, setSelected] = useState(new Date());
     const [notif, setNotif] = useState<Notification | null>(null);
+    const { user } = useUser();
+    const isMentor = user?.publicMetadata?.role === "mentor";
 
     // Fetch real data from backend
     const { sessions: upcomingSessions, isLoading: upcomingLoading, count: upcomingCount } = useUpcomingSessions();
@@ -120,13 +123,15 @@ export default function SessionsPage() {
                 canStartMeeting = true;
             }
 
+            const otherPerson = isMentor ? s.student : s.mentor;
+            const otherPersonName = otherPerson?.name || (isMentor ? "Student" : "Mentor");
             return {
                 id: s.bookingId || s._id || `session-${index}`,
-                student: s.student.name,
-                studentImage: s.student.imageUrl,
+                otherPersonName,
+                otherPersonImage: otherPerson?.imageUrl,
                 time: timeLabel,
                 date: sessionDate,
-                topic: `Session with ${s.mentor?.name || "Mentor"}`,
+                topic: `Session with ${otherPersonName}`,
                 duration: `${s.duration} min`,
                 status,
                 canStartMeeting,
@@ -134,7 +139,7 @@ export default function SessionsPage() {
                 meetingLink: s.meetingLink || `/meeting/${s.bookingId || s._id}`,
             };
         });
-    }, [upcomingSessions]);
+    }, [upcomingSessions, isMentor]);
 
     // Filter sessions for selected date
     const todaySessions = sessions.filter((s) => s.date.toDateString() === selected.toDateString());
@@ -217,7 +222,7 @@ export default function SessionsPage() {
                                         <div className="absolute left-0 top-4 bottom-4 w-1 bg-blue-500 rounded-r-full" />
                                         <div className="flex-1 pl-2">
                                             <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
-                                                <h3 className="font-bold text-slate-900 text-base sm:text-lg">{s.student}</h3>
+                                                <h3 className="font-bold text-slate-900 text-base sm:text-lg">{s.otherPersonName}</h3>
                                                 <span className={`px-2 sm:px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold uppercase ${s.status === "In progress" ? "bg-emerald-100 text-emerald-700" : "bg-blue-50 text-blue-700"}`}>
                                                     {s.status}
                                                 </span>
@@ -234,7 +239,7 @@ export default function SessionsPage() {
                                         </div>
                                         <button onClick={() => {
                                             if (!s.canStartMeeting) return;
-                                            show(`j-${s.id}`, `Joining call with ${s.student}…`);
+                                            show(`j-${s.id}`, `Joining call with ${s.otherPersonName}…`);
                                             window.location.href = s.meetingLink;
                                         }}
                                             disabled={!s.canStartMeeting}
@@ -322,7 +327,7 @@ export default function SessionsPage() {
                     <table className="w-full text-left">
                         <thead className="bg-slate-50/50 border-b border-slate-100">
                             <tr>
-                                {["TOPIC", "STUDENT", "PROGRESS", "DATE", "DURATION", "STATUS"].map((h) => (
+                                {["TOPIC", isMentor ? "STUDENT" : "MENTOR", "PROGRESS", "DATE", "DURATION", "STATUS"].map((h) => (
                                     <th key={h} className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">{h}</th>
                                 ))}
                             </tr>
@@ -334,7 +339,7 @@ export default function SessionsPage() {
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
                                             <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center"><User className="w-4 h-4 text-slate-500" /></div>
-                                            <span className="text-sm font-semibold text-slate-700">{s.student}</span>
+                                            <span className="text-sm font-semibold text-slate-700">{s.otherPersonName}</span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
@@ -367,7 +372,7 @@ export default function SessionsPage() {
                                         <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center shrink-0">
                                             <User className="w-3 h-3 text-slate-500" />
                                         </div>
-                                        <span className="text-sm font-semibold text-slate-700 truncate">{s.student}</span>
+                                        <span className="text-sm font-semibold text-slate-700 truncate">{s.otherPersonName}</span>
                                     </div>
                                 </div>
                                 <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold shrink-0 ${s.status === "In progress" ? "bg-emerald-50 text-emerald-600" : "bg-blue-50 text-blue-600"}`}>
