@@ -14,7 +14,7 @@ export interface ProfileBannerProps {
     phone?: string;
     location?: string;
     reviewsCount?: number;
-    rank?: number;
+    rank?: number | string;
     tagLine?: string;
     profilePhoto?: string | null;
     isEditable?: boolean;
@@ -86,12 +86,12 @@ export function ProfileBanner({
                     <div className="flex-1 w-full transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] text-details">
                         <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight m-0 mb-1 transition-colors flex flex-wrap items-center gap-3">
                             {name}
-                            {!isEditable && rank && rank > 0 && (
+                            {!isEditable && rank != null && rank !== "" && (typeof rank === "number" ? rank > 0 : true) && (
                                 <Badge variant="secondary" className="bg-amber-100 text-amber-800 hover:bg-amber-100 border-amber-200 gap-1 px-2 py-0.5 shadow-sm text-sm">
                                     <Star className="w-3 h-3 fill-amber-800 flex-shrink-0" /> <span className="translate-y-[1px]">AIR {rank}</span>
                                 </Badge>
                             )}
-                            {!isEditable && (!rank || rank === 0) && tagLine && (
+                            {!isEditable && (rank == null || rank === "" || (typeof rank === "number" && rank === 0)) && tagLine && (
                                 <Badge variant="secondary" className="bg-green-100 text-green-800 hover:bg-green-100 border-green-200 gap-1 px-2 py-0.5 shadow-sm text-sm">
                                     <ShieldCheck className="w-3 h-3 flex-shrink-0" /> <span className="translate-y-[1px]">Qualified</span>
                                 </Badge>

@@ -105,7 +105,7 @@ export default function Navbar() {
             />
           </Link>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 justify-end min-w-[180px]">
             {/* Auth section — only shows when signed in */}
             <SignedIn>
               <ProfileButton />
@@ -183,7 +183,7 @@ export default function Navbar() {
             {renderBecomeMentorLink()}
           </div>
 
-          <div className="flex items-center justify-end">
+          <div className="flex items-center justify-end min-w-[230px]">
             <SignedIn>
               <ProfileButton />
             </SignedIn>

@@ -40,14 +40,19 @@ export type MentorProfile = {
   profileImage?: string;
   tagLine: string;
   bio: string;
-  exam: string;
+  exam?: string;
 
   // Govt Exam Specific Fields
   service?: string;
   posting?: string;
-  rank?: number;
-  attempts?: number;
+  rank?: number | string;
+  attempts?: number | string;
   optionalSubject?: string;
+  percentile?: number | string;
+  selectionYear?: string | number;
+
+  // Languages mentor can communicate in
+  languages?: string[];
 
   // Generic education / experience
   college?: string;

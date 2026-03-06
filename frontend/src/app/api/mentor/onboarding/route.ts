@@ -87,6 +87,17 @@ export async function POST(req: Request) {
       );
     }
 
+    const EXAM_DISPLAY_NAMES: Record<string, string> = {
+      upsc: "UPSC CSE",
+      banking: "Banking",
+      neet: "NEET",
+      jee: "JEE",
+      cat: "CAT",
+      ssc: "SSC CGL",
+      clat: "CLAT",
+      ca: "CA/CMA/CS",
+    };
+
     const mentorProfile: any = {};
 
     if (data.basicInfo) {
@@ -110,11 +121,21 @@ export async function POST(req: Request) {
         specializations: data.expertise.specializations || "",
       };
 
-      if (data.expertise.examExpertise || data.expertise.rankOrScore) {
-        mentorProfile.examDetails = [{
-          examName: data.expertise.examExpertise || "",
-          rank: data.expertise.rankOrScore || "",
-        }];
+      // Build full examDetails from expertise (college, rank, percentile, attempts, selectionYear, etc.)
+      const examCode = data.expertise.examExpertise || "";
+      const examName = EXAM_DISPLAY_NAMES[examCode] || examCode || "";
+      const examDetail: Record<string, string> = {};
+      if (examName) examDetail.examName = examName;
+      if (data.expertise.college) examDetail.college = String(data.expertise.college);
+      if (data.expertise.rank != null) examDetail.rank = String(data.expertise.rank);
+      else if (data.expertise.rankOrScore) examDetail.rank = String(data.expertise.rankOrScore);
+      if (data.expertise.percentile != null) examDetail.percentile = String(data.expertise.percentile);
+      if (data.expertise.timesMainsAppeared != null) examDetail.attempts = String(data.expertise.timesMainsAppeared);
+      if (data.expertise.yearOfSelection) examDetail.selectionYear = String(data.expertise.yearOfSelection);
+      else if (data.expertise.selectedYear) examDetail.selectionYear = String(data.expertise.selectedYear);
+      if (Object.keys(examDetail).length > 0) {
+        if (!examDetail.examName) examDetail.examName = "General";
+        mentorProfile.examDetails = [examDetail];
       }
     }
 
@@ -159,16 +180,21 @@ export async function POST(req: Request) {
       mentorProfile.bio = data.expertise.keyHighlights;
     }
 
+    const updatePayload: Record<string, unknown> = {
+      role: "mentor",
+      name: `${data.basicInfo?.firstName || ""} ${data.basicInfo?.lastName || ""}`.trim() || existingUser.name,
+      mentorProfile,
+      isProfileComplete: true,
+    };
+
+    // Save preferred languages to User.languages (for mentor card display)
+    if (data.basicInfo?.preferredLanguages?.length) {
+      updatePayload.languages = data.basicInfo.preferredLanguages;
+    }
+
     const updatedUser = await User.findOneAndUpdate(
       { clerkId: user.id },
-      {
-        $set: {
-          role: "mentor",
-          name: `${data.basicInfo?.firstName || ""} ${data.basicInfo?.lastName || ""}`.trim() || existingUser.name,
-          mentorProfile,
-          isProfileComplete: true,
-        },
-      },
+      { $set: updatePayload },
       { new: true, runValidators: true }
     );
 

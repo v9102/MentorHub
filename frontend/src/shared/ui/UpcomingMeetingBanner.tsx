@@ -34,41 +34,38 @@ export default function UpcomingMeetingBanner() {
         return () => { observer.disconnect(); sentinel.remove(); };
     }, []);
 
-    // Hide if not signed in or still loading
-    if (!isSignedIn || isLoading) return null;
-
     const upcomingSession = sessions.find(
         (s) => s.status === "confirmed" || s.status === "pending" ||
             s.status === "meeting_started" || s.status === "meeting_ready" ||
             s.status === "In progress"
     );
 
-    if (!upcomingSession) return null;
-
-    const [year, month, day] = upcomingSession.date.split("-").map(Number);
-    const [startHour, startMin] = upcomingSession.startTime.split(":").map(Number);
-    const meetingStartDateTime = new Date(year, month - 1, day, startHour, startMin);
+    let meetingStartDateTime: Date | null = null;
     const now = new Date();
 
-    const msUntilMeeting = meetingStartDateTime.getTime() - now.getTime();
-    const hoursUntilMeeting = msUntilMeeting / (1000 * 60 * 60);
-    const minutesUntilMeeting = msUntilMeeting / (1000 * 60);
+    let msUntilMeeting = 0;
+    let hoursUntilMeeting = 0;
+    let minutesUntilMeeting = 0;
 
-    // Hide banner if:
-    // - more than 24h away (too far in the future), OR
-    // - more than 15 min in the past (session is over; matches backend 15-min grace)
-    if (hoursUntilMeeting > 24 || msUntilMeeting < -15 * 60 * 1000) return null;
+    if (upcomingSession) {
+        const [year, month, day] = upcomingSession.date.split("-").map(Number);
+        const [startHour, startMin] = upcomingSession.startTime.split(":").map(Number);
+        meetingStartDateTime = new Date(year, month - 1, day, startHour, startMin);
+        msUntilMeeting = meetingStartDateTime.getTime() - now.getTime();
+        hoursUntilMeeting = msUntilMeeting / (1000 * 60 * 60);
+        minutesUntilMeeting = msUntilMeeting / (1000 * 60);
+    }
 
     const isMentor = user?.publicMetadata?.role === "mentor";
     const isStudent = !isMentor;
-    const sessionId = upcomingSession.bookingId || (upcomingSession as any)._id;
-    const otherPersonName = isMentor
-        ? upcomingSession.student?.name
-        : upcomingSession.mentor?.name;
+    const sessionId = upcomingSession?.bookingId || (upcomingSession as any)?._id;
+    const otherPersonName = upcomingSession
+        ? (isMentor ? upcomingSession.student?.name : upcomingSession.mentor?.name)
+        : undefined;
 
-    const formattedDate = meetingStartDateTime.toLocaleDateString("en-US", {
+    const formattedDate = meetingStartDateTime?.toLocaleDateString("en-US", {
         weekday: "short", month: "short", day: "numeric", year: "numeric",
-    });
+    }) ?? "";
 
     const fmtTime = (t: string) => {
         const [h, m] = t.split(":").map(Number);
@@ -78,14 +75,13 @@ export default function UpcomingMeetingBanner() {
     };
 
     // Determine student meeting status (either from session or polled)
-    const currentStatus = meetingStatus ?? upcomingSession.status;
+    const currentStatus = upcomingSession ? (meetingStatus ?? upcomingSession.status) : null;
     const meetingHasStarted =
         currentStatus === "meeting_started" || currentStatus === "In progress";
 
     // Student can join only if within 10 min of start AND mentor has started
-    const withinJoinWindow = minutesUntilMeeting <= 10;
+    const withinJoinWindow = upcomingSession ? minutesUntilMeeting <= 10 : false;
 
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const pollMeetingStatus = useCallback(async () => {
         if (!isStudent || !sessionId) return;
         try {
@@ -99,7 +95,6 @@ export default function UpcomingMeetingBanner() {
         } catch { /* silent */ }
     }, [isStudent, sessionId, getToken]);
 
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
         if (!isStudent || !withinJoinWindow) return;
         // Poll every 8 seconds while within window and not yet started
@@ -108,6 +103,16 @@ export default function UpcomingMeetingBanner() {
         pollMeetingStatus(); // immediate first check
         return () => clearInterval(interval);
     }, [isStudent, withinJoinWindow, meetingHasStarted, pollMeetingStatus]);
+
+    const shouldHideBanner =
+        !isSignedIn ||
+        isLoading ||
+        !upcomingSession ||
+        !meetingStartDateTime ||
+        hoursUntilMeeting > 24 ||
+        msUntilMeeting < -15 * 60 * 1000;
+
+    if (shouldHideBanner) return null;
 
     const handleStudentJoin = async () => {
         if (!meetingHasStarted) return;
@@ -148,7 +153,7 @@ export default function UpcomingMeetingBanner() {
                                 </span>
                                 <span className="flex items-center gap-1">
                                     <Clock className="w-3.5 h-3.5" />
-                                    {fmtTime(upcomingSession.startTime)} — {fmtTime(upcomingSession.endTime)}
+                                    {fmtTime(upcomingSession!.startTime)} — {fmtTime(upcomingSession!.endTime)}
                                 </span>
                                 {/* Status badge for student */}
                                 {isStudent && withinJoinWindow && (

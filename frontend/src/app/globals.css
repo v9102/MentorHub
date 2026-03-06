@@ -187,8 +187,9 @@ body {
   --sidebar-ring: oklch(0.708 0 0);
 
   /* Mentomania Global Design Tokens */
-  --app-background: oklch(0.985 0.003 260);
-  /* Slate 50-ish */
+  /* App background — soft warm off-white instead of pure white */
+  --app-background: oklch(0.97 0.02 85);
+  /* Surface background (cards) stays white for contrast */
   --surface-background: oklch(1 0 0);
   /* White */
   --border-subtle: oklch(0.89 0.006 270);

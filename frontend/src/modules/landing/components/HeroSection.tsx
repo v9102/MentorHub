@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useRef, useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { Star, Search, ChevronDown } from 'lucide-react';
+import { useUser } from '@clerk/nextjs';
+import { Button } from '@/shared/ui/button';
+import { Star, Search, ChevronDown, ArrowRight } from 'lucide-react';
 import { popularExams } from '../data';
 import { useRouter } from 'next/navigation';
-import { useUser } from '@clerk/nextjs';
 import { useUpcomingSessions, type DashboardSession } from '@/shared/lib/hooks/useDashboard';
-import { Button } from '@/shared/ui/button';
 
 type Exam = (typeof popularExams)[number];
 
@@ -46,79 +46,72 @@ function ExamCombobox() {
                 `}
             >
                 <div className="flex items-center gap-3 text-left">
-                    <div className={`p-2 rounded-xl transition-colors duration-300 ${open ? 'bg-blue-50 text-blue-500' : 'bg-gray-50 text-gray-500'}`}>
+                    <div className="p-2 rounded-xl bg-slate-100 text-[#0A1628]">
                         <Search className="w-5 h-5" />
                     </div>
                     <div>
-                        <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-0.5">What Are You Working Towards?</div>
-                        <div className="text-[15px] font-medium text-gray-900 leading-none">Select your goal...</div>
+                        <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-0.5">
+                            WHAT ARE YOU WORKING TOWARDS?
+                        </div>
+                        <div className="text-[15px] font-medium text-gray-900 leading-none">
+                            Select your goal...
+                        </div>
                     </div>
                 </div>
-                <div className={`
-                    w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300
-                    ${open ? 'bg-blue-50 text-blue-500 rotate-180' : 'bg-gray-50 text-gray-400 group-hover:bg-gray-100'}
-                `}>
+                <div className="w-8 h-8 rounded-full flex items-center justify-center bg-slate-100 text-[#0A1628]">
                     <ChevronDown className="w-4 h-4" />
                 </div>
             </button>
 
-            {/* Beautiful Dropdown grid/list */}
-            <AnimatePresence>
-                {open && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.98 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.98 }}
-                        transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                        className="
-                            absolute left-0 right-0 mt-3 p-3 bg-white border border-gray-100
-                            rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)]
-                            overflow-hidden
-                        "
-                    >
-                        <div className="grid grid-cols-2 gap-2">
-                            {popularExams.map((exam, i) => {
-                                const Icon = exam.icon;
-                                return (
-                                    <motion.button
-                                        key={exam.id}
-                                        initial={{ opacity: 0, scale: 0.9 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        transition={{ delay: i * 0.03 }}
-                                        onClick={() => handleSelect(exam)}
-                                        className="
-                                            group flex items-center gap-3 p-3 rounded-xl cursor-pointer text-left
-                                            transition-transform duration-200 border border-transparent
-                                            hover:bg-gray-50 hover:border-gray-100 hover:shadow-sm
-                                        "
-                                    >
-                                        <div className={`
-                                            w-10 h-10 rounded-lg flex items-center justify-center shrink-0
-                                            ${exam.bg} ${exam.color} transition-transform duration-200 group-hover:scale-105
-                                        `}>
-                                            <Icon className="w-5 h-5" />
+            {/* Dropdown grid/list */}
+            {open && (
+                <div
+                    className="
+                        absolute left-0 right-0 mt-3 p-3 bg-white border border-gray-100
+                        rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)]
+                        overflow-hidden
+                    "
+                >
+                    <div className="grid grid-cols-2 gap-2">
+                        {popularExams.map((exam) => {
+                            const Icon = exam.icon;
+                            return (
+                                <button
+                                    key={exam.id}
+                                    onClick={() => handleSelect(exam)}
+                                    className="
+                                        group flex items-center gap-3 p-3 rounded-xl cursor-pointer text-left
+                                        transition-transform duration-150 border border-transparent
+                                        hover:bg-gray-50 hover:border-gray-100 hover:shadow-sm
+                                    "
+                                >
+                                    <div className={`
+                                        w-10 h-10 rounded-lg flex items-center justify-center shrink-0
+                                        ${exam.bg} ${exam.color} transition-transform duration-150 group-hover:scale-105
+                                    `}>
+                                        <Icon className="w-5 h-5" />
+                                    </div>
+                                    <div className="flex-1 truncate">
+                                        <div className="font-semibold text-sm text-gray-900 truncate">
+                                            {exam.name}
                                         </div>
-                                        <div className="flex-1 truncate">
-                                            <div className="font-semibold text-sm text-gray-900 truncate">
-                                                {exam.name}
-                                            </div>
-                                        </div>
-                                    </motion.button>
-                                );
-                            })}
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                                    </div>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
 
 
 export default function HeroSection() {
+    const { isLoaded, isSignedIn } = useUser();
 
     return (
-        <section className="relative pt-20 pb-20 md:pt-32 md:pb-32 bg-white z-10">
+        <section className="relative pt-16 pb-16 md:pt-24 md:pb-24 bg-white z-10">
 
             <div className="absolute inset-0 -z-10 bg-gradient-to-b from-white to-gray-50/60" />
 
@@ -127,33 +120,37 @@ export default function HeroSection() {
                 <div className="absolute bottom-0 left-0 h-[500px] w-[500px] rounded-full bg-slate-50/40 blur-[80px] opacity-30" />
             </div>
 
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 relative z-10">
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-start lg:items-center">
+                <div className="grid grid-cols-1 md:grid-cols-[55fr_45fr] gap-8 lg:gap-20 items-start lg:items-center mt-4 sm:mt-6">
 
-                    <div className="text-left lg:pr-6">
+                    <div className="text-left">
 
                         <motion.div
                             initial={{ opacity: 0, y: 8 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.25, ease: 'easeOut' }}
-                            className="inline-flex items-center gap-3 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs text-gray-600 mb-10 shadow-soft whitespace-nowrap"
+                            className="mt-3 inline-flex flex-wrap items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-1.5 text-sm text-gray-600 mb-6 sm:mb-10 shadow-soft"
                         >
                             {/* Stacked avatars with +120 badge */}
                             <div className="flex items-center">
                                 <div className="flex -space-x-2">
-                                    <img
+                                    <Image
                                         src="/mentors/vikram.jpg"
-                                        alt=""
+                                        alt="Mentor"
+                                        width={28}
+                                        height={28}
                                         className="w-7 h-7 rounded-full border-2 border-white object-cover"
                                     />
-                                    <img
+                                    <Image
                                         src="/mentors/rahul.jpg"
-                                        alt=""
+                                        alt="Mentor"
+                                        width={28}
+                                        height={28}
                                         className="w-7 h-7 rounded-full border-2 border-white object-cover"
                                     />
                                 </div>
-                                <span className="ml-1 text-[11px] font-semibold text-slate-500">+120</span>
+                                <span className="ml-1 text-[12px] font-semibold text-slate-500">+120</span>
                             </div>
 
                             {/* Rating */}
@@ -172,80 +169,85 @@ export default function HeroSection() {
                             </span>
                         </motion.div>
 
-                        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-6 lg:mb-7 items-stretch">
-                            <motion.h1
-                                initial={{ opacity: 0, y: 8 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.25, delay: 0.06, ease: 'easeOut' }}
-                                className="lg:col-span-3 text-2xl sm:text-[30px] lg:text-[46px] xl:text-[52px] font-extrabold leading-[1.15] lg:leading-[1.08] tracking-tight text-balance max-w-xl"
-                                style={{ color: '#0A1628', letterSpacing: '-0.5px' }}
-                            >
-                                1-on-1 mentorship that turns{' '}
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-600">
-                                    dreams into reality
-                                </span>
-                            </motion.h1>
+                        {/* Mobile hero image — full width above content */}
+                        <div className="relative w-full h-[240px] sm:h-[260px] rounded-2xl overflow-hidden mb-6 md:hidden">
+                            <Image
+                                src="/mentorLanding.png"
+                                alt="Mentorship session"
+                                fill
+                                sizes="(max-width: 767px) 100vw, 0vw"
+                                className="object-cover object-top"
+                            />
 
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ duration: 0.25, delay: 0.1, ease: 'easeOut' }}
-                                className="lg:col-span-2 w-full h-56 sm:h-64 md:h-72 lg:hidden relative rounded-2xl overflow-hidden shadow-floating border border-gray-100"
-                            >
-                                <Image
-                                    src="/mentorLanding.png"
-                                    alt="Mentorship session"
-                                    fill
-                                    className="object-cover object-left-top"
-                                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 0vw"
-                                    priority
-                                />
-                            </motion.div>
+                            {/* Top badge */}
+                            <div className="absolute top-3 right-3 bg-white/95 rounded-xl px-2.5 py-1.5 shadow-md flex items-center gap-1.5 border border-gray-100">
+                                <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                                <span className="text-[12px] font-bold text-primary">
+                                    Top Mentor
+                                </span>
+                            </div>
+
+                            {/* Bottom badge */}
+                            <div className="absolute bottom-3 left-3 bg-white/95 rounded-xl px-2.5 py-1.5 shadow-md flex items-center gap-1.5 border border-gray-100">
+                                <span className="text-[12px] font-bold text-primary">
+                                    4.9
+                                </span>
+                                <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                                <span className="text-[12px] text-slate-400">
+                                    200+ ratings
+                                </span>
+                            </div>
                         </div>
+
+                        <motion.h1
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.25, delay: 0.06, ease: 'easeOut' }}
+                            className="text-[30px] md:text-[36px] lg:text-[44px] xl:text-[52px] font-extrabold leading-[1.1] tracking-tight text-[#0A1628] mb-6"
+                        >
+                            1-on-1 mentorship that turns{' '}
+                            <span className="text-blue-500">
+                                dreams into reality
+                            </span>
+                        </motion.h1>
 
                         <motion.p
                             initial={{ opacity: 0, y: 8 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.25, delay: 0.12, ease: 'easeOut' }}
-                            className="text-[15px] lg:text-[17px] font-normal leading-[1.7] lg:leading-relaxed text-left mb-8 lg:mb-10 max-w-xl lg:mx-0 text-slate-600"
+                            className="text-[15px] md:text-[18px] text-gray-500 mb-6 leading-relaxed max-w-lg mx-auto lg:mx-0"
                         >
-                            High-intent, 1-on-1 mentorship from people who&apos;ve already cleared the exams you&apos;re aiming for.
+                            Guidance from those who've already reached where you want to go
                         </motion.p>
 
                         <motion.div
                             initial={{ opacity: 0, y: 8 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.25, delay: 0.18, ease: 'easeOut' }}
-                            className="flex justify-center lg:justify-start mb-4"
+                            className="flex justify-start mb-4"
                         >
-                            <ExamCombobox />
+                            <div className="w-full lg:max-w-md">
+                                <ExamCombobox />
+                            </div>
                         </motion.div>
 
-                        {/* Upcoming Session card sits directly under the goal dropdown */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 8 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.25, delay: 0.22, ease: 'easeOut' }}
-                            className="flex justify-center lg:justify-start"
-                        >
-                            <HeroMockUI />
-                        </motion.div>
+                        {/* Primary CTA intentionally removed from hero per latest design */}
                     </div>
 
                     <motion.div
                         initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3, delay: 0.22, ease: 'easeOut' }}
-                        className="hidden lg:block relative max-w-[580px] mx-auto"
+                        className="hidden md:block relative max-w-[580px] w-full mx-auto"
                     >
-                        <div className="relative rounded-3xl overflow-hidden shadow-floating border border-gray-100">
+                        <div className="relative w-full h-[340px] md:h-[380px] lg:h-[460px] xl:h-[520px] rounded-2xl lg:rounded-3xl overflow-hidden shadow-floating border border-gray-100">
                             <Image
                                 src="/mentorLanding.png"
                                 alt="Live 1-on-1 mentorship session"
-                                width={800}
-                                height={600}
-                                className="w-full h-auto object-cover"
+                                fill
                                 priority
+                                sizes="(max-width: 1023px) 50vw, (max-width: 1280px) 40vw, 580px"
+                                className="object-cover object-top"
                             />
 
                             <div className="absolute top-5 left-5 bg-white/95 rounded-full px-3.5 py-1.5 shadow-soft flex items-center gap-2 border border-gray-100">
@@ -286,6 +288,16 @@ export default function HeroSection() {
                     </motion.div>
                 </div>
 
+                {isLoaded && isSignedIn && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: 0.3, ease: 'easeOut' }}
+                        className="relative mx-auto max-w-2xl rounded-2xl border border-gray-100 bg-white shadow-floating overflow-hidden mt-10"
+                    >
+                        <HeroMockUI />
+                    </motion.div>
+                )}
             </div>
         </section>
     );
@@ -359,7 +371,7 @@ function HeroMockUI() {
     }
 
     return (
-        <div className="mt-4 lg:mt-5 w-full">
+        <div className="px-6 py-5">
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -404,7 +416,7 @@ function HeroMockUI() {
                                 </div>
                             </div>
                             <Button
-                                className="w-full bg-blue-500 hover:bg-blue-600 text-white text-sm transition-colors duration-200"
+                                className="w-full bg-[#FF9500] hover:bg-[#E8860A] text-[#0A1628] text-sm transition-colors duration-200"
                                 onClick={() => {
                                     const meetingActive =
                                         session.status === 'meeting_started' ||

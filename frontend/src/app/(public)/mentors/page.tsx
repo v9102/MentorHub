@@ -5,7 +5,7 @@ import { type MentorProfile } from "./mock";
 import { fetchMentors } from "@/shared/lib/api/mentors";
 import SimpleMentorCard from "@/shared/ui/SimpleMentorCard";
 import Pagination from "@/shared/ui/Pagination";
-import { Search, ChevronDown, X } from "lucide-react";
+import { Search, ChevronDown, X, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 /* ────────────────────────────────────────────────────────
@@ -26,13 +26,15 @@ const EXAM_OPTIONS = [
 
 const LANGUAGE_OPTIONS = [
   { label: "Any Language", value: "" },
-  { label: "Hindi", value: "Hindi" },
-  { label: "English", value: "English" },
-  { label: "Bilingual", value: "Bilingual" },
-  { label: "Tamil", value: "Tamil" },
-  { label: "Telugu", value: "Telugu" },
-  { label: "Marathi", value: "Marathi" },
-  { label: "Bengali", value: "Bengali" },
+  { label: "English", value: "en" },
+  { label: "Hindi", value: "hi" },
+  { label: "Bengali", value: "bn" },
+  { label: "Tamil", value: "ta" },
+  { label: "Telugu", value: "te" },
+  { label: "Marathi", value: "mr" },
+  { label: "Gujarati", value: "gu" },
+  { label: "Kannada", value: "kn" },
+  { label: "Malayalam", value: "ml" },
 ];
 
 const RATING_OPTIONS = [
@@ -156,14 +158,17 @@ export default function MentorsPage() {
   /* ── Data ── */
   const [mentors, setMentors] = useState<MentorProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
       try {
+        setFetchError(null);
         const data = await fetchMentors();
         setMentors(data);
       } catch (err) {
         console.error("Failed to load mentors", err);
+        setFetchError(err instanceof Error ? err.message : "Failed to load mentors. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -236,6 +241,9 @@ export default function MentorsPage() {
 
       if (selectedExam && m.exam !== selectedExam) return false;
 
+      if (selectedLanguage && !(m.languages || []).includes(selectedLanguage))
+        return false;
+
       if (selectedRating && (m.rating || 0) < Number(selectedRating))
         return false;
 
@@ -270,6 +278,7 @@ export default function MentorsPage() {
     mentors,
     debouncedSearch,
     selectedExam,
+    selectedLanguage,
     selectedRating,
     selectedPrice,
     selectedExperience,
@@ -470,6 +479,28 @@ export default function MentorsPage() {
               <SimpleMentorCard key={i} isLoading={true} />
             ))}
           </div>
+        ) : fetchError ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-28"
+          >
+            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-red-50 flex items-center justify-center">
+              <AlertCircle className="w-7 h-7 text-red-400" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              Could not load mentors
+            </h3>
+            <p className="text-gray-500 text-[15px] max-w-sm mx-auto mb-8">
+              {fetchError}
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-5 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-full hover:bg-gray-800 transition-colors"
+            >
+              Try again
+            </button>
+          </motion.div>
         ) : filteredMentors.length === 0 ? (
           <motion.div
             initial={{ opacity: 0 }}
@@ -535,6 +566,9 @@ export default function MentorsPage() {
                         college: mentor.college,
                         exam: mentor.exam,
                         rank: mentor.rank != null ? String(mentor.rank) : undefined,
+                        percentile: mentor.percentile != null ? String(mentor.percentile) : undefined,
+                        selectionYear: mentor.selectionYear ?? undefined,
+                        languages: mentor.languages,
                         service: mentor.service,
                         posting: mentor.posting,
                       }}

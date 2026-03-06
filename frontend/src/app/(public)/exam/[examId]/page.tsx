@@ -5,7 +5,7 @@ import { type MentorProfile } from "@/app/(public)/mentors/mock";
 import { fetchMentors } from "@/shared/lib/api/mentors";
 import SimpleMentorCard from "@/shared/ui/SimpleMentorCard";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, AlertCircle } from "lucide-react";
 
 export default function ExamPage({
   params,
@@ -15,11 +15,18 @@ export default function ExamPage({
   const { examId } = use(params);
   const [mentors, setMentors] = useState<MentorProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchMentors()
-      .then(setMentors)
-      .catch(console.error)
+      .then((data) => {
+        setMentors(data);
+        setFetchError(null);
+      })
+      .catch((err) => {
+        console.error("Failed to load mentors", err);
+        setFetchError(err instanceof Error ? err.message : "Failed to load mentors.");
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -81,6 +88,18 @@ export default function ExamPage({
                 <SimpleMentorCard key={i} isLoading={true} />
               ))}
             </div>
+          ) : fetchError ? (
+            <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
+              <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
+              <p className="text-gray-700 font-medium mb-2">Could not load mentors</p>
+              <p className="text-gray-500 text-sm mb-4">{fetchError}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-gray-900 text-white text-sm rounded-lg hover:bg-gray-800"
+              >
+                Try again
+              </button>
+            </div>
           ) : (
             <div className="space-y-6">
               {filteredMentors.length === 0 ? (
@@ -114,9 +133,12 @@ export default function ExamPage({
                       attendance: mentor.attendance,
                       exam: mentor.exam,
                       college: mentor.college,
+                      rank: mentor.rank != null ? String(mentor.rank) : undefined,
+                      percentile: mentor.percentile != null ? String(mentor.percentile) : undefined,
+                      selectionYear: mentor.selectionYear ?? undefined,
+                      languages: mentor.languages,
                       service: mentor.service,
                       posting: mentor.posting,
-                      rank: mentor.rank != null ? String(mentor.rank) : undefined,
                       offerings: mentor.offerings,
                     }}
                   />

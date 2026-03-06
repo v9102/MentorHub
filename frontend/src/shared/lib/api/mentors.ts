@@ -68,8 +68,8 @@ export const transformMentorData = (mentor: any): MentorProfile => {
           : "Helping students achieve their goals through personalised guidance."
     ),
 
-    // Education & Experience
-    college: professional.college || "N/A",
+    // Education & Experience — college from professionalInfo or examDetails
+    college: professional.college || mp.examDetails?.[0]?.college || undefined,
     yearOfPassing: professional.passingYear || 0,
     yearsOfExperience: basic.workExperience || 0,
     highestQualification: professional.highestQualification,
@@ -107,11 +107,15 @@ export const transformMentorData = (mentor: any): MentorProfile => {
       }
     ],
 
-    // Govt Specific Fields (Pass through if present)
+    // Govt / Exam Specific Fields (Pass through if present)
     service: mentor.service,
     posting: mentor.posting || basic.currentRole,
-    rank: mentor.rank || mp.examDetails?.[0]?.rank,
-    attempts: mentor.attempts || mp.examDetails?.[0]?.attempts,
+    rank: mentor.rank ?? mp.examDetails?.[0]?.rank,
+    attempts: mentor.attempts ?? mp.examDetails?.[0]?.attempts,
+    percentile: mentor.percentile ?? mp.examDetails?.[0]?.percentile,
+    selectionYear: mentor.selectionYear ?? mp.examDetails?.[0]?.selectionYear,
+    // Languages — top-level User.languages or mentorProfile.languages
+    languages: mentor.languages || mp.languages || (basic as any).preferredLanguages || [],
     exam: (() => {
       // First check explicit exam field
       const explicitExam = mentor.exam;
@@ -190,26 +194,29 @@ export const fetchMentors = async (): Promise<MentorProfile[]> => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('[fetchMentors] Error response:', errorText);
-      return [];
+      throw new Error(`Failed to fetch mentors: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
-    console.log('[fetchMentors] Received data:', { 
-      isArray: Array.isArray(data),
-      hasMentors: !!data.mentors,
-      mentorCount: Array.isArray(data) ? data.length : (data.mentors?.length || 0)
-    });
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[fetchMentors] Received data:', { 
+        isArray: Array.isArray(data),
+        hasMentors: !!data.mentors,
+        mentorCount: Array.isArray(data) ? data.length : (data.mentors?.length || 0)
+      });
+    }
     
     const backendMentors = Array.isArray(data) ? data : (data.mentors || []);
 
-    if (backendMentors.length === 0) {
+    if (backendMentors.length === 0 && process.env.NODE_ENV === 'development') {
       console.warn('[fetchMentors] No mentors returned from backend');
     }
 
     return backendMentors.map(transformMentorData);
   } catch (error) {
     console.error('[fetchMentors] Error:', error);
-    return [];
+    if (error instanceof Error) throw error;
+    throw new Error('Failed to fetch mentors');
   }
 };
 
