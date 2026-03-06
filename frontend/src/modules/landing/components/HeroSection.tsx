@@ -111,7 +111,7 @@ export default function HeroSection() {
     const { isLoaded, isSignedIn } = useUser();
 
     return (
-        <section className="relative pt-16 pb-16 md:pt-24 md:pb-24 bg-white z-10">
+        <section className="relative pt-16 pb-16 md:pt-24 md:pb-24 bg-white z-20">
 
             <div className="absolute inset-0 -z-10 bg-gradient-to-b from-white to-gray-50/60" />
 
