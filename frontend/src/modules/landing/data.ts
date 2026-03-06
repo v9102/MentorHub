@@ -1,14 +1,14 @@
 import { Calculator, Stethoscope, BookOpen, DollarSign, Scale, Target, Briefcase, Search, Calendar, Rocket, BadgeCheck, Coins, Users } from "lucide-react";
 
 export const popularExams = [
-    { id: "upsc", name: "UPSC CSE", icon: BookOpen, color: "text-orange-600", bg: "bg-orange-100", link: "/mentors?exam=UPSC+CSE" },
-    { id: "banking", name: "Banking", icon: DollarSign, color: "text-green-600", bg: "bg-green-100", link: "/mentors?exam=Banking" },
-    { id: "neet", name: "NEET", icon: Stethoscope, color: "text-rose-600", bg: "bg-rose-100", link: "/mentors?exam=NEET" },
-    { id: "jee", name: "JEE", icon: Calculator, color: "text-indigo-600", bg: "bg-indigo-100", link: "/mentors?exam=JEE" },
-    { id: "cat", name: "CAT", icon: Target, color: "text-amber-600", bg: "bg-amber-100", link: "/mentors?exam=CAT" },
-    { id: "ssc", name: "SSC CGL", icon: Briefcase, color: "text-blue-600", bg: "bg-blue-100", link: "/mentors?exam=SSC+CGL" },
-    { id: "clat", name: "CLAT", icon: Scale, color: "text-purple-600", bg: "bg-purple-100", link: "/mentors?exam=CLAT" },
-    { id: "ca", name: "CA/CMA/CS", icon: Calculator, color: "text-emerald-600", bg: "bg-emerald-100", link: "/mentors?exam=CA%2FCMA%2FCS" },
+    { id: "upsc", name: "UPSC CSE", icon: BookOpen, color: "text-[#0A1628]", bg: "bg-slate-50", link: "/mentors?exam=UPSC+CSE" },
+    { id: "banking", name: "Banking", icon: DollarSign, color: "text-[#0A1628]", bg: "bg-slate-50", link: "/mentors?exam=Banking" },
+    { id: "neet", name: "NEET", icon: Stethoscope, color: "text-[#0A1628]", bg: "bg-slate-50", link: "/mentors?exam=NEET" },
+    { id: "jee", name: "JEE", icon: Calculator, color: "text-[#0A1628]", bg: "bg-slate-50", link: "/mentors?exam=JEE" },
+    { id: "cat", name: "CAT", icon: Target, color: "text-[#0A1628]", bg: "bg-slate-50", link: "/mentors?exam=CAT" },
+    { id: "ssc", name: "SSC CGL", icon: Briefcase, color: "text-[#0A1628]", bg: "bg-slate-50", link: "/mentors?exam=SSC+CGL" },
+    { id: "clat", name: "CLAT", icon: Scale, color: "text-[#0A1628]", bg: "bg-slate-50", link: "/mentors?exam=CLAT" },
+    { id: "ca", name: "CA/CMA/CS", icon: Calculator, color: "text-[#0A1628]", bg: "bg-slate-50", link: "/mentors?exam=CA%2FCMA%2FCS" },
 ];
 
 export const featuredMentors = [

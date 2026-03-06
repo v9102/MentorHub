@@ -99,9 +99,9 @@ export default function Navbar() {
               src="/mentomanialogo.png"
               alt="MentoMania"
               width={200}
-              height={40}
+              height={104}
               className="w-auto object-contain"
-              style={{ height: '56px' }}
+              style={{ height: '104px' }}
             />
           </Link>
 
@@ -161,10 +161,10 @@ export default function Navbar() {
             <Image
               src="/mentomanialogo.png"
               alt="MentoMania"
-              width={200}
-              height={44}
+              width={220}
+              height={124}
               className="w-auto object-contain"
-              style={{ height: '56px' }}
+              style={{ height: '124px' }}
               priority
             />
           </Link>
@@ -235,14 +235,16 @@ export default function Navbar() {
                 className="flex items-center justify-between px-6 h-14 shrink-0"
                 style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}
               >
-                <Image
-                  src="/mentomanialogo.png"
-                  alt="MentoMania"
-                  width={180}
-                  height={40}
-                  className="w-auto object-contain"
-                  style={{ height: '40px' }}
-                />
+                <Link href="/" onClick={closeMenu}>
+                  <Image
+                    src="/mentomanialogo.png"
+                    alt="MentoMania"
+                    width={220}
+                    height={96}
+                    className="w-auto object-contain"
+                    style={{ height: '96px' }}
+                  />
+                </Link>
                 <button
                   onClick={closeMenu}
                   aria-label="Close menu"

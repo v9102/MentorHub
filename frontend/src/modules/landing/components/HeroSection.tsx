@@ -3,12 +3,12 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { useUser } from '@clerk/nextjs';
-import { Button } from '@/shared/ui/button';
 import { Star, Search, ChevronDown } from 'lucide-react';
 import { popularExams } from '../data';
 import { useRouter } from 'next/navigation';
+import { useUser } from '@clerk/nextjs';
 import { useUpcomingSessions, type DashboardSession } from '@/shared/lib/hooks/useDashboard';
+import { Button } from '@/shared/ui/button';
 
 type Exam = (typeof popularExams)[number];
 
@@ -50,8 +50,8 @@ function ExamCombobox() {
                         <Search className="w-5 h-5" />
                     </div>
                     <div>
-                        <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-0.5">Find Mentors By</div>
-                        <div className="text-[15px] font-medium text-gray-900 leading-none">Select your exam...</div>
+                        <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-0.5">What Are You Working Towards?</div>
+                        <div className="text-[15px] font-medium text-gray-900 leading-none">Select your goal...</div>
                     </div>
                 </div>
                 <div className={`
@@ -116,10 +116,9 @@ function ExamCombobox() {
 
 
 export default function HeroSection() {
-    const { isSignedIn, isLoaded } = useUser();
 
     return (
-        <section className="relative pt-36 pb-28 md:pt-48 md:pb-40 bg-white z-10">
+        <section className="relative pt-20 pb-20 md:pt-32 md:pb-32 bg-white z-10">
 
             <div className="absolute inset-0 -z-10 bg-gradient-to-b from-white to-gray-50/60" />
 
@@ -128,53 +127,108 @@ export default function HeroSection() {
                 <div className="absolute bottom-0 left-0 h-[500px] w-[500px] rounded-full bg-slate-50/40 blur-[80px] opacity-30" />
             </div>
 
-            <div className="max-w-6xl mx-auto px-6 relative z-10">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-start lg:items-center">
 
-                    <div className="text-center lg:text-left">
+                    <div className="text-left lg:pr-6">
 
                         <motion.div
                             initial={{ opacity: 0, y: 8 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.25, ease: 'easeOut' }}
-                            className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-1.5 text-sm text-gray-600 mb-10 shadow-soft"
+                            className="inline-flex items-center gap-3 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs text-gray-600 mb-10 shadow-soft whitespace-nowrap"
                         >
-                            <span className="h-1.5 w-1.5 rounded-full bg-blue-400 shrink-0" />
-                            <span>Trusted by 10,000+ Students</span>
+                            {/* Stacked avatars with +120 badge */}
+                            <div className="flex items-center">
+                                <div className="flex -space-x-2">
+                                    <img
+                                        src="/mentors/vikram.jpg"
+                                        alt=""
+                                        className="w-7 h-7 rounded-full border-2 border-white object-cover"
+                                    />
+                                    <img
+                                        src="/mentors/rahul.jpg"
+                                        alt=""
+                                        className="w-7 h-7 rounded-full border-2 border-white object-cover"
+                                    />
+                                </div>
+                                <span className="ml-1 text-[11px] font-semibold text-slate-500">+120</span>
+                            </div>
+
+                            {/* Rating */}
+                            <div className="flex items-center gap-1">
+                                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                                <span className="font-semibold text-gray-800">4.9/5</span>
+                            </div>
+
+                            {/* Divider */}
+                            <div className="w-px h-4 bg-gray-200" />
+
+                            {/* Exam services */}
+                            <span className="flex items-center gap-1 text-slate-500 font-medium">
+                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shrink-0" />
+                                IAS · IPS · SBI
+                            </span>
                         </motion.div>
 
-                        <motion.h1
-                            initial={{ opacity: 0, y: 8 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.25, delay: 0.06, ease: 'easeOut' }}
-                            className="text-5xl font-extrabold tracking-tight text-gray-900 lg:text-6xl mb-6 leading-[1.12]"
-                        >
-                            Ace Your{' '}
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-600">
-                                Dream Exam
-                            </span>
-                            <br className="hidden sm:block" />
-                            <span className="block mt-2">With Top Rankers</span>
-                        </motion.h1>
+                        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-6 lg:mb-7 items-stretch">
+                            <motion.h1
+                                initial={{ opacity: 0, y: 8 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.25, delay: 0.06, ease: 'easeOut' }}
+                                className="lg:col-span-3 text-2xl sm:text-[30px] lg:text-[46px] xl:text-[52px] font-extrabold leading-[1.15] lg:leading-[1.08] tracking-tight text-balance max-w-xl"
+                                style={{ color: '#0A1628', letterSpacing: '-0.5px' }}
+                            >
+                                1-on-1 mentorship that turns{' '}
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-600">
+                                    dreams into reality
+                                </span>
+                            </motion.h1>
+
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 0.25, delay: 0.1, ease: 'easeOut' }}
+                                className="lg:col-span-2 w-full h-56 sm:h-64 md:h-72 lg:hidden relative rounded-2xl overflow-hidden shadow-floating border border-gray-100"
+                            >
+                                <Image
+                                    src="/mentorLanding.png"
+                                    alt="Mentorship session"
+                                    fill
+                                    className="object-cover object-left-top"
+                                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 0vw"
+                                    priority
+                                />
+                            </motion.div>
+                        </div>
 
                         <motion.p
                             initial={{ opacity: 0, y: 8 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.25, delay: 0.12, ease: 'easeOut' }}
-                            className="text-lg text-gray-500 mb-12 leading-relaxed max-w-lg mx-auto lg:mx-0"
+                            className="text-[15px] lg:text-[17px] font-normal leading-[1.7] lg:leading-relaxed text-left mb-8 lg:mb-10 max-w-xl lg:mx-0 text-slate-600"
                         >
-                            Connect with mentors who serve in IAS, IPS, SBI, and Railways.
-                            Get personalized strategy, answer writing reviews, and interview guidance — 1-on-1.
+                            High-intent, 1-on-1 mentorship from people who&apos;ve already cleared the exams you&apos;re aiming for.
                         </motion.p>
 
                         <motion.div
                             initial={{ opacity: 0, y: 8 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.25, delay: 0.18, ease: 'easeOut' }}
-                            className="flex justify-center lg:justify-start mb-12"
+                            className="flex justify-center lg:justify-start mb-4"
                         >
                             <ExamCombobox />
+                        </motion.div>
+
+                        {/* Upcoming Session card sits directly under the goal dropdown */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.25, delay: 0.22, ease: 'easeOut' }}
+                            className="flex justify-center lg:justify-start"
+                        >
+                            <HeroMockUI />
                         </motion.div>
                     </div>
 
@@ -232,16 +286,6 @@ export default function HeroSection() {
                     </motion.div>
                 </div>
 
-                {isLoaded && isSignedIn && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3, delay: 0.3, ease: 'easeOut' }}
-                        className="relative mx-auto max-w-2xl rounded-2xl border border-gray-100 bg-white shadow-floating overflow-hidden mt-14"
-                    >
-                        <HeroMockUI />
-                    </motion.div>
-                )}
             </div>
         </section>
     );
@@ -315,7 +359,7 @@ function HeroMockUI() {
     }
 
     return (
-        <div className="px-6 py-5">
+        <div className="mt-4 lg:mt-5 w-full">
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
