@@ -400,9 +400,9 @@ function AuthFormsCardInner({ initialView }: AuthFormsCardProps) {
         <div className="w-full space-y-3">
 
             <div
-                className={`rounded-2xl border overflow-hidden ${isSignIn
+                className={`rounded-2xl border overflow-hidden transition-all duration-200 ${isSignIn
                     ? "border-[#1DA1F2]/30 shadow-[0_0_0_3px_rgba(29,161,242,0.08)] bg-white"
-                    : "border-slate-200 bg-white/70"
+                    : "border-[#1DA1F2]/10 bg-[#1DA1F2]/[0.02] hover:border-[#1DA1F2]/25 hover:bg-[#1DA1F2]/[0.05] hover:shadow-sm"
                     }`}
             >
                 <button
@@ -412,16 +412,16 @@ function AuthFormsCardInner({ initialView }: AuthFormsCardProps) {
                 >
                     <div className="flex items-center gap-3">
                         <div className="text-left">
-                            <p className={`font-semibold text-[15px] transition-colors duration-200 ${isSignIn ? "text-slate-900" : "text-slate-500 group-hover:text-slate-700"}`}>
+                            <p className={`font-semibold text-[15px] transition-colors duration-200 ${isSignIn ? "text-slate-900" : "text-slate-600 group-hover:text-slate-900"}`}>
                                 Sign In
                             </p>
                             {!isSignIn && (
-                                <p className="text-xs text-slate-400 mt-0.5">Already have an account?</p>
+                                <p className="text-xs text-slate-500 mt-0.5">Already have an account?</p>
                             )}
                         </div>
                     </div>
                     <div style={{ opacity: isSignIn ? 0 : 1 }}>
-                        <ChevronRight className={`w-4 h-4 ${isSignIn ? "text-transparent" : "text-slate-400 group-hover:text-slate-600"}`} />
+                        <ChevronRight className={`w-4 h-4 transition-colors duration-200 ${isSignIn ? "text-transparent" : "text-slate-400 group-hover:text-[#1DA1F2]"}`} />
                     </div>
                 </button>
 
@@ -524,9 +524,9 @@ function AuthFormsCardInner({ initialView }: AuthFormsCardProps) {
 
             {/* ===== SIGN UP ACCORDION CARD ===== */}
             <div
-                className={`rounded-2xl border overflow-hidden ${!isSignIn
+                className={`rounded-2xl border overflow-hidden transition-all duration-200 ${!isSignIn
                     ? "border-[#1DA1F2]/30 shadow-[0_0_0_3px_rgba(29,161,242,0.08)] bg-white"
-                    : "border-slate-200 bg-white/70"
+                    : "border-[#1DA1F2]/10 bg-[#1DA1F2]/[0.02] hover:border-[#1DA1F2]/25 hover:bg-[#1DA1F2]/[0.05] hover:shadow-sm"
                     }`}
             >
                 {/* Card Header */}
@@ -537,16 +537,16 @@ function AuthFormsCardInner({ initialView }: AuthFormsCardProps) {
                 >
                     <div className="flex items-center gap-3">
                         <div className="text-left">
-                            <p className={`font-semibold text-[15px] transition-colors duration-200 ${!isSignIn ? "text-slate-900" : "text-slate-500 group-hover:text-slate-700"}`}>
+                            <p className={`font-semibold text-[15px] transition-colors duration-200 ${!isSignIn ? "text-slate-900" : "text-slate-600 group-hover:text-slate-900"}`}>
                                 Create Account
                             </p>
                             {isSignIn && (
-                                <p className="text-xs text-slate-400 mt-0.5">New to MentoMania?</p>
+                                <p className="text-xs text-slate-500 mt-0.5">New to MentoMania?</p>
                             )}
                         </div>
                     </div>
                     <div style={{ opacity: !isSignIn ? 0 : 1 }}>
-                        <ChevronRight className={`w-4 h-4 ${!isSignIn ? "text-transparent" : "text-slate-400 group-hover:text-slate-600"}`} />
+                        <ChevronRight className={`w-4 h-4 transition-colors duration-200 ${!isSignIn ? "text-transparent" : "text-slate-400 group-hover:text-[#1DA1F2]"}`} />
                     </div>
                 </button>
 

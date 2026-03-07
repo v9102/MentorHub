@@ -51,10 +51,10 @@ function ExamCombobox() {
                     </div>
                     <div>
                         <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-0.5">
-                            WHAT ARE YOU WORKING TOWARDS?
+                            WHAT BRINGS YOU HERE?
                         </div>
                         <div className="text-[15px] font-medium text-gray-900 leading-none">
-                            Select your goal...
+                            Explore mentors...
                         </div>
                     </div>
                 </div>
@@ -111,7 +111,7 @@ export default function HeroSection() {
     const { isLoaded, isSignedIn } = useUser();
 
     return (
-        <section className="relative pt-16 pb-16 md:pt-24 md:pb-24 bg-white z-20">
+        <section className="relative pt-16 pb-4 sm:pb-6 min-[900px]:pb-8 md:pt-24 bg-white z-20">
 
             <div className="absolute inset-0 -z-10 bg-gradient-to-b from-white to-gray-50/60" />
 

@@ -12,6 +12,8 @@ export default function MeetingPage() {
     const [status, setStatus] = useState<"loading" | "authorized" | "unauthorized" | "error">("loading");
     const [role, setRole] = useState<"mentor" | "student" | null>(null);
     const [meetingState, setMeetingState] = useState<string | null>(null);
+    const [mentorName, setMentorName] = useState("");
+    const [studentName, setStudentName] = useState("");
 
     // Initial Auth
     useEffect(() => {
@@ -35,6 +37,8 @@ export default function MeetingPage() {
                 if (data.success) {
                     setRole(data.role);
                     setMeetingState(data.status);
+                    setMentorName(data.mentorName || "");
+                    setStudentName(data.studentName || "");
                     setStatus("authorized");
                 } else {
                     setStatus("unauthorized");
@@ -100,7 +104,7 @@ export default function MeetingPage() {
 
     if (status === "loading" || !isLoaded) {
         return (
-            <div className="flex h-screen w-full items-center justify-center bg-slate-900 text-white">
+            <div className="flex h-screen w-full items-center justify-center bg-[#1C1C1E] text-white">
                 <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
                 <span className="ml-3 text-lg font-medium">Validating session...</span>
             </div>
@@ -109,7 +113,7 @@ export default function MeetingPage() {
 
     if (status === "unauthorized") {
         return (
-            <div className="flex h-screen w-full items-center justify-center bg-slate-900 text-white">
+            <div className="flex h-screen w-full items-center justify-center bg-[#1C1C1E] text-white">
                 <div className="text-center">
                     <h1 className="text-3xl font-bold text-red-500 mb-2">Access Denied</h1>
                     <p className="text-slate-400">You do not have permission to join this meeting.</p>
@@ -120,7 +124,7 @@ export default function MeetingPage() {
 
     if (status === "error") {
         return (
-            <div className="flex h-screen w-full items-center justify-center bg-slate-900 text-white">
+            <div className="flex h-screen w-full items-center justify-center bg-[#1C1C1E] text-white">
                 <div className="text-center">
                     <h1 className="text-3xl font-bold text-red-500 mb-2">Connection Error</h1>
                     <p className="text-slate-400">Failed to connect to the meeting server.</p>
@@ -129,11 +133,19 @@ export default function MeetingPage() {
         );
     }
 
+    const iframeParams = new URLSearchParams({
+        roomId: sessionId as string,
+        role: role || "",
+        state: meetingState || "",
+        mentorName,
+        studentName,
+    });
+
     return (
-        <div className="h-screen w-full bg-[#202124] m-0 p-0 overflow-hidden">
+        <div className="h-screen w-screen bg-[#1C1C1E] m-0 p-0 overflow-hidden">
             <iframe
                 id="rtc-iframe"
-                src={`/rtc/index.html?roomId=${sessionId}&role=${role}&state=${meetingState}`}
+                src={`/rtc/index.html?${iframeParams.toString()}`}
                 className="w-full h-full border-none"
                 allow="camera; microphone; display-capture; autoplay"
             />

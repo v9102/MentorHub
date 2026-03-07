@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { SignedIn, SignedOut, useUser } from "@clerk/nextjs";
+import { SignedIn, SignedOut, ClerkLoading, ClerkFailed, useUser } from "@clerk/nextjs";
 import { ProfileButton } from "@/shared/ui/ProfileButton";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
@@ -106,28 +106,56 @@ export default function Navbar() {
           </Link>
 
           <div className="flex items-center gap-3 justify-end min-w-[180px]">
-            {/* Auth section — only shows when signed in */}
-            <SignedIn>
-              <ProfileButton />
-            </SignedIn>
-            <SignedOut>
-              <Link
-                href={`/sign-up/student?redirect=${encodeURIComponent(pathname === "/" ? "/" : pathname)}`}
-                style={{
-                  backgroundColor: '#2E5FFF',
-                  color: 'white',
-                  fontFamily: 'var(--font-dm-sans, sans-serif)',
-                  fontWeight: 600,
-                  fontSize: '13px',
-                  padding: '8px 18px',
+            {/* Fixed-width auth slot — prevents CLS when Clerk resolves */}
+            <div style={{ minWidth: '92px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+              <ClerkLoading>
+                <div style={{
+                  width: '92px', height: '34px',
                   borderRadius: '100px',
-                  whiteSpace: 'nowrap',
-                  display: 'inline-block',
-                }}
-              >
-                Get Started
-              </Link>
-            </SignedOut>
+                  background: '#E2E8F0',
+                  animation: 'pulse 1.5s ease infinite',
+                }} />
+              </ClerkLoading>
+              <SignedIn>
+                <ProfileButton />
+              </SignedIn>
+              <SignedOut>
+                <Link
+                  href={`/sign-up/student?redirect=${encodeURIComponent(pathname === "/" ? "/" : pathname)}`}
+                  style={{
+                    backgroundColor: '#2E5FFF',
+                    color: 'white',
+                    fontFamily: 'var(--font-dm-sans, sans-serif)',
+                    fontWeight: 600,
+                    fontSize: '13px',
+                    padding: '8px 18px',
+                    borderRadius: '100px',
+                    whiteSpace: 'nowrap',
+                    display: 'inline-block',
+                  }}
+                >
+                  Get Started
+                </Link>
+              </SignedOut>
+              <ClerkFailed>
+                <Link
+                  href={`/sign-up/student?redirect=${encodeURIComponent(pathname === "/" ? "/" : pathname)}`}
+                  style={{
+                    backgroundColor: '#2E5FFF',
+                    color: 'white',
+                    fontFamily: 'var(--font-dm-sans, sans-serif)',
+                    fontWeight: 600,
+                    fontSize: '13px',
+                    padding: '8px 18px',
+                    borderRadius: '100px',
+                    whiteSpace: 'nowrap',
+                    display: 'inline-block',
+                  }}
+                >
+                  Get Started
+                </Link>
+              </ClerkFailed>
+            </div>
             <button
               onClick={() => setIsMobileMenuOpen(true)}
               aria-label="Open menu"
@@ -156,7 +184,7 @@ export default function Navbar() {
           }}
         />
         {/* Content row — max-width centred, sits above the backdrop */}
-        <div className="hidden md:flex relative max-w-7xl mx-auto px-6 items-center justify-between h-16">
+        <div className="hidden md:flex relative max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 items-center justify-between h-16">
           <Link href="/">
             <Image
               src="/mentomanialogo.png"
@@ -184,6 +212,12 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center justify-end min-w-[230px]">
+            <ClerkLoading>
+              <div className="flex items-center space-x-4">
+                <div className="w-20 h-10 bg-gray-200 rounded-md animate-pulse" />
+                <div className="w-28 h-10 bg-gray-200 rounded-md animate-pulse" />
+              </div>
+            </ClerkLoading>
             <SignedIn>
               <ProfileButton />
             </SignedIn>
@@ -191,7 +225,7 @@ export default function Navbar() {
               <div className="flex items-center space-x-4">
                 <Link
                   href={`/sign-in?redirect=${encodeURIComponent(pathname === "/" ? "/" : pathname)}`}
-                  className="px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100 text-sm font-medium transition-colors whitespace-nowrap"
+                  className="px-5 py-2.5 rounded-full border border-blue-600 text-blue-600 hover:bg-blue-50 font-medium text-sm whitespace-nowrap transition-colors"
                 >
                   Sign In
                 </Link>
@@ -203,6 +237,22 @@ export default function Navbar() {
                 </Link>
               </div>
             </SignedOut>
+            <ClerkFailed>
+              <div className="flex items-center space-x-4">
+                <Link
+                  href={`/sign-in?redirect=${encodeURIComponent(pathname === "/" ? "/" : pathname)}`}
+                  className="px-5 py-2.5 rounded-full border border-blue-600 text-blue-600 hover:bg-blue-50 font-medium text-sm whitespace-nowrap transition-colors"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href={`/sign-up/student?redirect=${encodeURIComponent(pathname === "/" ? "/" : pathname)}`}
+                  className="px-5 py-2.5 rounded-full bg-blue-600 text-white hover:bg-blue-700 font-medium text-sm whitespace-nowrap transition-colors"
+                >
+                  Get Started
+                </Link>
+              </div>
+            </ClerkFailed>
           </div>
         </div>
       </nav>
@@ -306,7 +356,7 @@ export default function Navbar() {
                 </SignedIn>
               </div>
 
-              {/* Bottom: auth buttons for logged-out */}
+              {/* Bottom: auth buttons for logged-out (or when Clerk fails) */}
               <SignedOut>
                 <div className="px-6 pb-10 shrink-0 flex flex-col gap-3">
                   <Link
@@ -346,6 +396,45 @@ export default function Navbar() {
                   </Link>
                 </div>
               </SignedOut>
+              <ClerkFailed>
+                <div className="px-6 pb-10 shrink-0 flex flex-col gap-3">
+                  <Link
+                    href={`/sign-up/student?redirect=${encodeURIComponent(pathname === "/" ? "/" : pathname)}`}
+                    onClick={closeMenu}
+                    style={{
+                      display: 'block',
+                      textAlign: 'center',
+                      padding: '14px',
+                      borderRadius: '12px',
+                      backgroundColor: '#2E5FFF',
+                      color: 'white',
+                      fontFamily: 'var(--font-dm-sans, sans-serif)',
+                      fontWeight: 600,
+                      fontSize: '15px',
+                      boxShadow: '0 4px 14px rgba(46, 95, 255, 0.3)',
+                    }}
+                  >
+                    Get Started — It&apos;s Free
+                  </Link>
+                  <Link
+                    href={`/sign-in?redirect=${encodeURIComponent(pathname === "/" ? "/" : pathname)}`}
+                    onClick={closeMenu}
+                    style={{
+                      display: 'block',
+                      textAlign: 'center',
+                      padding: '13px',
+                      borderRadius: '12px',
+                      border: '1.5px solid #2E5FFF',
+                      color: '#2E5FFF',
+                      fontFamily: 'var(--font-dm-sans, sans-serif)',
+                      fontWeight: 500,
+                      fontSize: '15px',
+                    }}
+                  >
+                    Log In
+                  </Link>
+                </div>
+              </ClerkFailed>
             </motion.div>
           </>
         )}

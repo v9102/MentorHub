@@ -106,7 +106,7 @@ export default function FeaturedMentorCard({
                     </p>
                 )}
 
-                {/* Bio with ellipsis truncation */}
+                {/* Bio */}
                 {mentor.bio && (
                     <p className="text-sm text-gray-600 leading-relaxed mb-3 line-clamp-2">
                         {mentor.bio}
@@ -117,7 +117,7 @@ export default function FeaturedMentorCard({
                 <div className="flex gap-4 mb-4">
                     <div className="flex items-center gap-1 text-xs text-gray-500">
                         <Briefcase className="w-3.5 h-3.5 text-gray-400" />
-                        <span>{mentor.yearsOfExperience ?? 0}+ Years Exp.</span>
+                        <span>{mentor.yearsOfExperience ?? 0}+ Years Mentoring</span>
                     </div>
                     <div className="flex items-center gap-1 text-xs text-gray-500">
                         <Users className="w-3.5 h-3.5 text-gray-400" />

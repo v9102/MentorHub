@@ -6,12 +6,11 @@ import Navbar from "./Navbar";
 export default function ConditionalNavbar() {
     const pathname = usePathname();
 
-    // Hide the navbar on mentor dashboard, onboarding, and admin routes
-    // But show it on /mentors (public mentor listing page)
     if (
         (pathname?.startsWith("/mentor/") || pathname === "/mentor") ||
         pathname?.startsWith("/onboarding") ||
-        pathname?.startsWith("/admin")
+        pathname?.startsWith("/admin") ||
+        pathname?.startsWith("/meeting")
     ) {
         return null;
     }

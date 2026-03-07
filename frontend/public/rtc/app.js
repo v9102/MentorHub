@@ -1,5 +1,3 @@
-// mdc.ripple.MDCRipple.attachTo(document.querySelector('.mdc-button'));
-
 const configuration = {
   iceServers: [
     {
@@ -17,7 +15,7 @@ let roomDialog = null;
 let roomId = null;
 let localUid = null;
 const peerConnections = {};
-const chatChannels = {}; // Store chat datachannels
+const chatChannels = {};
 
 let isBlurEnabled = false;
 let segmenter = null;
@@ -28,13 +26,22 @@ let rawLocalStream = null;
 let blurWorking = false;
 let sourceVideo = null;
 let isHost = false;
+let isRealMediaActive = false;
+
+let isScreenSharing = false;
+let screenShareStream = null;
+let preScreenShareStream = null;
+let sessionTimerInterval = null;
+let sessionStartTime = null;
+let rtcMentorName = '';
+let rtcStudentName = '';
+let rtcRole = '';
+let activeSidePanel = null;
 
 const BLUR_CONFIG = {
   backgroundBlurAmount: 15,
   outputFPS: 30
 };
-
-let isRealMediaActive = false;
 
 function createDummyStream() {
   const canvas = document.createElement('canvas');
@@ -43,10 +50,10 @@ function createDummyStream() {
   const ctx = canvas.getContext('2d');
 
   const drawBlank = () => {
-    ctx.fillStyle = '#2E3A59';
+    ctx.fillStyle = '#2C2C2E';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.font = '30px Arial';
-    ctx.fillStyle = '#ffffff';
+    ctx.font = '24px Inter, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
     ctx.textAlign = 'center';
     ctx.fillText('Camera Off', canvas.width / 2, canvas.height / 2);
   };
@@ -54,7 +61,6 @@ function createDummyStream() {
   setInterval(drawBlank, 1000);
 
   const videoStream = canvas.captureStream(10);
-
   const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   const ds = audioCtx.createMediaStreamDestination();
   const silentAudio = ds.stream.getAudioTracks()[0];
@@ -64,62 +70,17 @@ function createDummyStream() {
 }
 
 function init() {
-  // No forced camera start required
   document.querySelector('#hangupBtn').addEventListener('click', hangUp);
   document.querySelector('#createBtn').addEventListener('click', () => createRoom(true));
   document.querySelector('#joinBtn').addEventListener('click', () => createRoom(false));
   document.querySelector('#micBtn').addEventListener('click', toggleMic);
   document.querySelector('#camBtn').addEventListener('click', toggleCam);
   document.querySelector('#blurBtn').addEventListener('click', toggleBlur);
-
-  // Custom Modal Logic (Optional, for legacy compatibility)
-  const dialog = document.querySelector('#room-dialog');
-  if (dialog) {
-    roomDialog = {
-      open: () => dialog.classList.add('active'),
-      close: () => dialog.classList.remove('active')
-    };
-    dialog.querySelectorAll('[data-mdc-dialog-action]').forEach(btn => {
-      btn.addEventListener('click', () => roomDialog.close());
-    });
-  }
-
-  const shareDlg = document.querySelector('#share-dialog');
-  if (shareDlg) {
-    const shareDialogObj = {
-      open: () => shareDlg.classList.add('active'),
-      close: () => shareDlg.classList.remove('active')
-    };
-    shareDlg.querySelectorAll('[data-mdc-dialog-action]').forEach(btn => {
-      btn.addEventListener('click', () => shareDialogObj.close());
-    });
-
-    const shareBtn = document.querySelector('#shareBtn');
-    if (shareBtn) {
-      shareBtn.addEventListener('click', () => {
-        const inviteLink = `${window.location.origin}/${roomId}`;
-        const linkInput = document.querySelector('#share-link');
-        if (linkInput) {
-          linkInput.value = inviteLink;
-          linkInput.select();
-          navigator.clipboard.writeText(inviteLink).then(() => {
-            console.log('Invite link copied to clipboard');
-          }).catch(err => {
-            console.error('Failed to copy text: ', err);
-          });
-        }
-        shareDialogObj.open();
-      });
-    }
-  }
-
-  // Chat Panel Modals
-  document.querySelector('#toggleChatBtn').addEventListener('click', () => {
-    document.querySelector('#chat-panel').classList.toggle('active');
-  });
-  document.querySelector('#closeChatBtn').addEventListener('click', () => {
-    document.querySelector('#chat-panel').classList.remove('active');
-  });
+  document.querySelector('#screenShareBtn').addEventListener('click', toggleScreenShare);
+  document.querySelector('#peopleBtn').addEventListener('click', () => toggleSidePanel('participants'));
+  document.querySelector('#toggleChatBtn').addEventListener('click', () => toggleSidePanel('chat'));
+  document.querySelector('#closeChatBtn').addEventListener('click', closeSidePanel);
+  document.querySelector('#closeParticipantsBtn').addEventListener('click', closeSidePanel);
 
   document.querySelector('#chat-form').addEventListener('submit', (e) => {
     e.preventDefault();
@@ -136,7 +97,17 @@ function init() {
     }
   });
 
-  // Init dummy stream instantly so WebRTC can connect without permissions
+  const dialog = document.querySelector('#room-dialog');
+  if (dialog) {
+    roomDialog = {
+      open: () => dialog.classList.add('active'),
+      close: () => dialog.classList.remove('active')
+    };
+    dialog.querySelectorAll('[data-mdc-dialog-action]').forEach(btn => {
+      btn.addEventListener('click', () => roomDialog.close());
+    });
+  }
+
   localStream = createDummyStream();
   rawLocalStream = localStream;
   document.querySelector('#hangupBtn').disabled = false;
@@ -156,15 +127,15 @@ function init() {
 
   const urlParams = new URLSearchParams(window.location.search);
   const rtcRoomId = urlParams.get('roomId');
-  const rtcRole = urlParams.get('role');
+  rtcRole = urlParams.get('role') || '';
   let rtcState = urlParams.get('state');
+  rtcMentorName = urlParams.get('mentorName') || '';
+  rtcStudentName = urlParams.get('studentName') || '';
 
   if (rtcRoomId) {
     const grBtn = document.querySelector('#greenRoomJoinBtn');
 
-    // Automatically start real media for the green room
     toggleRealMedia().then(() => {
-      // Attach local stream to the preview box safely
       const previewContainer = document.querySelector('#video-preview');
       const previewVideo = document.createElement('video');
       previewVideo.autoplay = true;
@@ -172,7 +143,6 @@ function init() {
       previewVideo.srcObject = localStream;
       previewContainer.appendChild(previewVideo);
 
-      // Setup icons syncing
       setInterval(() => {
         const btnMic = document.querySelector('#micBtn i').innerText;
         const btnCam = document.querySelector('#camBtn i').innerText;
@@ -206,19 +176,124 @@ function init() {
       grBtn.disabled = true;
       grBtn.innerText = 'Joining...';
 
-      // Notify parent Next.js app to update backend state
       if (rtcRole === "mentor") {
         window.parent.postMessage({ type: "MEETING_STARTED" }, "*");
       }
 
       await joinRoom(rtcRoomId);
 
-      // Hide Green Room, show Main Meeting
       document.querySelector('#green-room').classList.remove('active');
       document.querySelector('#main-meeting').style.display = 'flex';
+      startSessionTimer();
     }, { once: true });
   }
 }
+
+/* ── Side Panel Management ─────────────────────────── */
+
+function toggleSidePanel(panel) {
+  const sidePanel = document.querySelector('#side-panel');
+  const chatTab = document.querySelector('#chat-panel');
+  const participantsTab = document.querySelector('#participants-tab');
+  const chatBtn = document.querySelector('#toggleChatBtn');
+  const peopleBtn = document.querySelector('#peopleBtn');
+
+  if (activeSidePanel === panel) {
+    closeSidePanel();
+    return;
+  }
+
+  activeSidePanel = panel;
+  sidePanel.style.display = 'flex';
+
+  if (panel === 'chat') {
+    chatTab.style.display = 'flex';
+    participantsTab.style.display = 'none';
+    chatBtn.classList.add('active-panel');
+    peopleBtn.classList.remove('active-panel');
+  } else if (panel === 'participants') {
+    chatTab.style.display = 'none';
+    participantsTab.style.display = 'flex';
+    chatBtn.classList.remove('active-panel');
+    peopleBtn.classList.add('active-panel');
+    updateParticipantsList();
+  }
+}
+
+function closeSidePanel() {
+  document.querySelector('#side-panel').style.display = 'none';
+  activeSidePanel = null;
+  document.querySelector('#toggleChatBtn').classList.remove('active-panel');
+  document.querySelector('#peopleBtn').classList.remove('active-panel');
+}
+
+function updateParticipantsList() {
+  const list = document.querySelector('#participants-list');
+  if (!list) return;
+  list.innerHTML = '';
+
+  const localName = rtcRole === 'mentor' ? rtcMentorName : rtcStudentName;
+  addParticipantItem(list, localName || 'You', rtcRole, true);
+
+  if (Object.keys(peerConnections).length > 0) {
+    const remoteName = rtcRole === 'mentor' ? rtcStudentName : rtcMentorName;
+    const remoteRole = rtcRole === 'mentor' ? 'student' : 'mentor';
+    addParticipantItem(list, remoteName || 'Participant', remoteRole, false);
+  }
+}
+
+function addParticipantItem(container, name, role, isLocal) {
+  const item = document.createElement('div');
+  item.className = 'participant-item';
+
+  const avatar = document.createElement('div');
+  avatar.className = 'participant-avatar';
+  avatar.textContent = name.charAt(0).toUpperCase();
+
+  const info = document.createElement('div');
+  info.className = 'participant-info';
+
+  const displayName = document.createElement('div');
+  displayName.className = 'participant-display-name';
+  displayName.textContent = isLocal ? `${name} (You)` : name;
+
+  const roleTag = document.createElement('div');
+  roleTag.className = 'participant-role-tag';
+  roleTag.textContent = role ? role.charAt(0).toUpperCase() + role.slice(1) : '';
+
+  info.appendChild(displayName);
+  info.appendChild(roleTag);
+  item.appendChild(avatar);
+  item.appendChild(info);
+  container.appendChild(item);
+}
+
+/* ── Session Timer ─────────────────────────────────── */
+
+function startSessionTimer() {
+  sessionStartTime = Date.now();
+  const timerEl = document.querySelector('#sessionTimer');
+  if (!timerEl) return;
+
+  sessionTimerInterval = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
+    const hrs = Math.floor(elapsed / 3600);
+    const mins = Math.floor((elapsed % 3600) / 60);
+    const secs = elapsed % 60;
+    timerEl.textContent = hrs > 0
+      ? `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
+      : `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  }, 1000);
+}
+
+function stopSessionTimer() {
+  if (sessionTimerInterval) {
+    clearInterval(sessionTimerInterval);
+    sessionTimerInterval = null;
+  }
+}
+
+/* ── Mic / Cam Toggles ─────────────────────────────── */
 
 function toggleMic() {
   if (!isRealMediaActive) {
@@ -228,8 +303,17 @@ function toggleMic() {
   const audioTrack = localStream.getAudioTracks()[0];
   if (audioTrack) {
     audioTrack.enabled = !audioTrack.enabled;
-    const btnIcon = document.querySelector('#micBtn i');
-    btnIcon.innerText = audioTrack.enabled ? 'mic' : 'mic_off';
+    const btn = document.querySelector('#micBtn');
+    const icon = btn.querySelector('i');
+    const label = btn.querySelector('.ctrl-btn-label');
+    icon.innerText = audioTrack.enabled ? 'mic' : 'mic_off';
+    if (audioTrack.enabled) {
+      btn.classList.remove('muted');
+      if (label) label.textContent = 'Mute';
+    } else {
+      btn.classList.add('muted');
+      if (label) label.textContent = 'Unmute';
+    }
   }
 }
 
@@ -241,10 +325,82 @@ function toggleCam() {
   const videoTrack = localStream.getVideoTracks()[0];
   if (videoTrack) {
     videoTrack.enabled = !videoTrack.enabled;
-    const btnIcon = document.querySelector('#camBtn i');
-    btnIcon.innerText = videoTrack.enabled ? 'videocam' : 'videocam_off';
+    const btn = document.querySelector('#camBtn');
+    const icon = btn.querySelector('i');
+    const label = btn.querySelector('.ctrl-btn-label');
+    icon.innerText = videoTrack.enabled ? 'videocam' : 'videocam_off';
+    if (videoTrack.enabled) {
+      btn.classList.remove('muted');
+      if (label) label.textContent = 'Stop';
+    } else {
+      btn.classList.add('muted');
+      if (label) label.textContent = 'Start';
+    }
   }
 }
+
+/* ── Screen Share ──────────────────────────────────── */
+
+async function toggleScreenShare() {
+  if (!isScreenSharing) {
+    try {
+      screenShareStream = await navigator.mediaDevices.getDisplayMedia({
+        video: { cursor: 'always' },
+        audio: false
+      });
+
+      const screenTrack = screenShareStream.getVideoTracks()[0];
+      preScreenShareStream = localStream;
+
+      Object.values(peerConnections).forEach(pcStub => {
+        const sender = pcStub.pc.getSenders().find(s => s.track && s.track.kind === 'video');
+        if (sender) sender.replaceTrack(screenTrack).catch(e => console.error(e));
+      });
+
+      isScreenSharing = true;
+      const btn = document.querySelector('#screenShareBtn');
+      btn.classList.add('sharing');
+      btn.querySelector('i').innerText = 'cancel_presentation';
+      const label = btn.querySelector('.ctrl-btn-label');
+      if (label) label.textContent = 'Stop';
+
+      screenTrack.onended = () => stopScreenShare();
+    } catch (err) {
+      console.log('Screen share cancelled or failed:', err);
+    }
+  } else {
+    stopScreenShare();
+  }
+}
+
+function stopScreenShare() {
+  if (!isScreenSharing) return;
+
+  if (screenShareStream) {
+    screenShareStream.getTracks().forEach(t => t.stop());
+    screenShareStream = null;
+  }
+
+  const restoreStream = preScreenShareStream || localStream;
+  const videoTrack = restoreStream.getVideoTracks()[0];
+
+  Object.values(peerConnections).forEach(pcStub => {
+    const sender = pcStub.pc.getSenders().find(s => s.track && s.track.kind === 'video');
+    if (sender && videoTrack) sender.replaceTrack(videoTrack).catch(e => console.error(e));
+  });
+
+  localStream = restoreStream;
+  preScreenShareStream = null;
+  isScreenSharing = false;
+
+  const btn = document.querySelector('#screenShareBtn');
+  btn.classList.remove('sharing');
+  btn.querySelector('i').innerText = 'present_to_all';
+  const label = btn.querySelector('.ctrl-btn-label');
+  if (label) label.textContent = 'Share';
+}
+
+/* ── Real Media Toggle (preserved) ─────────────────── */
 
 async function toggleRealMedia() {
   if (isRealMediaActive) return;
@@ -258,8 +414,6 @@ async function toggleRealMedia() {
     rawLocalStream = stream;
 
     if (isBlurEnabled) {
-      // Background blur currently handling video, we let toggleBlur restart it if we were to support it
-      // Let's just reset the local stream safely
       localStream = stream;
       isBlurEnabled = false;
       document.querySelector('#blurBtn i').innerText = 'blur_on';
@@ -283,11 +437,20 @@ async function toggleRealMedia() {
     const micIcon = document.querySelector('#micBtn i');
     micIcon.innerText = 'mic';
 
+    document.querySelector('#micBtn').classList.remove('muted');
+    document.querySelector('#camBtn').classList.remove('muted');
+    const micLabel = document.querySelector('#micBtn .ctrl-btn-label');
+    if (micLabel) micLabel.textContent = 'Mute';
+    const camLabel = document.querySelector('#camBtn .ctrl-btn-label');
+    if (camLabel) camLabel.textContent = 'Stop';
+
   } catch (err) {
     console.error('Failed to get user media', err);
     alert('Failed to access camera and microphone.');
   }
 }
+
+/* ── Remote Audio / Kick (preserved) ───────────────── */
 
 function toggleRemoteAudio(uid) {
   const videoElement = document.getElementById(`video-${uid}`);
@@ -295,7 +458,8 @@ function toggleRemoteAudio(uid) {
     videoElement.muted = !videoElement.muted;
     const btn = document.getElementById(`mute-btn-${uid}`);
     if (btn) {
-      btn.innerText = videoElement.muted ? 'volume_off' : 'volume_up';
+      const icon = btn.querySelector('i');
+      if (icon) icon.innerText = videoElement.muted ? 'volume_off' : 'volume_up';
       if (videoElement.muted) btn.classList.add('muted');
       else btn.classList.remove('muted');
     }
@@ -303,11 +467,13 @@ function toggleRemoteAudio(uid) {
 }
 
 async function kickParticipant(uid) {
-  if (confirm(`Are you sure you want to kick participant ${uid}?`)) {
+  if (confirm('Remove this participant?')) {
     const db = firebase.firestore();
     await db.collection('rooms').doc(roomId).collection('participants').doc(uid).delete();
   }
 }
+
+/* ── Room Creation / Joining (signaling preserved) ─── */
 
 async function createRoom(isCreator) {
   if (isCreator) {
@@ -346,13 +512,8 @@ async function joinRoom(id = null) {
 
   document.querySelector('#createBtn').disabled = true;
   document.querySelector('#joinBtn').disabled = true;
-  document.querySelector('#currentRoom').innerText = `Current room is ${roomId}`;
-
-  const shareBtn = document.querySelector('#shareBtn');
-  if (shareBtn) {
-    shareBtn.style.display = isHost ? 'inline-flex' : 'none';
-  }
-  document.querySelector('#toggleChatBtn').style.display = 'inline-flex';
+  document.querySelector('#currentRoom').innerText = roomId;
+  console.log('Current room:', roomId);
 
   localUid = Math.random().toString(36).substring(7);
   console.log('My local UID:', localUid);
@@ -424,6 +585,8 @@ async function joinRoom(id = null) {
   });
 }
 
+/* ── Signaling Handlers (unchanged) ────────────────── */
+
 async function handleParticipant(remoteUid, participantsRef) {
   if (localUid < remoteUid) {
     console.log(`I (${localUid}) am calling ${remoteUid}`);
@@ -476,6 +639,8 @@ async function handleCandidate(remoteUid, candidateData) {
   }
 }
 
+/* ── Chat (preserved, with name display) ───────────── */
+
 function displayChatMessage(sender, text, isLocal) {
   const messagesDiv = document.querySelector('#chat-messages');
   if (!messagesDiv) return;
@@ -485,7 +650,8 @@ function displayChatMessage(sender, text, isLocal) {
   if (!isLocal) {
     const nameSpan = document.createElement('span');
     nameSpan.className = 'chat-sender-name';
-    nameSpan.innerText = `User ${sender.substring(0, 4)}`;
+    const remoteName = rtcRole === 'mentor' ? rtcStudentName : rtcMentorName;
+    nameSpan.innerText = remoteName || `User ${sender.substring(0, 4)}`;
     wrapper.appendChild(nameSpan);
   }
 
@@ -495,6 +661,8 @@ function displayChatMessage(sender, text, isLocal) {
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
+/* ── Peer Connection (unchanged) ───────────────────── */
+
 function createPeerConnection(remoteUid, participantsRef) {
   const pc = new RTCPeerConnection(configuration);
 
@@ -502,7 +670,6 @@ function createPeerConnection(remoteUid, participantsRef) {
     pc.addTrack(track, localStream);
   });
 
-  // Setup DataChannel for Chat
   const chatChannel = pc.createDataChannel('chat');
   chatChannels[remoteUid] = chatChannel;
   chatChannel.onmessage = (event) => {
@@ -542,28 +709,35 @@ function createPeerConnection(remoteUid, participantsRef) {
   return pc;
 }
 
+/* ── Video Element Management (redesigned) ─────────── */
+
 function addVideoElement(uid, stream, isLocal) {
-  const videoContainer = document.querySelector('#videos');
-
-  const div = document.createElement('div');
-  div.className = 'video-container';
-  div.id = `container-${uid}`;
-
-  const video = document.createElement('video');
-  video.id = `video-${uid}`;
-  video.autoplay = true;
-  video.playsInline = true;
-  video.srcObject = stream;
   if (isLocal) {
+    const pip = document.querySelector('#self-pip');
+    const video = document.createElement('video');
+    video.id = `video-${uid}`;
+    video.autoplay = true;
+    video.playsInline = true;
     video.muted = true;
-  }
+    video.srcObject = stream;
+    const label = pip.querySelector('.pip-label');
+    pip.insertBefore(video, label);
+  } else {
+    const container = document.querySelector('#remote-video-container');
+    const placeholder = document.querySelector('#remote-placeholder');
+    if (placeholder) placeholder.style.display = 'none';
 
-  div.appendChild(video);
+    const video = document.createElement('video');
+    video.id = `video-${uid}`;
+    video.autoplay = true;
+    video.playsInline = true;
+    video.srcObject = stream;
+    container.appendChild(video);
 
-  const controlsDiv = document.createElement('div');
-  controlsDiv.className = 'video-controls';
+    const controlsDiv = document.createElement('div');
+    controlsDiv.className = 'video-controls';
+    controlsDiv.id = `controls-${uid}`;
 
-  if (!isLocal) {
     const muteBtn = document.createElement('button');
     muteBtn.className = 'control-btn';
     muteBtn.title = 'Mute Audio';
@@ -577,8 +751,8 @@ function addVideoElement(uid, stream, isLocal) {
 
     if (isHost) {
       const kickBtn = document.createElement('button');
-      kickBtn.className = 'control-btn kick-btn';
-      kickBtn.title = 'Kick Participant';
+      kickBtn.className = 'control-btn';
+      kickBtn.title = 'Remove';
       const kickIcon = document.createElement('i');
       kickIcon.className = 'material-icons';
       kickIcon.innerText = 'person_remove';
@@ -586,67 +760,18 @@ function addVideoElement(uid, stream, isLocal) {
       kickBtn.addEventListener('click', () => kickParticipant(uid));
       controlsDiv.appendChild(kickBtn);
     }
-  }
 
-  if (!isLocal || (isLocal && isHost)) {
-    div.appendChild(controlsDiv);
-  }
+    container.appendChild(controlsDiv);
 
-  videoContainer.appendChild(div);
-
-  // Make element draggable
-  makeDraggable(div);
-}
-
-function makeDraggable(element) {
-  let isDragging = false;
-  let currentX;
-  let currentY;
-  let initialX;
-  let initialY;
-  let xOffset = 0;
-  let yOffset = 0;
-
-  element.addEventListener("mousedown", dragStart);
-  document.addEventListener("mouseup", dragEnd);
-  document.addEventListener("mousemove", drag);
-
-  function dragStart(e) {
-    if (e.target.closest('.video-controls')) return; // Allow clicking buttons
-
-    initialX = e.clientX - xOffset;
-    initialY = e.clientY - yOffset;
-
-    if (e.target === element || element.contains(e.target)) {
-      isDragging = true;
-      element.classList.add('dragging');
-      // Ensure absolute position if not already
-      // element.style.position = 'absolute'; // Optional: if we want free float from grid
+    const remoteLabel = document.querySelector('#remote-label');
+    const remoteName = document.querySelector('#remoteParticipantName');
+    if (remoteLabel) remoteLabel.style.display = '';
+    if (remoteName) {
+      const name = rtcRole === 'mentor' ? rtcStudentName : rtcMentorName;
+      remoteName.textContent = name || `User ${uid.substring(0, 4)}`;
     }
-  }
 
-  function dragEnd(e) {
-    initialX = currentX;
-    initialY = currentY;
-    isDragging = false;
-    element.classList.remove('dragging');
-  }
-
-  function drag(e) {
-    if (isDragging) {
-      e.preventDefault();
-      currentX = e.clientX - initialX;
-      currentY = e.clientY - initialY;
-
-      xOffset = currentX;
-      yOffset = currentY;
-
-      setTranslate(currentX, currentY, element);
-    }
-  }
-
-  function setTranslate(xPos, yPos, el) {
-    el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
+    if (activeSidePanel === 'participants') updateParticipantsList();
   }
 }
 
@@ -655,13 +780,29 @@ function removeParticipant(remoteUid) {
     peerConnections[remoteUid].pc.close();
     delete peerConnections[remoteUid];
   }
-  const videoContainer = document.getElementById(`container-${remoteUid}`);
-  if (videoContainer) {
-    videoContainer.remove();
+
+  const video = document.getElementById(`video-${remoteUid}`);
+  if (video) video.remove();
+  const controls = document.getElementById(`controls-${remoteUid}`);
+  if (controls) controls.remove();
+
+  const container = document.querySelector('#remote-video-container');
+  if (container && !container.querySelector('video')) {
+    const placeholder = document.querySelector('#remote-placeholder');
+    if (placeholder) placeholder.style.display = '';
+    const remoteLabel = document.querySelector('#remote-label');
+    if (remoteLabel) remoteLabel.style.display = 'none';
   }
+
+  if (activeSidePanel === 'participants') updateParticipantsList();
 }
 
+/* ── Hang Up (updated for new DOM) ─────────────────── */
+
 async function hangUp(e) {
+  stopSessionTimer();
+  if (isScreenSharing) stopScreenShare();
+
   if (animationId) {
     cancelAnimationFrame(animationId);
     animationId = null;
@@ -674,9 +815,7 @@ async function hangUp(e) {
   }
 
   const tracks = localStream.getTracks();
-  tracks.forEach(track => {
-    track.stop();
-  });
+  tracks.forEach(track => track.stop());
 
   Object.keys(chatChannels).forEach(uid => {
     if (chatChannels[uid]) chatChannels[uid].close();
@@ -688,8 +827,25 @@ async function hangUp(e) {
     await db.collection('rooms').doc(roomId).collection('participants').doc(localUid).delete();
   }
 
-  document.querySelector('#videos').innerHTML = '';
-  document.querySelector('#cameraBtn').disabled = false;
+  const remoteContainer = document.querySelector('#remote-video-container');
+  if (remoteContainer) {
+    remoteContainer.querySelectorAll('video').forEach(v => v.remove());
+    remoteContainer.querySelectorAll('.video-controls').forEach(c => c.remove());
+    const placeholder = document.querySelector('#remote-placeholder');
+    if (placeholder) placeholder.style.display = '';
+  }
+
+  const pip = document.querySelector('#self-pip');
+  if (pip) {
+    const pipVideo = pip.querySelector('video');
+    if (pipVideo) pipVideo.remove();
+  }
+
+  const remoteLabel = document.querySelector('#remote-label');
+  if (remoteLabel) remoteLabel.style.display = 'none';
+
+  closeSidePanel();
+
   document.querySelector('#joinBtn').disabled = true;
   document.querySelector('#createBtn').disabled = true;
   document.querySelector('#hangupBtn').disabled = true;
@@ -697,12 +853,12 @@ async function hangUp(e) {
   document.querySelector('#camBtn').disabled = true;
   document.querySelector('#blurBtn').disabled = true;
   document.querySelector('#currentRoom').innerText = '';
-  document.querySelector('#greenRoomJoinBtn').style.display = 'none';
-  document.querySelector('#greenRoomJoinBtn').disabled = false;
-  document.querySelector('#greenRoomJoinBtn').innerHTML = '<i class="material-icons left">meeting_room</i><span class="btn-text">Join Meeting</span>';
 
-  const shareBtn = document.querySelector('#shareBtn');
-  if (shareBtn) shareBtn.style.display = 'none';
+  const greenRoomBtn = document.querySelector('#greenRoomJoinBtn');
+  if (greenRoomBtn) {
+    greenRoomBtn.style.display = 'none';
+    greenRoomBtn.disabled = false;
+  }
 
   const path = window.location.pathname.slice(1);
   if (path) {
@@ -711,6 +867,8 @@ async function hangUp(e) {
     document.location.reload(true);
   }
 }
+
+/* ── Background Blur (preserved) ───────────────────── */
 
 async function initBlur() {
   return new Promise((resolve, reject) => {

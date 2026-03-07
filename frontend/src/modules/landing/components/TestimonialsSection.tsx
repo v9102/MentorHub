@@ -81,14 +81,25 @@ export default function TestimonialsSection() {
                 <div className="absolute top-[40%] left-[20%] w-[600px] h-[600px] bg-blue-100/40 rounded-full blur-[100px] mix-blend-multiply" />
             </div>
 
-            <div className="container mx-auto px-4 max-w-6xl relative z-10">
-                <div className="text-center mb-20">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl relative z-10">
+                <div className="text-center mb-16 max-w-3xl mx-auto">
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className="inline-block mb-4"
+                    >
+                        <span className="text-blue-700 font-bold tracking-wider uppercase text-xs px-3 py-1 rounded-full bg-blue-50 border border-blue-100">
+                            Testimonials
+                        </span>
+                    </motion.div>
+
                     <motion.h2
                         initial={{ opacity: 0, y: 16 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-                        className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 mb-6 leading-[1.1]"
+                        className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 leading-[1.1]"
                     >
                         Success Stories
                     </motion.h2>
@@ -97,7 +108,7 @@ export default function TestimonialsSection() {
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.08, duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
                         viewport={{ once: true }}
-                        className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed"
+                        className="mt-6 text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed"
                     >
                         Real results from determined aspirants backed by expert guidance.
                     </motion.p>

@@ -23,9 +23,9 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
                     <Image
                         src="/mentomanialogo.png"
                         alt="MentoMania"
-                        width={200}
-                        height={44}
-                        className="h-10 w-auto object-contain drop-shadow-sm"
+                        width={564}
+                        height={124}
+                        className="h-[124px] w-auto object-contain drop-shadow-sm"
                     />
                 </Link>
 

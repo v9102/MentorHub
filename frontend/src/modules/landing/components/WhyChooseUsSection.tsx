@@ -52,15 +52,15 @@ export default function WhyChooseUsSection() {
                 <div className="absolute bottom-[10%] right-[-10%] w-[40%] h-[40%] bg-indigo-50/60 rounded-full blur-[100px] mix-blend-multiply" />
             </div>
 
-            <div className="container mx-auto px-4 relative z-10 max-w-6xl">
-                <div className="text-center mb-20 max-w-3xl mx-auto">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 max-w-6xl">
+                <div className="text-center mb-16 max-w-3xl mx-auto">
                     <span className="text-blue-700 font-bold tracking-wider uppercase text-xs px-3 py-1 rounded-full bg-blue-50 border border-blue-100">
                         Why Choose MentoMania
                     </span>
-                    <h2 className="mt-8 text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 leading-[1.1] mb-6">
+                    <h2 className="mt-8 text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 leading-[1.1]">
                         From Scattered to <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Structured</span>
                     </h2>
-                    <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+                    <p className="mt-6 text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
                         Stop wasting time on random videos and outdated material. Get a personalized roadmap from those who have already reached the destination.
                     </p>
                 </div>

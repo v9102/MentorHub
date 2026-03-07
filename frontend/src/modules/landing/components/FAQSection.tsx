@@ -37,8 +37,8 @@ export default function FAQSection() {
                 <div className="absolute -bottom-[20%] -left-[10%] w-[600px] h-[600px] bg-indigo-50/60 rounded-full blur-[100px] mix-blend-multiply" />
             </div>
 
-            <div className="container mx-auto px-4 max-w-4xl relative z-10">
-                <div className="text-center mb-20">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl relative z-10">
+                <div className="text-center mb-16 max-w-3xl mx-auto">
                     <span className="text-blue-700 font-bold tracking-wider uppercase text-xs px-3 py-1 rounded-full bg-blue-50 border border-blue-100">
                         FAQ
                     </span>
@@ -47,16 +47,16 @@ export default function FAQSection() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-                        className="mt-8 text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 leading-[1.1] mb-6"
+                        className="mt-8 text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 leading-[1.1]"
                     >
                         Frequently Asked Questions
                     </motion.h2>
-                    <p className="text-lg text-gray-600 max-w-xl mx-auto leading-relaxed">
+                    <p className="mt-6 text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
                         Everything you need to know about simple booking, pricing, and mentorship.
                     </p>
                 </div>
 
-                <div className="space-y-4 mb-20">
+                <div className="space-y-4 mb-20 max-w-3xl mx-auto">
                     {faqs.map((faq, index) => (
                         <FAQItem key={index} question={faq.question} answer={faq.answer} index={index} />
                     ))}
@@ -68,7 +68,7 @@ export default function FAQSection() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-                    className="bg-gray-50/80 backdrop-blur-sm rounded-3xl p-10 md:p-12 text-center border border-gray-100 shadow-sm"
+                    className="bg-gray-50/80 backdrop-blur-sm rounded-3xl p-10 md:p-12 text-center border border-gray-100 shadow-sm max-w-3xl mx-auto"
                 >
                     <div className="flex justify-center -space-x-2 mb-4">
                         {[1, 2, 3].map((i) => (

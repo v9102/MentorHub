@@ -16,10 +16,10 @@ export default function Footer() {
               <Image
                 src="/mentomanialogo.png"
                 alt="MentoMania"
-                width={200}
-                height={44}
+                width={564}
+                height={124}
                 className="w-auto object-contain"
-                style={{ height: '44px' }}
+                style={{ height: '124px' }}
                 priority
               />
             </Link>
