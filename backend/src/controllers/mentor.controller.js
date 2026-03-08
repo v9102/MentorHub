@@ -21,7 +21,7 @@ export const getMentors = async (req, res) => {
     const [mentors, totalMentors] = await Promise.all([
       User.find(filter)
         .sort({ createdAt: -1 })
-        .select("name username imageUrl mentorProfile.basicInfo mentorProfile.pricing mentorProfile.rating")
+        .select("name username imageUrl mentorProfile.basicInfo mentorProfile.professionalInfo mentorProfile.expertise mentorProfile.examDetails mentorProfile.languages mentorProfile.pricing mentorProfile.rating mentorProfile.verification mentorProfile.bio")
         .skip(skip)
         .limit(limit)
         .lean(),
